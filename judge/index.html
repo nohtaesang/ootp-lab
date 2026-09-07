@@ -22,7 +22,7 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.45;word-break:keep-all}
-.app{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100vh;gap:10px;padding:10px 14px 0}
+.app{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;height:100vh;gap:10px;padding:10px 14px 0}
 header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 h1{font-size:18px;margin:0;font-weight:600}
 .sub{font-size:12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
@@ -37,6 +37,13 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--
 .prog small{font-size:13px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
 .prog .n{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;min-width:44px}
 .prog .n.done{color:var(--accent)}
+button.small{padding:4px 10px;font-size:13px}
+.checklist{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:12px 18px;font-size:14px;max-height:46vh;overflow:auto}
+.checklist .chead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.checklist ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
+.checklist li{margin:0 0 6px;break-inside:avoid}
+.checklist li b{font-weight:700;margin-right:4px}
+.checklist li i{color:var(--muted);font-style:normal;font-size:12px;margin-left:4px}
 .cols{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(440px,1.35fr) minmax(320px,1fr);gap:12px;min-height:0}
 @media (max-width:1100px){.app{height:auto}.cols{grid-template-columns:1fr}.card{overflow:visible}}
 .card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;min-height:0;overflow:auto}
@@ -210,8 +217,26 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     <h1>드래프트 선수 판정</h1>
     <div class="batch" id="batch"></div>
   </div>
-  <div class="sub"><kbd>[</kbd> <kbd>]</kbd> 나이 · <kbd>←</kbd> <kbd>→</kbd> 이전/다음</div>
+  <div style="display:flex;gap:14px;align-items:center"><button id="showcheck" class="small">무엇을 보면 되나요</button><div class="sub"><kbd>[</kbd> <kbd>]</kbd> 나이 · <kbd>←</kbd> <kbd>→</kbd> 이전/다음</div></div>
 </header>
+<div class="checklist" id="checklist" hidden>
+  <div class="chead"><b>판정할 때 이걸 봐요</b><button id="hidecheck" class="small">닫기</button></div>
+  <ol>
+    <li><b>재능이 몸과 맞나</b> 재능은 소질 7개에서 나와요. 몸보다 유난히 앞서면 "특이점"이 떠요. <i>재능 · 소질 보기</i></li>
+    <li><b>다 크면 재능에 닿나</b> 전성기 능력 ≈ 재능 × 프로의식. 프로의식이 낮으면 "다 크면"이 천장보다 낮아요. <i>요약 띠 · 열지도</i></li>
+    <li><b>능력마다 크는 나이가 달라요</b> 발(주력·수비 범위) 정점 25·하락 28 빠름 / 팔(구속) 26·29 / 힘(파워·송구 강도) 28·31 / 지구력(체력·회복력) 27·31 / 기술(컨택·제구·변화량·포구·송구·번트·도루·블로킹·견제·퀵모션) 29·33 느림 / 판단(선구안·주루 판단) 30·36 아주 느림. <i>열지도</i></li>
+    <li><b>성장 유형이 곡선과 맞나</b> 라벨은 곡선에서 재요. "N세에 전성기, M세부터 하락" 문장과 차트의 선이 같아야 해요. <i>히든 성장 · 차트</i></li>
+    <li><b>히든이 드러나나</b> 프로의식 → 다 크면 높이. 부상·디셉션·슬라이딩은 아직 곡선에 안 들어가요. <i>히든</i></li>
+    <li><b>주 역할이 맞나</b> 타자·투수 중 천장 잠재가 뚜렷이 높은 쪽. 육성 버튼으로 반대쪽도 비교해 보세요. <i>이름 옆</i></li>
+    <li><b>포지션이 맞나</b> 주 = 적성(수비·어깨·스피드·판단 + 체격 + 감각) 최고. 부 = 적성 14↑ 최대 3개. 수비 못하면 좌익·우익·1루. 숫자는 익숙함/적성. <i>그라운드 그림</i></li>
+    <li><b>구종이 폼·회전과 맞나</b> 사이드암 싱커·슬라이더, 외회전 슬라이더·커브, 내회전 체인지업·스플리터. 변화구 ≤ 직구. 직구 최고는 표 맨 위. <i>구종 표</i></li>
+    <li><b>수준 말이 맞나</b> 리그 정상급·1군 주전급·백업·2군급은 OVR 문턱이고, 10이 프로 전체 평균(임시). <i>요약 띠</i></li>
+    <li><b>30대 하락이 자연스러운가</b> 3번 속도대로. 40세까지 안 떨어지면 이상해요. <i>차트 · 열지도</i></li>
+    <li><b>이런 선수가 얼마나 흔해야 하나</b> 아직 목표가 없어요. 느낌만 적어도 돼요.</li>
+    <li><b>대조 쌍·재검</b> 같은 몸에 프로의식만 다른 둘, 이전 지적이 고쳐졌는지(점선 = 고치기 전). <i>배지</i></li>
+  </ol>
+  <p class="hint">태그 대응: 성장 3·4·5 · 노화 10 · 구속 8·9 · 재능 대비 1·2 · 구종 8 · 수비 7</p>
+</div>
 
 <div class="cols">
 <section class="card" id="s1">
@@ -291,7 +316,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '155e49c 2026-09-07';
+  const BUILD = '01fe486 2026-09-07';
   const BATCH = (entries.find(e => !e.preset && !e.recheck && !e.contrast) || entries[0]).key.replace(/^[dc](\d+)-.*$/, 'b$1');
   const BATCH_SIZE = 10, PER_ROLE = 5;
 
@@ -665,6 +690,10 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   }
   $('copynew').addEventListener('click', copyUnsent);
   $('buildtag').textContent = '빌드 ' + BUILD;
+  $('showcheck').addEventListener('click', () => { $('checklist').hidden = !$('checklist').hidden; });
+  $('hidecheck').addEventListener('click', () => { $('checklist').hidden = true; });
+  // 처음 한 번은 펼쳐서 보여 준다
+  try { if (!localStorage.getItem('draft-judge-checklist-seen')) { $('checklist').hidden = false; localStorage.setItem('draft-judge-checklist-seen', '1'); } } catch (e) {}
   $('copyall').addEventListener('click', async () => {
     if (!records.length) { status('아직 기록이 없어요.', 'err'); return; }
     const ok = await copyText(records.map(judgmentText).join('\n\n'));
