@@ -1074,6 +1074,9 @@ input:focus, select:focus{
     bindRouteLinks(el);
     if (parts[0] === 'players') bindPlayersFilters(el);
     if (parts[0] === 'selection') bindSelection(el, parts[1] || 'lineup');
+    if (parts[0] === 'player' && parts[1]) bindPlayerDetail(el, parseInt(parts[1], 10));
+    if (parts[0] === 'staff' && !parts[1]) bindStaffFilters(el);
+    if (parts[0] === 'training') bindTraining(el);
   }
 
   function bindRouteLinks(root){
@@ -1180,9 +1183,45 @@ input:focus, select:focus{
     });
   }
 
+  // 개인 훈련 라디오 옵션
+  const IND_TRAININGS = [
+    { key:'none',    label:'없음' },
+    { key:'contact', label:'컨택 집중', category:'bat' },
+    { key:'power',   label:'파워 집중', category:'body' },
+    { key:'speed',   label:'주력 집중', category:'body' },
+    { key:'defense', label:'수비 집중', category:'field' },
+    { key:'control', label:'제구 집중', category:'pitch' },
+    { key:'velocity',label:'구속 집중', category:'body' },
+    { key:'body',    label:'몸 만들기', category:'body' },
+    { key:'rehab',   label:'재활',     category:null },
+  ];
+  const IND_KEY = pid => `indiv:${pid}`;
+  function loadIndiv(pid){
+    try { return JSON.parse(localStorage.getItem(IND_KEY(pid))) || ['none','none']; }
+    catch { return ['none','none']; }
+  }
+  function saveIndiv(pid, arr){ try { localStorage.setItem(IND_KEY(pid), JSON.stringify(arr)); } catch {} }
+
   function viewPlayer(id){
     const p = POOL.players.find(x => String(x.id) === id);
     if (!p) return `<div class="placeholder">선수 ${id} 없음</div>`;
+
+    // 헤더 정보 카드
+    const foreignBadge = p.foreign ? `<span style="font-size:var(--text-xs);color:var(--text-muted);padding:2px 6px;border:1px solid var(--border);border-radius:var(--radius-s);margin-left:8px">외국인</span>` : '';
+    const headerCards = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:var(--size-8);margin-bottom:var(--size-16)">
+      ${[
+        ['등번호', `#${p.number}`],
+        ['포지션', p.position],
+        ['나이', `${p.age}세`],
+        ['좌우', `${p.throws}/${p.bats}`],
+        ['현재 (OVR)', p.ovr],
+        ['재능', p.talent_avg],
+      ].map(([k,v]) => `<div style="padding:var(--size-10) var(--size-12);border:1px solid var(--border);border-radius:var(--radius-s);background:var(--bg-secondary)">
+        <div style="font-size:var(--text-xxs);color:var(--text-muted);letter-spacing:var(--tracking-wide);text-transform:uppercase;margin-bottom:2px">${k}</div>
+        <div style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--text-normal);font-size:var(--text-md)">${v}</div>
+      </div>`).join('')}
+    </div>`;
+
     const groupsHtml = ['bat','run','field','pitch','body'].map(g => {
       const items = POOL.ability_labels.filter(a => a[2] === g);
       if (!items.length) return '';
@@ -1196,16 +1235,30 @@ input:focus, select:focus{
         <div class="abilities">${inner}</div>
       </div>`;
     }).join('');
+
+    // 개인 훈련 편집
+    const indiv = loadIndiv(p.id);
+    const trainingSlots = [0,1].map(slotIdx => {
+      const cur = indiv[slotIdx];
+      const opts = IND_TRAININGS.map(t => `<option value="${t.key}" ${cur===t.key?'selected':''}>${t.label}</option>`).join('');
+      return `<div style="display:flex;align-items:center;gap:var(--size-8);margin-bottom:var(--size-6)">
+        <span style="font-size:var(--text-xs);color:var(--text-muted);width:60px">자리 ${slotIdx+1}</span>
+        <select data-indiv-slot="${slotIdx}" style="flex:1;max-width:280px">${opts}</select>
+      </div>`;
+    }).join('');
+
     return `
-      <h1 class="page-title">${p.name}</h1>
-      <p class="page-sub">${p.role} · ${p.age}세 · 재능 ${p.talent_avg}</p>
+      <h1 class="page-title">${p.name}${foreignBadge}</h1>
+      <p class="page-sub">${p.role} · ${p.position} · ${p.age}세</p>
+      ${headerCards}
       <div class="card">
         <h2 class="section-title">능력</h2>
         ${groupsHtml}
       </div>
       <div class="card">
-        <h2 class="section-title">개인 훈련</h2>
-        <div class="placeholder">편집 UI · 다음 이터레이션</div>
+        <h2 class="section-title">개인 훈련 (자리 2)</h2>
+        ${trainingSlots}
+        <p style="font-size:var(--text-xs);color:var(--text-faint);margin-top:8px">브라우저에 저장. 매치엔진/성장 코어 연결은 다음 이터레이션.</p>
       </div>
       <div class="card">
         <h2 class="section-title">성장 곡선</h2>
@@ -1213,25 +1266,119 @@ input:focus, select:focus{
       </div>`;
   }
 
+  function bindPlayerDetail(el, pid){
+    el.querySelectorAll('[data-indiv-slot]').forEach(sel => {
+      sel.addEventListener('change', e => {
+        const slot = parseInt(sel.dataset.indivSlot, 10);
+        const cur = loadIndiv(pid);
+        cur[slot] = e.target.value;
+        saveIndiv(pid, cur);
+      });
+    });
+  }
+
+  // 스태프 상태
+  const staffState = { search:'', kind:'all', sortBy:'kind', sortDir:'asc' };
+
+  // 직책별 주 능력
+  const KIND_MAIN_ABILITY = {
+    manager: 'motivation',
+    bat_coach: 'bat_training',
+    pitch_coach: 'pitch_training',
+    field_coach: 'field_training',
+    run_coach: 'run_training',
+    body_coach: 'body_training',
+    youth_coach: 'youth_development',
+    gm: 'motivation',
+  };
+  const MAIN_ABILITY_LABEL = {
+    motivation:'동기',
+    bat_training:'타격',
+    pitch_training:'투구',
+    field_training:'수비',
+    run_training:'주루',
+    body_training:'체력',
+    youth_development:'유소년',
+  };
+
   function viewStaffList(){
-    const rows = POOL.staff.map(s => `
-      <div class="dlist-row" data-route="/staff/${s.id}" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr">
+    const st = staffState;
+    let items = POOL.staff.slice();
+    if (st.kind !== 'all') items = items.filter(s => s.kind === st.kind);
+    if (st.search) {
+      const q = st.search.toLowerCase();
+      items = items.filter(s => s.name.toLowerCase().includes(q));
+    }
+    const mainOf = s => s.abilities[KIND_MAIN_ABILITY[s.kind] || 'motivation'] || 1;
+    const keyFn = (s, by) => {
+      if (by === 'kind') return KIND_LABELS[s.kind] || s.kind;
+      if (by === 'main') return mainOf(s);
+      if (by === 'motiv') return s.abilities.motivation || 1;
+      return s.name;
+    };
+    items = sortRows(items, st.sortBy, st.sortDir, keyFn);
+
+    const th = (key, label) => {
+      const active = st.sortBy === key;
+      const arrow = !active ? '↕' : (st.sortDir === 'asc' ? '↑' : '↓');
+      return `<span class="sort-th ${active?'active':''}" data-sort="${key}">${label}<span class="sort-indicator">${arrow}</span></span>`;
+    };
+
+    const rows = items.map(s => {
+      const mainKey = KIND_MAIN_ABILITY[s.kind] || 'motivation';
+      const mainVal = s.abilities[mainKey] || 1;
+      const mainLabel = MAIN_ABILITY_LABEL[mainKey] || '';
+      return `<div class="dlist-row" data-route="/staff/${s.id}" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr">
         <div class="cell-primary">${s.name}</div>
         <div>${KIND_LABELS[s.kind] || s.kind}</div>
-        <div class="cell-num">—</div>
+        <div class="cell-num">${mainLabel} ${mainVal}</div>
         <div class="cell-num">${s.abilities.motivation || '-'}</div>
         <div class="cell-num">—</div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
+
+    const kinds = Array.from(new Set(POOL.staff.map(s => s.kind)));
+    const kindOpts = ['<option value="all">전체 직책</option>']
+      .concat(kinds.map(k => `<option value="${k}" ${st.kind===k?'selected':''}>${KIND_LABELS[k]||k}</option>`))
+      .join('');
+
     return `
       <div class="filterbar">
-        <span class="count">${POOL.staff.length}명</span>
+        <input type="search" class="search" placeholder="이름 검색" value="${st.search}" id="staff-search">
+        <select id="staff-kind">${kindOpts}</select>
+        <span class="count">${items.length} / ${POOL.staff.length}</span>
       </div>
       <div class="dlist">
         <div class="dlist-row head" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr">
-          <div>이름</div><div>직책</div><div>주 능력</div><div>동기</div><div>배치</div>
+          <div>${th('name','이름')}</div>
+          <div>${th('kind','직책')}</div>
+          <div>${th('main','주 능력')}</div>
+          <div>${th('motiv','동기')}</div>
+          <div>배치</div>
         </div>
         ${rows}
       </div>`;
+  }
+
+  function bindStaffFilters(el){
+    const search = el.querySelector('#staff-search');
+    if (search) search.addEventListener('input', e => {
+      staffState.search = e.target.value;
+      renderContent(activeTab().route);
+      const s = document.getElementById('staff-search');
+      if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
+    });
+    const kindSel = el.querySelector('#staff-kind');
+    if (kindSel) kindSel.addEventListener('change', e => {
+      staffState.kind = e.target.value;
+      renderContent(activeTab().route);
+    });
+    el.querySelectorAll('.sort-th').forEach(t => t.addEventListener('click', () => {
+      const key = t.dataset.sort;
+      if (staffState.sortBy === key) staffState.sortDir = staffState.sortDir === 'asc' ? 'desc' : 'asc';
+      else { staffState.sortBy = key; staffState.sortDir = 'asc'; }
+      renderContent(activeTab().route);
+    }));
   }
 
   function viewStaff(id){
@@ -1242,11 +1389,22 @@ input:focus, select:focus{
       run_training:'주루·작전 훈련', body_training:'체력 훈련',
       youth_development:'유소년 육성', motivation:'동기 부여',
     };
-    const abInner = Object.entries(labels).map(([k,l]) =>
-      `<div class="ability">
-        <span class="ability-label">${l}</span>
+    const mainKey = KIND_MAIN_ABILITY[s.kind] || 'motivation';
+    const abInner = Object.entries(labels).map(([k,l]) => {
+      const isMain = k === mainKey;
+      return `<div class="ability" style="${isMain?'border-color:var(--accent)':''}">
+        <span class="ability-label">${l}${isMain?' <span style="font-size:var(--text-xxs);color:var(--accent);margin-left:4px">MAIN</span>':''}</span>
         <span class="ability-value">${s.abilities[k] || 1}</span>
-      </div>`).join('');
+      </div>`;
+    }).join('');
+
+    // 현재 배치 (훈련 슬롯 편집 상태에서 읽음)
+    const trainAssign = loadTrainingAssign();
+    const assignedCat = Object.entries(trainAssign).find(([cat, sid]) => sid === s.id);
+    const assignedText = assignedCat
+      ? `${CATEGORIES_TRAIN.find(c=>c.key===assignedCat[0])?.label || assignedCat[0]} 슬롯에 배치됨`
+      : '현재 배치 없음';
+
     return `
       <h1 class="page-title">${s.name}</h1>
       <p class="page-sub">${KIND_LABELS[s.kind] || s.kind}</p>
@@ -1256,7 +1414,8 @@ input:focus, select:focus{
       </div>
       <div class="card">
         <h2 class="section-title">배치</h2>
-        <div class="placeholder">실제 슬롯 연결 · 다음 이터레이션</div>
+        <p style="font-size:var(--text-sm);color:var(--text-normal)">${assignedText}</p>
+        <p style="font-size:var(--text-xs);color:var(--text-faint);margin-top:6px">배치 편집은 <a class="crumb" style="display:inline;padding:2px 4px" data-route="/training">훈련</a>에서.</p>
       </div>`;
   }
 
