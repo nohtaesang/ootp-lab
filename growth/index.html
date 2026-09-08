@@ -33,9 +33,9 @@ thead th{background:var(--card);color:var(--muted);font-weight:500;font-size:12p
 th.name,td.name{text-align:left;font-family:inherit;color:var(--ink);position:sticky;left:0;background:var(--card);z-index:3;width:120px;padding-left:0;font-weight:500}
 thead th.name{z-index:4}
 tr.g th{text-align:left;padding-top:12px;color:var(--muted);font-size:11px;letter-spacing:.04em;border-bottom:0;font-weight:600;background:var(--card)}
-td.val .top{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:15px;color:var(--ink);line-height:1.2}
-td.val .top .arrow{color:var(--muted);margin:0 2px;font-weight:400}
-td.val .deltas{display:flex;justify-content:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;line-height:1.4;margin-top:2px;min-height:14px}
+td.val .top{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;color:var(--ink);line-height:1.2}
+td.val .top .arrow{color:var(--muted);margin:0 2px;font-weight:400;font-size:11px}
+td.val .deltas{display:flex;justify-content:center;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:500;line-height:1.4;margin-top:2px;min-height:14px;flex-wrap:wrap}
 td.val .d{white-space:nowrap}
 .legend{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.7}
 .legend b{color:var(--ink);font-weight:600}
@@ -59,8 +59,8 @@ td.val .d{white-space:nowrap}
   <h2>능력 × 나이 (성장기 위주)</h2>
   <div class="grid"><table id="grid"></table></div>
   <p class="legend">
-    각 셀 위 숫자가 <b>표시값</b>(1~20). 시나리오 하나만 켜면 <b>기본→시나리오값</b>이 위에 나오고, 여러 개 켜면 기본값만 나온다. 아래 작은 숫자는 시나리오별 <b>기본 대비 내부 차이</b>로 색으로 구분한다.<br>
-    파워·주력·구속·체력 같은 신체 능력은 <b>천장까지 가는 속도만</b> 요인이 바꾸고 천장은 못 넘는다. 초반 나이에 조금 빨리 도달하지만 정점 뒤엔 같은 값에 붙는다.
+    각 셀 위 숫자는 <b>표시값</b>(1~20). 시나리오 표시값이 기본과 다르면 <b>기본→시나리오값</b>이 나오고, 여러 시나리오는 화살표 뒤에 색깔로 나란히 붙는다. 아래 작은 숫자는 시나리오별 <b>기본 대비 내부 차이</b>.<br>
+    파워·주력·구속·체력 같은 신체 능력은 <b>천장까지 가는 속도만</b> 요인이 바꾸고 천장(재능값)은 못 넘는다. 지금 표준 선수는 재능 15 균등이라 신체 정점이 12쯤이고 18~19세에 이미 그 근처에 붙는다. 그래서 파워 집중을 켜도 표시값 차이가 잘 안 나게 되어 있음 — 재능이 더 높은 유망주였다면 차이가 오래 보인다.
   </p>
 </div>
 </div>
@@ -70,7 +70,7 @@ td.val .d{white-space:nowrap}
 (function(){
   const pool = JSON.parse(document.getElementById('pool').textContent);
   const AGES = pool.scenarios[0].ages.map(a => a.age);
-  const SHOW = [16, 18, 20, 22, 24, 26, 28, 30];
+  const SHOW = [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
   const abilities = pool.ability_labels;
   const SET_NAMES = {bat:'타격', run:'주루', field:'수비', pitch:'투구', common:'공통'};
   const groups = ['bat','run','field','pitch','common'];
@@ -95,7 +95,7 @@ td.val .d{white-space:nowrap}
     const base = pool.scenarios.find(s => s.id === 'baseline');
     const active = OPTIONAL.filter(s => selected.has(s.id));
     const ageIdx = a => AGES.indexOf(a);
-    let head = '<colgroup><col style="width:120px">' + SHOW.map(() => '<col style="width:80px">').join('') + '</colgroup>';
+    let head = '<colgroup><col style="width:100px">' + SHOW.map(() => '<col style="width:60px">').join('') + '</colgroup>';
     head += '<thead><tr><th class="name">능력</th>' + SHOW.map(a => `<th>${a}세</th>`).join('') + '</tr></thead><tbody>';
     let body = '';
     for (const g of groups) {
@@ -107,28 +107,22 @@ td.val .d{white-space:nowrap}
         for (const a of SHOW) {
           const baseAbil = base.ages[ageIdx(a)].abilities[id];
           const baseDisp = base.ages[ageIdx(a)].display[id];
+          const scResults = active.map(sc => {
+            const v = sc.ages[ageIdx(a)].abilities[id];
+            return { sc, v, vd: sc.ages[ageIdx(a)].display[id], diff: v - baseAbil };
+          });
+          const anyDispDiff = scResults.some(r => r.vd !== baseDisp);
           let top;
-          if (active.length === 1) {
-            const sc = active[0];
-            const v = sc.ages[ageIdx(a)].abilities[id];
-            const vd = sc.ages[ageIdx(a)].display[id];
-            const diff = v - baseAbil;
-            if (Math.abs(diff) < 0.1 && vd === baseDisp) {
-              top = `${baseDisp}`;
-            } else if (vd === baseDisp) {
-              top = `${baseDisp}`;
-            } else {
-              top = `${baseDisp}<span class="arrow">→</span><span style="color:${sc.color}">${vd}</span>`;
-            }
-          } else {
+          if (!active.length || !anyDispDiff) {
             top = `${baseDisp}`;
+          } else {
+            const parts = scResults.map(r => r.vd === baseDisp ? `<span style="color:var(--muted)">${r.vd}</span>` : `<span style="color:${r.sc.color}">${r.vd}</span>`).join(' ');
+            top = `${baseDisp}<span class="arrow">→</span>${parts}`;
           }
-          const deltas = active.map(sc => {
-            const v = sc.ages[ageIdx(a)].abilities[id];
-            const diff = v - baseAbil;
-            if (Math.abs(diff) < 0.1) return '';
-            const sign = diff > 0 ? '+' : '';
-            return `<span class="d" style="color:${sc.color}">${sign}${diff.toFixed(1)}</span>`;
+          const deltas = scResults.map(r => {
+            if (Math.abs(r.diff) < 0.1) return '';
+            const sign = r.diff > 0 ? '+' : '';
+            return `<span class="d" style="color:${r.sc.color}">${sign}${r.diff.toFixed(1)}</span>`;
           }).filter(Boolean).join('');
           body += `<td class="val"><div class="top">${top}</div><div class="deltas">${deltas}</div></td>`;
         }
