@@ -5,13 +5,11 @@
 :root{
   --bg:#F3F6F4;--card:#FFFFFF;--ink:#1B2A24;--muted:#66766E;--rule:#D5DCD7;--soft:#E9EFEB;
   --accent:#1F6F4A;--accent-ink:#FFFFFF;--accent-soft:#DDEFE4;
-  --base:#66766E;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
     --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;
-    --base:#90A6B9;
   }
 }
 *{box-sizing:border-box}
@@ -30,20 +28,15 @@ h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .scenarios .swatch{display:inline-block;width:14px;height:14px;border-radius:3px}
 .grid{overflow-x:auto}
 table{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;table-layout:fixed;width:100%;min-width:900px}
-th,td{padding:5px 6px;border-bottom:1px solid var(--soft);white-space:nowrap;text-align:center}
+th,td{padding:8px 6px;border-bottom:1px solid var(--soft);white-space:nowrap;text-align:center;vertical-align:middle}
 thead th{background:var(--card);color:var(--muted);font-weight:500;font-size:12px;position:sticky;top:0;z-index:2}
-th.name,td.name{text-align:left;font-family:inherit;color:var(--ink);position:sticky;left:0;background:var(--card);z-index:3;width:130px;padding-left:0}
+th.name,td.name{text-align:left;font-family:inherit;color:var(--ink);position:sticky;left:0;background:var(--card);z-index:3;width:120px;padding-left:0;font-weight:500}
 thead th.name{z-index:4}
-tr.g th{text-align:left;padding-top:10px;color:var(--muted);font-size:11px;letter-spacing:.04em;border-bottom:0;font-weight:600;background:var(--card)}
-td.val{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:15px}
-td.val small{display:block;font-size:10px;font-weight:500;line-height:1.2;margin-top:0}
-tr.base td.val{color:var(--ink)}
-tr.base td.val small{color:var(--muted)}
-tr.sc td.name{padding-left:12px;font-size:12px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:6px;padding-top:6px;padding-bottom:6px}
-tr.sc td.name .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
-tr.sc td.val small{font-weight:400}
-tr.sc td.eq{color:var(--muted);opacity:.45}
-tr.sc td.eq small{color:transparent}
+tr.g th{text-align:left;padding-top:12px;color:var(--muted);font-size:11px;letter-spacing:.04em;border-bottom:0;font-weight:600;background:var(--card)}
+td.val .top{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:15px;color:var(--ink);line-height:1.2}
+td.val .top .arrow{color:var(--muted);margin:0 2px;font-weight:400}
+td.val .deltas{display:flex;justify-content:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;line-height:1.4;margin-top:2px;min-height:14px}
+td.val .d{white-space:nowrap}
 .legend{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.7}
 .legend b{color:var(--ink);font-weight:600}
 </style>
@@ -66,7 +59,7 @@ tr.sc td.eq small{color:transparent}
   <h2>능력 × 나이 (성장기 위주)</h2>
   <div class="grid"><table id="grid"></table></div>
   <p class="legend">
-    각 능력마다 <b>기본</b>이 첫 줄이고, 켠 시나리오가 아래로 한 줄씩 붙는다. 숫자는 표시값(1~20), 아래 작은 숫자는 기본 대비 내부 차이. 값은 시나리오 색으로 표시된다.<br>
+    각 셀 위 숫자가 <b>표시값</b>(1~20). 시나리오 하나만 켜면 <b>기본→시나리오값</b>이 위에 나오고, 여러 개 켜면 기본값만 나온다. 아래 작은 숫자는 시나리오별 <b>기본 대비 내부 차이</b>로 색으로 구분한다.<br>
     파워·주력·구속·체력 같은 신체 능력은 <b>천장까지 가는 속도만</b> 요인이 바꾸고 천장은 못 넘는다. 초반 나이에 조금 빨리 도달하지만 정점 뒤엔 같은 값에 붙는다.
   </p>
 </div>
@@ -77,7 +70,6 @@ tr.sc td.eq small{color:transparent}
 (function(){
   const pool = JSON.parse(document.getElementById('pool').textContent);
   const AGES = pool.scenarios[0].ages.map(a => a.age);
-  // 성장기 위주: 16~30 짝수
   const SHOW = [16, 18, 20, 22, 24, 26, 28, 30];
   const abilities = pool.ability_labels;
   const SET_NAMES = {bat:'타격', run:'주루', field:'수비', pitch:'투구', common:'공통'};
@@ -101,10 +93,9 @@ tr.sc td.eq small{color:transparent}
 
   function renderGrid(){
     const base = pool.scenarios.find(s => s.id === 'baseline');
-    const active = OPTIONAL.filter(s => selected.has(s.id));  // 사이드바 순서 유지 → 흔들림 없음
+    const active = OPTIONAL.filter(s => selected.has(s.id));
     const ageIdx = a => AGES.indexOf(a);
-    // 열: 이름 + 나이들
-    let head = '<colgroup><col style="width:130px">' + SHOW.map(() => '<col style="width:66px">').join('') + '</colgroup>';
+    let head = '<colgroup><col style="width:120px">' + SHOW.map(() => '<col style="width:80px">').join('') + '</colgroup>';
     head += '<thead><tr><th class="name">능력</th>' + SHOW.map(a => `<th>${a}세</th>`).join('') + '</tr></thead><tbody>';
     let body = '';
     for (const g of groups) {
@@ -112,30 +103,36 @@ tr.sc td.eq small{color:transparent}
       if (!list.length) continue;
       body += `<tr class="g"><th class="name">${SET_NAMES[g]}</th>` + SHOW.map(() => '<th></th>').join('') + `</tr>`;
       for (const [id, label] of list) {
-        // 기본 줄
-        body += `<tr class="base"><td class="name">${label}</td>`;
+        body += `<tr><td class="name">${label}</td>`;
         for (const a of SHOW) {
-          const b = base.ages[ageIdx(a)];
-          body += `<td class="val">${b.display[id]}</td>`;
-        }
-        body += '</tr>';
-        // 시나리오 줄들
-        for (const sc of active) {
-          body += `<tr class="sc"><td class="name"><span class="dot" style="background:${sc.color}"></span>${sc.label.split('(')[0].trim()}</td>`;
-          for (const a of SHOW) {
-            const b = base.ages[ageIdx(a)].abilities[id];
+          const baseAbil = base.ages[ageIdx(a)].abilities[id];
+          const baseDisp = base.ages[ageIdx(a)].display[id];
+          let top;
+          if (active.length === 1) {
+            const sc = active[0];
             const v = sc.ages[ageIdx(a)].abilities[id];
             const vd = sc.ages[ageIdx(a)].display[id];
-            const diff = v - b;
-            if (Math.abs(diff) < 0.1) {
-              body += `<td class="val eq">${vd}<small>·</small></td>`;
+            const diff = v - baseAbil;
+            if (Math.abs(diff) < 0.1 && vd === baseDisp) {
+              top = `${baseDisp}`;
+            } else if (vd === baseDisp) {
+              top = `${baseDisp}`;
             } else {
-              const sign = diff > 0 ? '+' : '';
-              body += `<td class="val" style="color:${sc.color}">${vd}<small style="color:${sc.color}">${sign}${diff.toFixed(1)}</small></td>`;
+              top = `${baseDisp}<span class="arrow">→</span><span style="color:${sc.color}">${vd}</span>`;
             }
+          } else {
+            top = `${baseDisp}`;
           }
-          body += `</tr>`;
+          const deltas = active.map(sc => {
+            const v = sc.ages[ageIdx(a)].abilities[id];
+            const diff = v - baseAbil;
+            if (Math.abs(diff) < 0.1) return '';
+            const sign = diff > 0 ? '+' : '';
+            return `<span class="d" style="color:${sc.color}">${sign}${diff.toFixed(1)}</span>`;
+          }).filter(Boolean).join('');
+          body += `<td class="val"><div class="top">${top}</div><div class="deltas">${deltas}</div></td>`;
         }
+        body += '</tr>';
       }
     }
     $('grid').innerHTML = head + body + '</tbody>';
