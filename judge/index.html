@@ -204,7 +204,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
 .verdict button{height:40px;padding:0 14px;font-weight:600;font-size:15px}
 .verdict button[aria-pressed="true"]{background:var(--bar-accent);color:var(--bar-accent-ink);border-color:var(--bar-accent)}
 .verdict button[data-v="odd"][aria-pressed="true"],.verdict button[data-v="odd_other"][aria-pressed="true"]{background:var(--lo);border-color:var(--lo);color:#fff}
-.chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-height:40px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;align-items:flex-end;min-height:40px}
 .chips button{height:32px;padding:0 12px;font-size:13px;border-radius:999px}
 .chips button[aria-pressed="true"]{background:var(--bar-accent);color:var(--bar-accent-ink);border-color:var(--bar-accent)}
 .actions{display:flex;gap:6px;align-items:stretch;flex-wrap:wrap}
@@ -322,7 +322,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'b40dcd3 2026-09-08';
+  const BUILD = 'afcce2b 2026-09-08';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
