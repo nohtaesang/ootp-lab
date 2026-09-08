@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>OOTP Game (v1 스켈레톤)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ============ 디자인 토큰 (원시 값 하드코드 금지 — ADR 0012) ============ */
+:root{
+  --bg:#F3F6F4; --card:#FFFFFF; --ink:#1B2A24; --muted:#66766E;
+  --rule:#D5DCD7; --soft:#E9EFEB; --hover:#E9EFEB;
+  --accent:#1F6F4A; --accent-ink:#FFFFFF; --accent-soft:#DDEFE4;
+  --pos:#1F6F4A; --neg:#B4463C;
+  --sidebar-w: 200px;
+  --sidebar-w-collapsed: 56px;
+  --tabbar-h: 36px;
+  --header-h: 44px;
+  --nav-h: 34px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101B24; --card:#16232E; --ink:#E4ECE7; --muted:#90A6B9;
+    --rule:#304453; --soft:#1C2A36; --hover:#22323F;
+    --accent:#A6EDB6; --accent-ink:#0F2418; --accent-soft:#1E3A2C;
+    --pos:#7ED89A; --neg:#E28A80;
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  font-size:14px; line-height:1.4;
+  overflow:hidden;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent}
+a{color:inherit;text-decoration:none}
+
+/* ============ 앱 셸 ============ */
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;grid-template-rows:1fr;height:100vh}
+.app.sidebar-collapsed{grid-template-columns:var(--sidebar-w-collapsed) 1fr}
+
+/* --- 사이드바 --- */
+.sidebar{
+  background:var(--card); border-right:1px solid var(--rule);
+  display:flex; flex-direction:column; padding:8px 0;
+}
+.sidebar .brand{
+  display:flex; align-items:center; gap:8px; padding:10px 14px 14px;
+  font-weight:700; font-size:15px;
+}
+.sidebar .brand .logo{font-size:18px}
+.app.sidebar-collapsed .sidebar .brand-name{display:none}
+.sidebar .items{display:flex;flex-direction:column;flex:1;gap:2px;padding:0 8px}
+.sidebar .item{
+  display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border-radius:6px;
+  color:var(--muted); font-size:13.5px; font-weight:500;
+  transition:background .12s;
+}
+.sidebar .item:hover{background:var(--hover)}
+.sidebar .item.active{background:var(--accent-soft); color:var(--accent); font-weight:600}
+.sidebar .item .icon{font-size:16px;width:20px;text-align:center;flex:0 0 auto}
+.app.sidebar-collapsed .sidebar .item-label{display:none}
+.app.sidebar-collapsed .sidebar .item{justify-content:center;padding:9px 0}
+.sidebar .footer{padding:8px;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--soft)}
+.sidebar .footer .season{
+  padding:6px 12px; font-family:"IBM Plex Mono",monospace; font-size:12px;
+  color:var(--muted);
+}
+.app.sidebar-collapsed .sidebar .footer .season{display:none}
+.sidebar .footer .btn{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 10px; border-radius:6px; font-size:13px;
+  background:var(--soft); color:var(--ink); font-weight:500;
+}
+.sidebar .footer .btn:hover{background:var(--hover)}
+.app.sidebar-collapsed .sidebar .footer .btn{padding:8px;justify-content:center}
+.app.sidebar-collapsed .sidebar .footer .btn-label{display:none}
+.sidebar .toggle{
+  padding:8px 10px; border-radius:6px; font-size:13px; color:var(--muted);
+  display:flex;align-items:center;gap:8px;
+}
+.sidebar .toggle:hover{background:var(--hover);color:var(--ink)}
+
+/* --- 우측 메인 --- */
+.main{display:grid;grid-template-rows:var(--header-h) var(--tabbar-h) var(--nav-h) 1fr;min-width:0;overflow:hidden}
+
+/* 헤더 (글로벌) */
+.header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px; border-bottom:1px solid var(--rule);
+  background:var(--card);
+}
+.header .title{font-size:13px;color:var(--muted);font-weight:500}
+.header .right{display:flex;align-items:center;gap:8px}
+.header .settings{padding:6px 8px;border-radius:5px;color:var(--muted)}
+.header .settings:hover{background:var(--hover);color:var(--ink)}
+
+/* 탭바 */
+.tabbar{
+  display:flex; align-items:end; padding:0 8px;
+  border-bottom:1px solid var(--rule); background:var(--bg);
+  overflow-x:auto; scrollbar-width:none;
+}
+.tabbar::-webkit-scrollbar{display:none}
+.tab{
+  display:flex; align-items:center; gap:6px;
+  padding:6px 8px 6px 12px; margin-right:2px;
+  border-radius:6px 6px 0 0; height:calc(var(--tabbar-h) - 4px);
+  font-size:12.5px; color:var(--muted); font-weight:500;
+  border:1px solid transparent; border-bottom:0;
+  max-width:180px; min-width:80px; white-space:nowrap;
+}
+.tab:hover{background:var(--soft);color:var(--ink)}
+.tab.active{background:var(--card);color:var(--ink);border-color:var(--rule);position:relative;top:1px}
+.tab .icon{font-size:13px}
+.tab .name{overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.tab .close{
+  opacity:0; width:16px;height:16px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;
+  color:var(--muted);
+}
+.tab:hover .close, .tab.active .close{opacity:1}
+.tab .close:hover{background:var(--rule);color:var(--ink)}
+.tab-new{padding:6px 10px;color:var(--muted);border-radius:5px;font-size:16px;line-height:1;height:26px;align-self:center}
+.tab-new:hover{background:var(--soft);color:var(--ink)}
+
+/* Tab Navigation Bar */
+.navbar{
+  display:flex; align-items:center; gap:8px;
+  padding:0 12px; border-bottom:1px solid var(--rule);
+  background:var(--card); font-size:12.5px;
+}
+.navbar .navbtn{
+  padding:4px 6px;border-radius:4px;color:var(--muted);
+  display:inline-flex;align-items:center;justify-content:center;min-width:22px;
+}
+.navbar .navbtn:hover{background:var(--hover);color:var(--ink)}
+.navbar .navbtn:disabled{opacity:.3;cursor:not-allowed}
+.navbar .navbtn:disabled:hover{background:transparent}
+.navbar .crumbs{display:flex;align-items:center;gap:6px;overflow:hidden;flex:1;min-width:0}
+.navbar .crumb{color:var(--muted);white-space:nowrap;padding:2px 4px;border-radius:3px}
+.navbar .crumb:hover{color:var(--ink);background:var(--hover)}
+.navbar .crumb.last{color:var(--ink);font-weight:600;pointer-events:none}
+.navbar .crumb.last:hover{background:transparent}
+.navbar .sep{color:var(--muted);font-size:11px;opacity:.6}
+
+/* 콘텐츠 */
+.content{overflow:auto;padding:20px 24px;min-width:0}
+.content h1{font-size:22px;margin:0 0 4px;font-weight:700}
+.content .sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+
+/* 공통 UI */
+.card{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px 18px;margin-bottom:14px}
+.card h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+
+/* 선수/스태프 리스트 */
+.list{background:var(--card);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.list .row{
+  display:grid; grid-template-columns:2fr 1fr 1fr 1.5fr;
+  padding:11px 16px; border-bottom:1px solid var(--soft);
+  align-items:center; gap:12px; cursor:pointer;
+}
+.list .row:last-child{border-bottom:0}
+.list .row:hover{background:var(--hover)}
+.list .row.head{
+  background:var(--soft); font-size:11px; text-transform:uppercase;
+  color:var(--muted); font-weight:600; letter-spacing:.05em;
+  cursor:default; padding:8px 16px;
+}
+.list .row.head:hover{background:var(--soft)}
+.list .row .name{font-weight:600;color:var(--ink)}
+.list .row .name.link{color:var(--accent)}
+.list .row .stars{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
+
+/* 능력 그리드 */
+.abilities{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.abilities .ability{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:6px 10px; border-radius:5px; background:var(--soft);
+  font-size:12.5px;
+}
+.abilities .ability .lab{color:var(--muted)}
+.abilities .ability .val{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.set-group{margin-bottom:14px}
+.set-group h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:600}
+
+/* 훈련 화면 */
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.slot{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
+.slot h3{margin:0 0 8px;font-size:14px}
+.slot select{
+  width:100%;padding:6px 8px;border-radius:5px;
+  border:1px solid var(--rule);background:var(--bg);color:var(--ink);
+  font-size:13px;font-family:inherit;
+}
+.slot .stars{margin-top:8px;font-size:12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+
+.placeholder{color:var(--muted);font-size:13px;padding:20px 0;text-align:center;font-style:italic}
+</style>
+</head><body>
+<div class="app" id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="logo">⚾</span>
+      <span class="brand-name">OOTP</span>
+    </div>
+    <div class="items" id="sidebar-items"></div>
+    <div class="footer">
+      <div class="season">2026 시즌</div>
+      <button class="btn" onclick="advanceYear()">
+        <span class="btn-label">+1년</span>
+        <span>→</span>
+      </button>
+      <button class="toggle" onclick="toggleSidebar()">
+        <span>↔</span>
+        <span class="btn-label">접기</span>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="header">
+      <span class="title" id="doc-title">게임 앱 v1 스켈레톤 (실사용 후 ADR 확정)</span>
+      <div class="right"><button class="settings" title="설정">⚙</button></div>
+    </header>
+    <div class="tabbar" id="tabbar"></div>
+    <div class="navbar">
+      <button class="navbtn" id="nav-back" title="뒤로">←</button>
+      <button class="navbtn" id="nav-forward" title="앞으로">→</button>
+      <div class="crumbs" id="crumbs"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script id="pool" type="application/json">{"config":"default","ability_labels":[["eye","선구안","bat"],["contact","컨택","bat"],["power","파워","body"],["bunt","번트","bat"],["speed","주력","body"],["steal","도루 기술","run"],["baserun","주루 판단","run"],["range","수비 범위","field"],["glove","포구","field"],["arm_str","송구 강도","field"],["arm_acc","송구 정확도","field"],["block","블로킹","field"],["transfer","송구 동작","field"],["stamina","체력","body"],["pickoff","견제","pitch"],["quick","퀵모션","pitch"],["control","제구","pitch"],["velocity","구속","body"],["movement","변화량","pitch"],["recovery","회복력","body"]],"players":[{"id":1001,"name":"김민수","age":20,"role":"야수","talent_avg":14,"ability_display":{"arm_acc":10,"arm_str":10,"baserun":9,"block":9,"bunt":8,"contact":9,"control":5,"eye":9,"glove":10,"movement":5,"pickoff":5,"power":12,"quick":4,"range":11,"recovery":13,"speed":10,"stamina":11,"steal":7,"transfer":10,"velocity":13}},{"id":1002,"name":"박준호","age":24,"role":"야수","talent_avg":13,"ability_display":{"arm_acc":9,"arm_str":8,"baserun":7,"block":9,"bunt":8,"contact":7,"control":4,"eye":8,"glove":7,"movement":4,"pickoff":4,"power":8,"quick":6,"range":12,"recovery":10,"speed":13,"stamina":9,"steal":9,"transfer":10,"velocity":10}},{"id":1003,"name":"이현우","age":27,"role":"투수","talent_avg":14,"ability_display":{"arm_acc":5,"arm_str":5,"baserun":7,"block":7,"bunt":8,"contact":7,"control":11,"eye":8,"glove":6,"movement":10,"pickoff":10,"power":6,"quick":10,"range":7,"recovery":4,"speed":6,"stamina":6,"steal":5,"transfer":5,"velocity":7}},{"id":1004,"name":"정성훈","age":22,"role":"투수","talent_avg":9,"ability_display":{"arm_acc":2,"arm_str":6,"baserun":4,"block":3,"bunt":3,"contact":3,"control":8,"eye":3,"glove":3,"movement":4,"pickoff":8,"power":5,"quick":8,"range":5,"recovery":5,"speed":5,"stamina":5,"steal":5,"transfer":3,"velocity":7}},{"id":1005,"name":"최영재","age":19,"role":"야수","talent_avg":15,"ability_display":{"arm_acc":11,"arm_str":8,"baserun":6,"block":10,"bunt":10,"contact":10,"control":7,"eye":7,"glove":9,"movement":8,"pickoff":7,"power":9,"quick":6,"range":8,"recovery":9,"speed":6,"stamina":9,"steal":8,"transfer":11,"velocity":8}}],"staff":[{"id":1,"name":"박감독","kind":"manager","abilities":{"bat_training":1,"body_training":1,"field_training":1,"motivation":15,"pitch_training":1,"run_training":1,"youth_development":1}},{"id":2,"name":"김타격","kind":"bat_coach","abilities":{"bat_training":17,"body_training":1,"field_training":1,"motivation":13,"pitch_training":1,"run_training":1,"youth_development":1}},{"id":3,"name":"이투수","kind":"pitch_coach","abilities":{"bat_training":1,"body_training":1,"field_training":1,"motivation":11,"pitch_training":15,"run_training":1,"youth_development":1}},{"id":4,"name":"정수비","kind":"field_coach","abilities":{"bat_training":1,"body_training":1,"field_training":12,"motivation":10,"pitch_training":1,"run_training":1,"youth_development":1}},{"id":5,"name":"장주루","kind":"run_coach","abilities":{"bat_training":1,"body_training":1,"field_training":1,"motivation":12,"pitch_training":1,"run_training":13,"youth_development":1}},{"id":6,"name":"홍체력","kind":"body_coach","abilities":{"bat_training":1,"body_training":16,"field_training":1,"motivation":9,"pitch_training":1,"run_training":1,"youth_development":1}},{"id":7,"name":"송유소년","kind":"youth_coach","abilities":{"bat_training":1,"body_training":1,"field_training":1,"motivation":14,"pitch_training":1,"run_training":1,"youth_development":14}},{"id":8,"name":"윤단장","kind":"gm","abilities":{"bat_training":1,"body_training":1,"field_training":1,"motivation":10,"pitch_training":1,"run_training":1,"youth_development":1}}]}</script>
+<script>
+(function(){
+  const POOL = JSON.parse(document.getElementById('pool').textContent);
+  const SET_NAMES = {bat:'타격', run:'주루', field:'수비', pitch:'투구', body:'체력'};
+  const KIND_LABELS = {
+    manager:'감독', bat_coach:'타격 코치', pitch_coach:'투수 코치',
+    field_coach:'수비 코치', run_coach:'주루·작전 코치', body_coach:'체력 코치',
+    youth_coach:'유소년 코치', gm:'단장'
+  };
+
+  // ── 사이드바(Root Destinations) ──────────────────────────────
+  const CATEGORIES = [
+    { key:'players', icon:'⚾', label:'선수단', home:'/players' },
+    { key:'staff',   icon:'👤', label:'스태프', home:'/staff' },
+    { key:'training',icon:'📊', label:'훈련',   home:'/training' },
+  ];
+
+  // ── 라우트 → Root Context 매핑 ───────────────────────────────
+  function routeContext(route){
+    if (route.startsWith('/players') || route.startsWith('/player/')) return 'players';
+    if (route.startsWith('/staff'))    return 'staff';
+    if (route.startsWith('/training')) return 'training';
+    return 'players';
+  }
+
+  // ── 탭 상태 ──────────────────────────────────────────────────
+  // 각 탭: { id, route, history:[route,...], histIdx }
+  let tabs = [];
+  let activeTabId = null;
+  let nextTabId = 1;
+
+  function makeTab(route){
+    return { id: nextTabId++, route, history:[route], histIdx:0 };
+  }
+  function activeTab(){ return tabs.find(t => t.id === activeTabId); }
+
+  function openTab(route){
+    const t = makeTab(route);
+    tabs.push(t);
+    activeTabId = t.id;
+    render();
+  }
+  function closeTab(id){
+    const idx = tabs.findIndex(t => t.id === id);
+    if (idx < 0) return;
+    tabs.splice(idx,1);
+    if (activeTabId === id) {
+      if (tabs.length === 0) openTab('/players'); // 마지막 닫으면 홈 자동
+      else activeTabId = tabs[Math.max(0, idx-1)].id;
+    }
+    render();
+  }
+  function switchTo(route, opts={}){
+    if (opts.newTab) {
+      openTab(route);
+      return;
+    }
+    // 같은 카테고리 홈으로 가는 경우: 이미 열려있으면 그 탭으로 스위치
+    const cats = CATEGORIES.map(c => c.home);
+    if (cats.includes(route)) {
+      const existing = tabs.find(t => t.route === route);
+      if (existing) { activeTabId = existing.id; render(); return; }
+    }
+    if (!tabs.length) { openTab(route); return; }
+    const t = activeTab();
+    t.history = t.history.slice(0, t.histIdx+1);
+    t.history.push(route);
+    t.histIdx = t.history.length - 1;
+    t.route = route;
+    render();
+  }
+  function goBack(){
+    const t = activeTab(); if (!t || t.histIdx <= 0) return;
+    t.histIdx--; t.route = t.history[t.histIdx]; render();
+  }
+  function goForward(){
+    const t = activeTab(); if (!t || t.histIdx >= t.history.length-1) return;
+    t.histIdx++; t.route = t.history[t.histIdx]; render();
+  }
+
+  // ── 라우트 파싱 ──────────────────────────────────────────────
+  function parseRoute(route){
+    const parts = route.split('/').filter(Boolean);
+    return parts; // ["players"] or ["player","1001"] or ["staff","2"] or ["training"]
+  }
+
+  // ── 브레드크럼 ──────────────────────────────────────────────
+  function breadcrumbFor(route){
+    const parts = parseRoute(route);
+    const crumbs = [];
+    const ctx = routeContext(route);
+    const cat = CATEGORIES.find(c => c.key === ctx);
+    crumbs.push({ label: cat.label, route: cat.home });
+    if (parts[0] === 'player' && parts[1]) {
+      const p = POOL.players.find(x => String(x.id) === parts[1]);
+      crumbs.push({ label: p ? p.name : parts[1], route });
+    } else if (parts[0] === 'staff' && parts[1]) {
+      const s = POOL.staff.find(x => String(x.id) === parts[1]);
+      crumbs.push({ label: s ? s.name : parts[1], route });
+    }
+    return crumbs;
+  }
+
+  // ── 탭 라벨 ─────────────────────────────────────────────────
+  function tabLabel(route){
+    const parts = parseRoute(route);
+    if (parts[0] === 'players') return { icon:'⚾', name:'선수단' };
+    if (parts[0] === 'staff')   return { icon:'👤', name:'스태프' };
+    if (parts[0] === 'training')return { icon:'📊', name:'훈련' };
+    if (parts[0] === 'player' && parts[1]) {
+      const p = POOL.players.find(x => String(x.id) === parts[1]);
+      return { icon:'👤', name: p ? p.name : `선수 ${parts[1]}` };
+    }
+    if (parts[0] === 'staff' && parts[1]) {
+      const s = POOL.staff.find(x => String(x.id) === parts[1]);
+      return { icon:'👤', name: s ? s.name : `스태프 ${parts[1]}` };
+    }
+    return { icon:'?', name:'페이지' };
+  }
+
+  // ── 렌더링 ──────────────────────────────────────────────────
+  function render(){
+    const t = activeTab();
+    if (!t) { openTab('/players'); return; }
+    const ctx = routeContext(t.route);
+
+    // 사이드바
+    document.getElementById('sidebar-items').innerHTML = CATEGORIES.map(c =>
+      `<a class="item ${c.key === ctx ? 'active' : ''}" data-route="${c.home}">
+        <span class="icon">${c.icon}</span><span class="item-label">${c.label}</span>
+      </a>`
+    ).join('');
+    document.querySelectorAll('.sidebar .item').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        switchTo(el.dataset.route, { newTab: e.metaKey || e.ctrlKey });
+      });
+    });
+
+    // 탭바
+    const tabbar = document.getElementById('tabbar');
+    tabbar.innerHTML = tabs.map(tab => {
+      const lb = tabLabel(tab.route);
+      return `<div class="tab ${tab.id===activeTabId?'active':''}" data-id="${tab.id}">
+        <span class="icon">${lb.icon}</span>
+        <span class="name">${lb.name}</span>
+        <button class="close" data-close="${tab.id}" title="닫기">×</button>
+      </div>`;
+    }).join('') + `<button class="tab-new" title="새 탭 (홈)">+</button>`;
+    tabbar.querySelectorAll('.tab').forEach(el => {
+      el.addEventListener('click', e => {
+        if (e.target.dataset.close) return;
+        activeTabId = parseInt(el.dataset.id, 10);
+        render();
+      });
+    });
+    tabbar.querySelectorAll('.close').forEach(b => {
+      b.addEventListener('click', e => { e.stopPropagation(); closeTab(parseInt(b.dataset.close, 10)); });
+    });
+    tabbar.querySelector('.tab-new').addEventListener('click', () => openTab('/players'));
+
+    // Nav 버튼
+    document.getElementById('nav-back').disabled = t.histIdx <= 0;
+    document.getElementById('nav-forward').disabled = t.histIdx >= t.history.length - 1;
+
+    // 브레드크럼
+    const crumbs = breadcrumbFor(t.route);
+    document.getElementById('crumbs').innerHTML = crumbs.map((c, i) => {
+      const last = i === crumbs.length - 1;
+      const sep = i > 0 ? '<span class="sep">/</span>' : '';
+      return `${sep}<a class="crumb ${last?'last':''}" data-route="${c.route}">${c.label}</a>`;
+    }).join('');
+    document.querySelectorAll('.crumb').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        switchTo(el.dataset.route, { newTab: e.metaKey || e.ctrlKey });
+      });
+    });
+
+    // 콘텐츠
+    renderContent(t.route);
+  }
+
+  function renderContent(route){
+    const parts = parseRoute(route);
+    const el = document.getElementById('content');
+    if (parts[0] === 'players') el.innerHTML = renderPlayersHome();
+    else if (parts[0] === 'player') el.innerHTML = renderPlayerDetail(parts[1]);
+    else if (parts[0] === 'staff' && !parts[1]) el.innerHTML = renderStaffHome();
+    else if (parts[0] === 'staff' && parts[1]) el.innerHTML = renderStaffDetail(parts[1]);
+    else if (parts[0] === 'training') el.innerHTML = renderTrainingHome();
+    else el.innerHTML = `<div class="placeholder">알 수 없는 페이지: ${route}</div>`;
+
+    // 링크 위임
+    el.querySelectorAll('[data-route]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        switchTo(a.dataset.route, { newTab: e.metaKey || e.ctrlKey });
+      });
+    });
+  }
+
+  // ── 페이지들 ────────────────────────────────────────────────
+  function renderPlayersHome(){
+    const rows = POOL.players.map(p => `
+      <div class="row" data-route="/player/${p.id}">
+        <div class="name link">${p.name}</div>
+        <div>${p.age}세</div>
+        <div>${p.role}</div>
+        <div class="stars">재능 ${p.talent_avg}</div>
+      </div>
+    `).join('');
+    return `
+      <h1>선수단</h1>
+      <p class="sub">등록 선수 ${POOL.players.length}명. 선수 이름을 클릭해 상세 (Cmd+클릭: 새 탭)</p>
+      <div class="list">
+        <div class="row head"><div>이름</div><div>나이</div><div>역할</div><div>재능</div></div>
+        ${rows}
+      </div>
+    `;
+  }
+
+  function renderPlayerDetail(id){
+    const p = POOL.players.find(x => String(x.id) === id);
+    if (!p) return `<div class="placeholder">선수 ${id} 없음</div>`;
+    const groups = ['bat','run','field','pitch','body'];
+    const groupsHtml = groups.map(g => {
+      const items = POOL.ability_labels.filter(a => a[2] === g);
+      if (!items.length) return '';
+      const inner = items.map(([aid, label, _]) => `
+        <div class="ability"><span class="lab">${label}</span><span class="val">${p.ability_display[aid] || '·'}</span></div>
+      `).join('');
+      return `<div class="set-group"><h3>${SET_NAMES[g]}</h3><div class="abilities">${inner}</div></div>`;
+    }).join('');
+    return `
+      <h1>${p.name}</h1>
+      <p class="sub">${p.role} · ${p.age}세 · 재능 평균 ${p.talent_avg}</p>
+      <div class="card">
+        <h2>능력</h2>
+        ${groupsHtml}
+      </div>
+      <div class="card">
+        <h2>개인 훈련 (자리 2)</h2>
+        <div class="placeholder">v1 다음 이터레이션에 편집 UI</div>
+      </div>
+      <div class="card">
+        <h2>성장 곡선</h2>
+        <div class="placeholder">v1 다음 이터레이션에 season 통과한 시뮬 결과</div>
+      </div>
+    `;
+  }
+
+  function renderStaffHome(){
+    const rows = POOL.staff.map(s => `
+      <div class="row" data-route="/staff/${s.id}">
+        <div class="name link">${s.name}</div>
+        <div>${KIND_LABELS[s.kind] || s.kind}</div>
+        <div class="stars">동기 ${s.abilities.motivation || '-'}</div>
+        <div>—</div>
+      </div>
+    `).join('');
+    return `
+      <h1>스태프</h1>
+      <p class="sub">등록 스태프 ${POOL.staff.length}명. 이름을 클릭해 상세.</p>
+      <div class="list">
+        <div class="row head"><div>이름</div><div>직책</div><div>동기</div><div>배치</div></div>
+        ${rows}
+      </div>
+    `;
+  }
+
+  function renderStaffDetail(id){
+    const s = POOL.staff.find(x => String(x.id) === id);
+    if (!s) return `<div class="placeholder">스태프 ${id} 없음</div>`;
+    const labels = {
+      bat_training:'타격 훈련', pitch_training:'투수 훈련', field_training:'수비 훈련',
+      run_training:'주루·작전 훈련', body_training:'체력 훈련',
+      youth_development:'유소년 육성', motivation:'동기 부여',
+    };
+    const abInner = Object.entries(labels).map(([k,l]) =>
+      `<div class="ability"><span class="lab">${l}</span><span class="val">${s.abilities[k] || 1}</span></div>`
+    ).join('');
+    return `
+      <h1>${s.name}</h1>
+      <p class="sub">${KIND_LABELS[s.kind] || s.kind}</p>
+      <div class="card">
+        <h2>능력 (1~20)</h2>
+        <div class="abilities">${abInner}</div>
+      </div>
+      <div class="card">
+        <h2>배치 슬롯</h2>
+        <div class="placeholder">v1 다음 이터레이션에 실제 배치 연결</div>
+      </div>
+    `;
+  }
+
+  function renderTrainingHome(){
+    const slots = [
+      { key:'bat', label:'타격', kind:'bat_coach' },
+      { key:'pitch', label:'투구', kind:'pitch_coach' },
+      { key:'field', label:'수비', kind:'field_coach' },
+      { key:'run', label:'주루·작전', kind:'run_coach' },
+      { key:'body', label:'체력', kind:'body_coach' },
+    ];
+    const cards = slots.map(s => {
+      const coaches = POOL.staff.filter(x => x.kind === s.kind);
+      const opts = ['<option value="">(비어 있음)</option>'].concat(
+        coaches.map(c => `<option value="${c.id}">${c.name}</option>`)
+      ).join('');
+      return `
+        <div class="slot">
+          <h3>${s.label} 슬롯</h3>
+          <select>${opts}</select>
+          <div class="stars">별점: — · 비중: 1.0</div>
+        </div>
+      `;
+    }).join('');
+    return `
+      <h1>훈련</h1>
+      <p class="sub">팀 훈련 5슬롯. 각 슬롯에 코치 배치.</p>
+      <div class="slots">${cards}</div>
+      <div class="card" style="margin-top:16px">
+        <h2>결과 요약</h2>
+        <div class="placeholder">v1 다음 이터레이션에 계산 결과 (환경 요인·동기)</div>
+      </div>
+    `;
+  }
+
+  // ── 이벤트 ──────────────────────────────────────────────────
+  document.getElementById('nav-back').addEventListener('click', goBack);
+  document.getElementById('nav-forward').addEventListener('click', goForward);
+  window.toggleSidebar = () => {
+    document.getElementById('app').classList.toggle('sidebar-collapsed');
+  };
+  window.advanceYear = () => {
+    alert('v1 스켈레톤: 시즌 진행은 다음 이터레이션');
+  };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { /* 자리 예약 */ }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowRight') { e.preventDefault(); goForward(); }
+  });
+
+  // 초기: 선수단 탭 하나 열고 시작
+  openTab('/players');
+})();
+</script>
+</body></html>
