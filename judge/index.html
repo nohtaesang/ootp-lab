@@ -316,7 +316,12 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '01fe486 2026-09-07';
+  const BUILD = '3ee51d0 2026-09-08';
+  // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
+  const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
+  const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
+  const talCls = v => v >= DR.talent_hi ? 'hi' : v <= DR.talent_lo ? 'lo' : '';
+  const z20 = z => Math.max(1, Math.min(20, Math.round(DR.z_center + z * DR.z_per_sd)));
   const BATCH = (entries.find(e => !e.preset && !e.recheck && !e.contrast) || entries[0]).key.replace(/^[dc](\d+)-.*$/, 'b$1');
   const BATCH_SIZE = 10, PER_ROLE = 5;
 
@@ -355,7 +360,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   // 좌표는 위 여백 12px 포함(viewBox 200×172). 숫자 = 익숙함(skill), 테두리 게이지 = 적성(apt)
   const FIELD = [['CF',100,24],['LF',30,50],['RF',170,50],['SS',68,80],['2B',132,80],['3B',36,118],['1B',164,118],['P',100,116],['C',100,154]];
   function fieldSvg(P, mains){
-    const col = v => v >= 16 ? 'var(--hi)' : v <= 3 ? 'var(--muted)' : v <= 7 ? 'var(--lo)' : 'var(--ink)';
+    const col = v => v >= DR.talent_hi ? 'var(--hi)' : v <= 3 ? 'var(--muted)' : v <= DR.ability_lo ? 'var(--lo)' : 'var(--ink)';
     let s = '<svg viewBox="0 0 200 172" xmlns="http://www.w3.org/2000/svg">';
     s += '<rect width="200" height="172" fill="#2F6B3F"/>';
     s += '<path d="M100 166 L28 106 Q100 4 172 106 Z" fill="#3E8A50"/>';
@@ -441,17 +446,17 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     const peakOvr = Math.max(...v.ages.map(ovrOf));
     $('summary').innerHTML = `<span>지금 <b>${nowOvr}</b></span><span>→</span><span>다 크면 <b>${peakOvr}</b></span><span class="lvl">${stars ? stars[3] + '이에요' : ''}</span>`;
     if (e.covers && e.covers.length) { $('covers').hidden = false; $('covers').textContent = '이번엔 이걸 봐요: ' + e.covers.join(' × '); } else { $('covers').hidden = true; }
-    const talRow = t => `<span>${t.label.replace(' 재능','')}</span><span class="n ${t.display >= 16 ? 'hi' : t.display <= 10 ? 'lo' : ''}">${t.display}</span>`;
+    const talRow = t => `<span>${t.label.replace(' 재능','')}</span><span class="n ${talCls(t.display)}">${t.display}</span>`;
     const tal = ids => ids.map(id => talRow(e.talents.find(t => t.id === id))).join('');
     $('tal-bat').innerHTML = tal(['batting','power']);
     $('tal-pit').innerHTML = tal(['velocity','control','breaking']);
     $('tal-common').innerHTML = tal(['fielding','arm','speed','endurance','judgment']);
     renderTalentDim();
     // 소질 7개: 표준편차 → 1~20 (10이 보통)
-    $('apts').innerHTML = e.aptitudes.map(([label, z]) => { const v = Math.max(1, Math.min(20, Math.round(10.5 + z * 3))); return `<div><span>${label.replace(' 소질', '')}</span><b class="${v >= 14 ? 'hi' : v <= 7 ? 'lo' : ''}">${v}</b></div>`; }).join('');
+    $('apts').innerHTML = e.aptitudes.map(([label, z]) => { const v = z20(z); return `<div><span>${label.replace(' 소질', '')}</span><b class="${v >= 14 ? 'hi' : v <= 7 ? 'lo' : ''}">${v}</b></div>`; }).join('');
     // 히든은 1~20 숫자. 10이 보통, ±3이 한 단계. 이름이 나쁜 것(부상 빈도)은 높을수록 나쁘다
-    const to20 = z => Math.max(1, Math.min(20, Math.round(10.5 + z * 3)));
-    const num = (v, goodHigh) => { const cls = goodHigh ? (v >= 14 ? 'hi' : v <= 7 ? 'lo' : '') : (v <= 7 ? 'hi' : v >= 14 ? 'lo' : ''); return `<b class="n ${cls}">${v}</b>`; };
+    const to20 = z20;
+    const num = (v, goodHigh) => { const cls = goodHigh ? abCls(v) : (v <= DR.ability_lo ? 'hi' : v >= DR.ability_hi ? 'lo' : ''); return `<b class="n ${cls}">${v}</b>`; };
     const we = (e.personality.find(([l]) => l === '프로의식') || [null, 50])[1];
     const we20 = Math.max(1, Math.min(20, Math.round(we / 5)));
     $('hidden-body').innerHTML = [
@@ -568,19 +573,19 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     const P = e.positions || null;
     const posLine = P ? `<div class="posapt">${['C','1B','2B','3B','SS','LF','CF','RF'].map(id => { const v = P.apt[id]; const main = id === P.main; return `<span class="${main ? 'main' : ''}"><small>${(P.labels && P.labels[id] || id).replace('수', '')}</small><b class="${v >= 16 ? 'hi' : v <= 7 ? 'lo' : ''}">${v}</b></span>`; }).join('')}</div>` : '';
     $('groups').innerHTML = groupOrder.map(([set, name]) => {
-      const items = pool.ability_labels.filter(x => x[2] === set).map(([id, label]) => { const v = r.display[id]; return `<span>${label}</span><span class="n ${v >= 14 ? 'hi' : v <= 7 ? 'lo' : ''}">${v}</span>`; }).join('');
+      const items = pool.ability_labels.filter(x => x[2] === set).map(([id, label]) => { const v = r.display[id]; return `<span>${label}</span><span class="n ${abCls(v)}">${v}</span>`; }).join('');
       return `<div class="group ${dimSet.has(set) ? 'dim' : ''}"><h4>${name}${dimSet.has(set) ? ' (안 키워요)' : ''}</h4><div class="list">${items}</div></div>`;
     }).join('');
     if (role === 'batter') { $('pitchwrap').hidden = true; } else {
       $('pitchwrap').hidden = false;
-      const fmax = Math.round(r.fastball); const fvc = fmax >= 150 ? 'hi' : fmax <= 140 ? 'lo' : '';
+      const fmax = Math.round(r.fastball); const fvc = fmax >= DR.fastball_hi_kmh ? 'hi' : fmax <= DR.fastball_lo_kmh ? 'lo' : '';
       $('pitches').innerHTML = `<thead><tr><th>구종</th><th>km/h</th><th>가로 cm<br><small>+팔쪽 −글러브쪽</small></th><th>세로 cm</th><th>제구</th><th>구위</th><th>사용</th></tr></thead><tbody>` +
         `<tr class="fmax"><td>직구 최고</td><td class="${fvc}">${fmax}</td><td colspan="5"><small>평소 구속은 아래 직구 계열 줄이에요</small></td></tr>` +
         r.pitches.map(p => {
           // 구속 색: 직구 계열은 150↑ 초록 / 140↓ 빨강, 변화구는 직구 대비라 색 없음. 제구·구위는 능력과 같은 구간(14↑ 초록, 7↓ 빨강)
           const isFast = /포심|투심|싱커|커터/.test(p.label);
-          const vc = isFast ? (p.velo >= 150 ? 'hi' : p.velo <= 140 ? 'lo' : '') : '';
-          const c = v => v >= 14 ? 'hi' : v <= 7 ? 'lo' : '';
+          const vc = isFast ? (p.velo >= DR.fastball_hi_kmh ? 'hi' : p.velo <= DR.fastball_lo_kmh ? 'lo' : '') : '';
+          const c = abCls;
           return `<tr><td>${p.label}</td><td class="${vc}">${p.velo}</td><td>${p.h > 0 ? '+' : ''}${p.h}</td><td>${p.v > 0 ? '+' : ''}${p.v}</td><td class="${c(p.control)}">${p.control}</td><td class="${c(p.stuff)}">${p.stuff}</td><td>${Math.round(p.usage * 100)}%</td></tr>`;
         }).join('') + '</tbody>';
     }
@@ -596,7 +601,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     for (const [set, name] of groupOrder) {
       h += `<tr class="g ${dimSet.has(set) ? 'dim' : ''}"><th colspan="${HEAT_AGES.length + 1}">${name}${dimSet.has(set) ? ' (안 키워요)' : ''}</th></tr>`;
       for (const [id, label] of pool.ability_labels.filter(x => x[2] === set)) {
-        h += `<tr class="${dimSet.has(set) ? 'dim' : ''}"><th>${label}</th>` + HEAT_AGES.map(a => { const val = byAge[a] ? byAge[a].display[id] : null; const c = val == null ? '' : val >= 14 ? 'hi' : val <= 7 ? 'lo' : ''; return `<td class="${c} ${a === nearest ? 'now' : ''}">${val == null ? '' : val}</td>`; }).join('') + '</tr>';
+        h += `<tr class="${dimSet.has(set) ? 'dim' : ''}"><th>${label}</th>` + HEAT_AGES.map(a => { const val = byAge[a] ? byAge[a].display[id] : null; const c = val == null ? '' : abCls(val); return `<td class="${c} ${a === nearest ? 'now' : ''}">${val == null ? '' : val}</td>`; }).join('') + '</tr>';
       }
     }
     $('heat').innerHTML = h + '</tbody>';
