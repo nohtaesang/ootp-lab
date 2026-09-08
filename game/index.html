@@ -170,17 +170,28 @@ input:focus, select:focus{
   min-width: 0;
 }
 .sidebar-header{
-  height: var(--header-h);
-  display: flex; align-items: center;
-  padding: 0 var(--size-16);
+  height: var(--tabbar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--size-8) 0 var(--size-16);
   border-bottom: 1px solid var(--border);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
-  color: var(--text-muted);
+  color: var(--text-normal);
 }
+.sidebar-toggle{
+  padding: var(--size-4) var(--size-6);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-size: var(--text-md);
+  line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px;
+}
+.sidebar-toggle:hover{background: var(--bg-hover); color: var(--text-normal)}
 .app.sidebar-collapsed .sidebar-header{padding: 0; justify-content: center}
 .app.sidebar-collapsed .sidebar-header .brand-full{display: none}
+.app.sidebar-collapsed .sidebar-toggle{transform: rotate(180deg)}
 
 .sidebar-nav{
   flex: 1;
@@ -248,20 +259,10 @@ input:focus, select:focus{
 /* ── Main ── */
 .main{
   display: grid;
-  grid-template-rows: var(--header-h) var(--tabbar-h) var(--navbar-h) 1fr;
+  grid-template-rows: var(--tabbar-h) var(--navbar-h) 1fr;
   min-width: 0;
   overflow: hidden;
 }
-
-.header{
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 var(--size-16);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-secondary);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-}
-.header-actions{display: flex; gap: var(--size-4)}
 
 .tabbar{
   display: flex; align-items: stretch;
@@ -533,6 +534,7 @@ input:focus, select:focus{
   <aside class="sidebar">
     <div class="sidebar-header">
       <span class="brand-full">OOTP</span>
+      <button class="sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기">‹</button>
     </div>
     <nav class="sidebar-nav" id="sidebar-items"></nav>
     <div class="sidebar-footer">
@@ -541,20 +543,10 @@ input:focus, select:focus{
         <span class="button-label">+1년 진행</span>
         <span>›</span>
       </button>
-      <button class="button button-ghost" onclick="toggleSidebar()">
-        <span class="button-label">사이드바 접기</span>
-      </button>
     </div>
   </aside>
 
   <div class="main">
-    <header class="header">
-      <span>v1 스켈레톤 · 실사용 후 확정</span>
-      <div class="header-actions">
-        <button class="button button-ghost">설정</button>
-      </div>
-    </header>
-
     <div class="tabbar" id="tabbar"></div>
 
     <div class="navbar">
