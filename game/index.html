@@ -153,33 +153,47 @@ input:focus, select:focus{
 ::selection{background: var(--accent); color: var(--text-on-accent)}
 
 /* ============================================================
- * APP SHELL
+ * APP SHELL — grid areas
+ *   ┌──────── topbar (전체 폭) ────────┐
+ *   │                                  │
+ *   ├── sidebar ────┬── main ──────────┤
+ *   │               │                  │
+ *   └───────────────┴──────────────────┘
  * ============================================================ */
 .app{
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--header-h) 1fr;
+  grid-template-areas:
+    "topbar  topbar"
+    "sidebar main";
   height: 100vh;
 }
 .app.sidebar-collapsed{grid-template-columns: var(--sidebar-w-collapsed) 1fr}
 
-/* ── Sidebar ── */
-.sidebar{
+/* ── Topbar (전체 폭) ── */
+.topbar{
+  grid-area: topbar;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
   background: var(--bg-secondary);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  min-width: 0;
 }
-.sidebar-header{
-  height: var(--tabbar-h);
+.app.sidebar-collapsed .topbar{grid-template-columns: var(--sidebar-w-collapsed) 1fr}
+.topbar-brand{
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 var(--size-8) 0 var(--size-16);
-  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  height: 100%;
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
   color: var(--text-normal);
 }
-.sidebar-toggle{
+.app.sidebar-collapsed .topbar-brand{padding: 0; justify-content: center}
+.app.sidebar-collapsed .topbar-brand .brand-full{display: none}
+.topbar-toggle{
   padding: var(--size-4) var(--size-6);
   border-radius: var(--radius-s);
   color: var(--text-muted);
@@ -188,10 +202,40 @@ input:focus, select:focus{
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 24px;
 }
-.sidebar-toggle:hover{background: var(--bg-hover); color: var(--text-normal)}
-.app.sidebar-collapsed .sidebar-header{padding: 0; justify-content: center}
-.app.sidebar-collapsed .sidebar-header .brand-full{display: none}
-.app.sidebar-collapsed .sidebar-toggle{transform: rotate(180deg)}
+.topbar-toggle:hover{background: var(--bg-hover); color: var(--text-normal)}
+.app.sidebar-collapsed .topbar-toggle{transform: rotate(180deg)}
+.topbar-right{
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: var(--size-8);
+  padding: 0 var(--size-16);
+  height: 100%;
+}
+.topbar-season{
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.topbar-advance{
+  display: inline-flex; align-items: center; gap: var(--size-6);
+  padding: var(--size-4) var(--size-10);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-normal);
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+}
+.topbar-advance:hover{background: var(--bg-hover); border-color: var(--border-strong)}
+
+/* ── Sidebar ── */
+.sidebar{
+  grid-area: sidebar;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
 
 .sidebar-nav{
   flex: 1;
@@ -260,35 +304,12 @@ input:focus, select:focus{
 
 /* ── Main ── */
 .main{
+  grid-area: main;
   display: grid;
-  grid-template-rows: var(--header-h) var(--tabbar-h) var(--navbar-h) 1fr;
+  grid-template-rows: var(--tabbar-h) var(--navbar-h) 1fr;
   min-width: 0;
   overflow: hidden;
 }
-
-.topbar{
-  display: flex; align-items: center; justify-content: flex-end;
-  padding: 0 var(--size-16);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-secondary);
-  gap: var(--size-8);
-}
-.topbar-season{
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-}
-.topbar-advance{
-  display: inline-flex; align-items: center; gap: var(--size-6);
-  padding: var(--size-4) var(--size-10);
-  border-radius: var(--radius-s);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--text-normal);
-  border: 1px solid var(--border);
-  background: var(--bg-tertiary);
-}
-.topbar-advance:hover{background: var(--bg-hover); border-color: var(--border-strong)}
 
 .tabbar{
   display: flex; align-items: stretch;
@@ -592,22 +613,25 @@ input:focus, select:focus{
 </style>
 </head><body>
 <div class="app" id="app">
-  <aside class="sidebar">
-    <div class="sidebar-header">
+  <header class="topbar">
+    <div class="topbar-brand">
       <span class="brand-full">OOTP</span>
-      <button class="sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기">‹</button>
+      <button class="topbar-toggle" onclick="toggleSidebar()" title="사이드바 접기">‹</button>
     </div>
-    <nav class="sidebar-nav" id="sidebar-items"></nav>
-  </aside>
-
-  <div class="main">
-    <header class="topbar">
+    <div class="topbar-right">
       <span class="topbar-season">2026 시즌</span>
       <button class="topbar-advance" onclick="advanceYear()">
         +1년
         <span>›</span>
       </button>
-    </header>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <nav class="sidebar-nav" id="sidebar-items"></nav>
+  </aside>
+
+  <div class="main">
     <div class="tabbar" id="tabbar"></div>
 
     <div class="navbar">
