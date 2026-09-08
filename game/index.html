@@ -199,6 +199,19 @@ input:focus, select:focus{
   display: flex; flex-direction: column; gap: var(--size-2);
   overflow-y: auto;
 }
+.nav-group-label{
+  padding: var(--size-12) var(--size-10) var(--size-4);
+  font-size: var(--text-xxs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.app.sidebar-collapsed .nav-group-label{display: none}
+.nav-divider{
+  height: 1px; background: var(--border);
+  margin: var(--size-8) var(--size-8);
+}
 .sidebar-item{
   display: flex; align-items: center; gap: var(--size-10);
   padding: var(--size-6) var(--size-10);
@@ -666,13 +679,20 @@ input:focus, select:focus{
     const t = activeTab();
     const ctx = t ? routeContext(t.route) : null;
 
-    // Sidebar
-    document.getElementById('sidebar-items').innerHTML = CATEGORIES.map(c =>
-      `<a class="sidebar-item ${c.key === ctx ? 'active' : ''}" data-route="${c.home}">
-        <span class="item-glyph">${c.glyph}</span>
-        <span class="item-label">${c.label}</span>
-      </a>`
-    ).join('');
+    // Sidebar: 카테고리 + Lab 섹션 (자리 예약)
+    document.getElementById('sidebar-items').innerHTML =
+      CATEGORIES.map(c =>
+        `<a class="sidebar-item ${c.key === ctx ? 'active' : ''}" data-route="${c.home}">
+          <span class="item-glyph">${c.glyph}</span>
+          <span class="item-label">${c.label}</span>
+        </a>`
+      ).join('') +
+      `<div class="nav-divider"></div>
+       <div class="nav-group-label">Lab</div>
+       <a class="sidebar-item" style="opacity:.4;pointer-events:none">
+         <span class="item-glyph">·</span>
+         <span class="item-label">(자리 예약)</span>
+       </a>`;
     document.querySelectorAll('.sidebar-item').forEach(el => {
       el.addEventListener('click', e => {
         e.preventDefault();
