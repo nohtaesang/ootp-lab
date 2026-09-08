@@ -896,7 +896,7 @@ input:focus, select:focus{
   }
 
   const CATEGORIES = [
-    { key:'players',   glyph:'PL', label:'선수단', home:'/players' },
+    { key:'players',   glyph:'PL', label:'선수단', home:'/players/overview' },
     { key:'selection', glyph:'SE', label:'편성',   home:'/selection/lineup' },
     { key:'staff',     glyph:'ST', label:'스태프', home:'/staff' },
     { key:'training',  glyph:'TR', label:'훈련',   home:'/training' },
@@ -909,6 +909,12 @@ input:focus, select:focus{
     if (route.startsWith('/training')) return 'training';
     return null;
   }
+
+  const PLAYERS_SUBTABS = [
+    { key:'overview', label:'개요' },
+    { key:'list',     label:'리스트' },
+    { key:'roster',   label:'로스터' },
+  ];
 
   let tabs = [];
   let activeTabId = null;
@@ -963,7 +969,10 @@ input:focus, select:focus{
     const ctx = routeContext(route);
     const cat = CATEGORIES.find(c => c.key === ctx);
     if (cat) crumbs.push({ label: cat.label, route: cat.home });
-    if (parts[0] === 'player' && parts[1]){
+    if (parts[0] === 'players' && parts[1]) {
+      const st = PLAYERS_SUBTABS.find(t => t.key === parts[1]);
+      if (st) crumbs.push({ label: st.label, route });
+    } else if (parts[0] === 'player' && parts[1]){
       const p = POOL.players.find(x => String(x.id) === parts[1]);
       crumbs.push({ label: p ? p.name : parts[1], route });
     } else if (parts[0] === 'staff' && parts[1]){
@@ -984,6 +993,10 @@ input:focus, select:focus{
     if (parts[0] === 'selection') {
       const names = { lineup:'라인업', rotation:'로테이션', bullpen:'불펜', depth:'뎁스' };
       return { glyph:'SE', name: names[parts[1]] || '편성' };
+    }
+    if (parts[0] === 'players' && parts[1]) {
+      const names = { overview:'선수단 개요', list:'선수단 리스트', roster:'선수단 로스터' };
+      return { glyph:'PL', name: names[parts[1]] || '선수단' };
     }
     if (parts[0] === 'player' && parts[1]){
       const p = POOL.players.find(x => String(x.id) === parts[1]);
@@ -1085,7 +1098,7 @@ input:focus, select:focus{
   function renderContent(route){
     const parts = parseRoute(route);
     const el = document.getElementById('content');
-    if (parts[0] === 'players') el.innerHTML = viewPlayers();
+    if (parts[0] === 'players') el.innerHTML = viewPlayersHub(parts[1] || 'overview');
     else if (parts[0] === 'player') el.innerHTML = viewPlayer(parts[1]);
     else if (parts[0] === 'staff' && !parts[1]) el.innerHTML = viewStaffList();
     else if (parts[0] === 'staff' && parts[1]) el.innerHTML = viewStaff(parts[1]);
@@ -1093,7 +1106,7 @@ input:focus, select:focus{
     else if (parts[0] === 'selection') el.innerHTML = viewSelection(parts[1] || 'lineup');
     else el.innerHTML = `<div class="placeholder">알 수 없는 페이지: ${route}</div>`;
     bindRouteLinks(el);
-    if (parts[0] === 'players') bindPlayersFilters(el);
+    if (parts[0] === 'players') bindPlayersHub(el, parts[1] || 'overview');
     if (parts[0] === 'selection') bindSelection(el, parts[1] || 'lineup');
     if (parts[0] === 'player' && parts[1]) bindPlayerDetail(el, parseInt(parts[1], 10));
     if (parts[0] === 'staff' && !parts[1]) bindStaffFilters(el);
@@ -1121,6 +1134,203 @@ input:focus, select:focus{
       const va = keyFn(a, sortBy), vb = keyFn(b, sortBy);
       if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
       return String(va).localeCompare(String(vb), 'ko') * dir;
+    });
+  }
+
+  function viewPlayersHub(sub){
+    const subtabs = PLAYERS_SUBTABS.map(t =>
+      `<a class="subtab ${t.key===sub?'active':''}" data-route="/players/${t.key}">${t.label}</a>`
+    ).join('');
+    let body = '';
+    if (sub === 'overview') body = viewPlayersOverview();
+    else if (sub === 'list') body = viewPlayers();
+    else if (sub === 'roster') body = viewPlayersRoster();
+    else body = `<div class="placeholder">알 수 없는 뷰: ${sub}</div>`;
+    return `<div class="subtabs">${subtabs}</div>${body}`;
+  }
+
+  function bindPlayersHub(el, sub){
+    el.querySelectorAll('.subtab').forEach(t => {
+      t.addEventListener('click', e => {
+        e.preventDefault();
+        switchTo(t.dataset.route, { newTab: e.metaKey || e.ctrlKey });
+      });
+    });
+    if (sub === 'list') bindPlayersFilters(el);
+    if (sub === 'roster') bindPlayersRoster(el);
+  }
+
+  // ── 개요 (Team Overview) ─────────────────────────────────────
+  function viewPlayersOverview(){
+    const players = POOL.players;
+    const n = players.length;
+    const avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0) / arr.length) : 0;
+    const avgAge = avg(players.map(p => p.age));
+    const avgOvr = avg(players.map(p => p.ovr));
+    const avgTal = avg(players.map(p => p.talent_avg));
+    const foreign = players.filter(p => p.foreign).length;
+
+    // 역할별 인원
+    const byRole = {};
+    players.forEach(p => { byRole[p.role] = (byRole[p.role]||0) + 1; });
+
+    // 포지션별 인원
+    const byPos = {};
+    players.forEach(p => { byPos[p.position] = (byPos[p.position]||0) + 1; });
+
+    // 최고 재능 5명
+    const topTalent = players.slice().sort((a,b) => b.talent_avg - a.talent_avg).slice(0, 5);
+    // 최고 OVR 5명
+    const topOvr = players.slice().sort((a,b) => b.ovr - a.ovr).slice(0, 5);
+    // 최연소 5명 (유망주)
+    const youngest = players.slice().sort((a,b) => a.age - b.age).slice(0, 5);
+
+    const summaryCards = [
+      ['등록 인원', `${n}명`],
+      ['평균 나이', avgAge.toFixed(1)],
+      ['평균 현재 (OVR)', avgOvr.toFixed(1)],
+      ['평균 재능', avgTal.toFixed(1)],
+      ['외국인', `${foreign}명`],
+    ];
+
+    const summaryHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--size-8);margin-bottom:var(--size-16)">
+      ${summaryCards.map(([k,v]) => `<div style="padding:var(--size-10) var(--size-12);border:1px solid var(--border);border-radius:var(--radius-s);background:var(--bg-secondary)">
+        <div style="font-size:var(--text-xxs);color:var(--text-muted);letter-spacing:var(--tracking-wide);text-transform:uppercase;margin-bottom:2px">${k}</div>
+        <div style="font-family:var(--font-mono);font-weight:var(--weight-semibold);color:var(--text-normal);font-size:var(--text-md)">${v}</div>
+      </div>`).join('')}
+    </div>`;
+
+    const roleChips = Object.entries(byRole).map(([role, count]) =>
+      `<span style="display:inline-flex;align-items:center;gap:4px;padding:var(--size-4) var(--size-10);border:1px solid var(--border);border-radius:var(--radius-s);font-size:var(--text-sm);background:var(--bg-secondary)">
+        ${role} <span style="color:var(--text-muted);font-family:var(--font-mono)">${count}</span>
+      </span>`
+    ).join(' ');
+
+    const posOrder = C.positions.map(([id]) => id);
+    const posRows = posOrder.filter(p => byPos[p]).map(p => `<tr>
+      <td style="padding:6px 12px;color:var(--text-muted)">${p}</td>
+      <td style="padding:6px 12px">${POSITION_LABELS[p]}</td>
+      <td style="padding:6px 12px;font-family:var(--font-mono);text-align:right">${byPos[p]}</td>
+    </tr>`).join('');
+
+    const listItem = p => `<div class="dlist-row" data-route="/player/${p.id}" style="grid-template-columns:2fr 60px 60px 60px">
+      <div class="cell-primary">${p.name} <span class="hand-marker">${p.position}</span></div>
+      <div class="cell-num">${p.age}</div>
+      <div class="cell-num">${p.ovr}</div>
+      <div class="cell-num">${p.talent_avg}</div>
+    </div>`;
+
+    return `
+      ${summaryHtml}
+      <div class="card">
+        <h2 class="section-title">역할 구성</h2>
+        <div>${roleChips}</div>
+      </div>
+      <div class="card">
+        <h2 class="section-title">포지션 구성</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:var(--text-sm)">
+          <tbody>${posRows}</tbody>
+        </table>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--size-12)">
+        <div class="card">
+          <h2 class="section-title">현재 상위 (OVR)</h2>
+          <div class="dlist" style="border:0"><div class="dlist-row head" style="grid-template-columns:2fr 60px 60px 60px"><div>선수</div><div>나이</div><div>OVR</div><div>재능</div></div>${topOvr.map(listItem).join('')}</div>
+        </div>
+        <div class="card">
+          <h2 class="section-title">잠재 상위 (재능)</h2>
+          <div class="dlist" style="border:0"><div class="dlist-row head" style="grid-template-columns:2fr 60px 60px 60px"><div>선수</div><div>나이</div><div>OVR</div><div>재능</div></div>${topTalent.map(listItem).join('')}</div>
+        </div>
+        <div class="card">
+          <h2 class="section-title">최연소</h2>
+          <div class="dlist" style="border:0"><div class="dlist-row head" style="grid-template-columns:2fr 60px 60px 60px"><div>선수</div><div>나이</div><div>OVR</div><div>재능</div></div>${youngest.map(listItem).join('')}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── 로스터 (등록 상태별) ─────────────────────────────────────
+  const rosterEditKey = () => teamKey('roster_overrides');
+  function loadRosterOverrides(){
+    try { return JSON.parse(localStorage.getItem(rosterEditKey())) || {}; }
+    catch { return {}; }
+  }
+  function saveRosterOverrides(obj){
+    try { localStorage.setItem(rosterEditKey(), JSON.stringify(obj)); } catch {}
+  }
+  function currentStatusOf(pid){
+    const overrides = loadRosterOverrides();
+    if (overrides[pid]) return overrides[pid];
+    const r = (POOL.registrations || []).find(x => x.player === pid);
+    return r ? r.status : 'active';
+  }
+  function setStatusOf(pid, status){
+    const overrides = loadRosterOverrides();
+    overrides[pid] = status;
+    saveRosterOverrides(overrides);
+  }
+
+  function viewPlayersRoster(){
+    const statuses = (POOL.league?.statuses) || [['active','액티브']];
+    // 그룹핑
+    const groups = {};
+    statuses.forEach(([id]) => groups[id] = []);
+    POOL.players.forEach(p => {
+      const st = currentStatusOf(p.id);
+      if (!groups[st]) groups[st] = [];
+      groups[st].push(p);
+    });
+    const activeLimit = POOL.league?.roster_active_limit;
+    const activeCount = groups['active']?.length || 0;
+    const overLimit = activeLimit && activeCount > activeLimit;
+
+    const statusOpts = statuses.map(([id,label]) => `<option value="${id}">${label}</option>`).join('');
+
+    const groupHtml = statuses.map(([id, label]) => {
+      const list = groups[id] || [];
+      const isActive = id === 'active';
+      const badge = isActive && activeLimit ? `<span style="margin-left:8px;color:${overLimit?'var(--neg)':'var(--text-muted)'};font-family:var(--font-mono);font-size:var(--text-xs)">${activeCount} / ${activeLimit}</span>` : '';
+      const rows = list.map(p => `<div class="dlist-row" style="grid-template-columns:2fr 60px 60px 60px 120px">
+        <div class="cell-primary" data-route="/player/${p.id}">${p.name} <span class="hand-marker">${p.position}</span></div>
+        <div class="cell-num">${p.age}</div>
+        <div class="cell-num">${p.ovr}</div>
+        <div class="cell-num">${p.talent_avg}</div>
+        <div>
+          <select data-roster-set="${p.id}" style="width:100%;font-size:var(--text-xs)">
+            ${statuses.map(([sid, slabel]) => `<option value="${sid}" ${currentStatusOf(p.id)===sid?'selected':''}>${slabel}</option>`).join('')}
+          </select>
+        </div>
+      </div>`).join('');
+      return `<div class="card">
+        <h2 class="section-title">${label}${badge}</h2>
+        ${list.length ? `<div class="dlist" style="border:0">
+          <div class="dlist-row head" style="grid-template-columns:2fr 60px 60px 60px 120px">
+            <div>선수</div><div>나이</div><div>OVR</div><div>재능</div><div>상태 변경</div>
+          </div>
+          ${rows}
+        </div>` : `<div class="placeholder">비어 있음</div>`}
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="filterbar" style="gap:var(--size-12)">
+        <span style="font-size:var(--text-sm);color:var(--text-muted)">리그 규정: 액티브 ${activeLimit || '—'}명</span>
+        ${overLimit ? `<span style="color:var(--neg);font-size:var(--text-sm)">액티브 한도 초과</span>` : ''}
+      </div>
+      ${groupHtml}
+    `;
+  }
+
+  function bindPlayersRoster(el){
+    el.querySelectorAll('[data-roster-set]').forEach(sel => {
+      sel.addEventListener('change', e => {
+        const pid = parseInt(sel.dataset.rosterSet, 10);
+        setStatusOf(pid, e.target.value);
+        renderContent(activeTab().route);
+      });
+    });
+    el.querySelectorAll('[data-route]').forEach(el2 => {
+      // 이미 bindRouteLinks에서 처리되지만 셀렉트 안엔 없으니 추가 없음
     });
   }
 
@@ -1418,17 +1628,34 @@ input:focus, select:focus{
     { key:'depth',    label:'뎁스 차트', active:true },
   ];
 
-  const LINEUP_KEYS = { rhp:'lineup:rhp', lhp:'lineup:lhp' };
+  // 팀 컨텍스트 키. 나중에 다른 팀 지원 시 자동 분리.
+  function teamKey(kind){
+    return `${kind}:${POOL.team.franchise}:${POOL.team.season}`;
+  }
   const lineupState = { versus: 'rhp' };  // 'rhp' or 'lhp'
 
+  // selection crate JSON 직렬화와 일치. slots 안엔 order·player·position.
   function loadLineup(versus){
     try {
-      const raw = localStorage.getItem(LINEUP_KEYS[versus]);
-      return raw ? JSON.parse(raw) : new Array(9).fill(null);
-    } catch { return new Array(9).fill(null); }
+      const raw = localStorage.getItem(teamKey(`lineup:${versus}`));
+      if (!raw) return new Array(C.lineup_size).fill(null);
+      const obj = JSON.parse(raw);
+      if (Array.isArray(obj)) return obj;  // 이전 형식 호환
+      return obj.slots.map(s => s.player ?? null);
+    } catch { return new Array(C.lineup_size).fill(null); }
   }
   function saveLineup(versus, arr){
-    try { localStorage.setItem(LINEUP_KEYS[versus], JSON.stringify(arr)); } catch {}
+    const slots = arr.map((pid, i) => ({
+      order: i + 1,
+      player: pid ?? null,
+      position: pid != null ? (POOL.players.find(p => p.id === pid)?.position || null) : null,
+    }));
+    const payload = {
+      team: { franchise: POOL.team.franchise, season: POOL.team.season },
+      versus,
+      slots,
+    };
+    try { localStorage.setItem(teamKey(`lineup:${versus}`), JSON.stringify(payload)); } catch {}
   }
 
   function isPositionPlayer(p){
@@ -1502,12 +1729,22 @@ input:focus, select:focus{
   }
 
   // ── 로테이션 (선발 5) ─────────────────────────────────────────
-  const ROTATION_KEY = 'rotation';
   function loadRotation(){
-    try { return JSON.parse(localStorage.getItem(ROTATION_KEY)) || new Array(5).fill(null); }
-    catch { return new Array(5).fill(null); }
+    try {
+      const raw = localStorage.getItem(teamKey('rotation'));
+      if (!raw) return new Array(C.rotation_size).fill(null);
+      const obj = JSON.parse(raw);
+      if (Array.isArray(obj)) return obj;
+      return obj.starters || new Array(C.rotation_size).fill(null);
+    } catch { return new Array(C.rotation_size).fill(null); }
   }
-  function saveRotation(arr){ try { localStorage.setItem(ROTATION_KEY, JSON.stringify(arr)); } catch {} }
+  function saveRotation(arr){
+    const payload = {
+      team: { franchise: POOL.team.franchise, season: POOL.team.season },
+      starters: arr.map(x => x ?? null),
+    };
+    try { localStorage.setItem(teamKey('rotation'), JSON.stringify(payload)); } catch {}
+  }
   function isSP(p){ return p.position === 'SP'; }
 
   function viewRotation(){
@@ -1556,19 +1793,26 @@ input:focus, select:focus{
   }
 
   // ── 불펜 (역할별) ──────────────────────────────────────────────
-  const BULLPEN_KEY = 'bullpen';
   const BULLPEN_ROLES = C.bullpen_roles.map(([key, label, short]) => ({ key, label, short }));
   function loadBullpen(){
     try {
-      const raw = JSON.parse(localStorage.getItem(BULLPEN_KEY)) || {};
+      const raw = JSON.parse(localStorage.getItem(teamKey('bullpen'))) || {};
+      // 새 형식: { team, by_role }. 이전 형식: { closer:[], ... }
+      const map = raw.by_role || raw;
       const out = {};
-      BULLPEN_ROLES.forEach(r => out[r.key] = Array.isArray(raw[r.key]) ? raw[r.key] : []);
+      BULLPEN_ROLES.forEach(r => out[r.key] = Array.isArray(map[r.key]) ? map[r.key] : []);
       return out;
     } catch {
       const out = {}; BULLPEN_ROLES.forEach(r => out[r.key] = []); return out;
     }
   }
-  function saveBullpen(obj){ try { localStorage.setItem(BULLPEN_KEY, JSON.stringify(obj)); } catch {} }
+  function saveBullpen(obj){
+    const payload = {
+      team: { franchise: POOL.team.franchise, season: POOL.team.season },
+      by_role: obj,
+    };
+    try { localStorage.setItem(teamKey('bullpen'), JSON.stringify(payload)); } catch {}
+  }
   function isRP(p){ return p.position === 'RP'; }
 
   function viewBullpen(){
@@ -1619,18 +1863,16 @@ input:focus, select:focus{
   }
 
   // ── 뎁스 차트 ─────────────────────────────────────────────────
-  const DEPTH_KEY = 'depth_chart';
-  // 라인업 후보 포지션 = pool의 offensive_positions (DH 리그 9자리)
   const DEPTH_POSITIONS = C.offensive_positions.map(id => ({ key: id, label: POSITION_LABELS[id] || id }));
-  // 뎁스 랭크는 id 배열, 라벨은 DEPTH_RANK_LABELS에서
   const DEPTH_RANKS = C.depth_ranks.map(([id, label]) => label);
   const DEPTH_RANK_IDS = C.depth_ranks.map(([id]) => id);
   function loadDepth(){
     try {
-      const raw = JSON.parse(localStorage.getItem(DEPTH_KEY)) || {};
+      const raw = JSON.parse(localStorage.getItem(teamKey('depth_chart'))) || {};
+      const map = raw.by_position || raw;
       const out = {};
       DEPTH_POSITIONS.forEach(pos => {
-        out[pos.key] = Array.isArray(raw[pos.key]) ? raw[pos.key].slice(0,3) : [null,null,null];
+        out[pos.key] = Array.isArray(map[pos.key]) ? map[pos.key].slice(0,3) : [null,null,null];
         while (out[pos.key].length < 3) out[pos.key].push(null);
       });
       return out;
@@ -1638,7 +1880,13 @@ input:focus, select:focus{
       const out = {}; DEPTH_POSITIONS.forEach(pos => out[pos.key] = [null,null,null]); return out;
     }
   }
-  function saveDepth(obj){ try { localStorage.setItem(DEPTH_KEY, JSON.stringify(obj)); } catch {} }
+  function saveDepth(obj){
+    const payload = {
+      team: { franchise: POOL.team.franchise, season: POOL.team.season },
+      by_position: obj,
+    };
+    try { localStorage.setItem(teamKey('depth_chart'), JSON.stringify(payload)); } catch {}
+  }
 
   function viewDepth(){
     const state = loadDepth();
