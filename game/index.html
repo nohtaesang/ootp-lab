@@ -3,244 +3,566 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>OOTP Game (v1 스켈레톤)</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<title>OOTP Game (v1)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <style>
-/* ============ 디자인 토큰 (원시 값 하드코드 금지 — ADR 0012) ============ */
+/* ============================================================
+ * DESIGN TOKENS — Obsidian 감각의 얇은 시스템.
+ * 모든 원시 값은 여기 한 곳. 컴포넌트는 var(--...)만 참조.
+ * 나중에 스타일 통째로 바꾸려면 이 블록만 갈아끼운다.
+ * ============================================================ */
 :root{
-  --bg:#F3F6F4; --card:#FFFFFF; --ink:#1B2A24; --muted:#66766E;
-  --rule:#D5DCD7; --soft:#E9EFEB; --hover:#E9EFEB;
-  --accent:#1F6F4A; --accent-ink:#FFFFFF; --accent-soft:#DDEFE4;
-  --pos:#1F6F4A; --neg:#B4463C;
-  --sidebar-w: 200px;
-  --sidebar-w-collapsed: 56px;
-  --tabbar-h: 36px;
-  --header-h: 44px;
-  --nav-h: 34px;
+  /* ── Color scale (neutral) ── */
+  --color-n-0:   #ffffff;
+  --color-n-05:  #fafafa;
+  --color-n-10:  #f4f4f5;
+  --color-n-20:  #e4e4e7;
+  --color-n-25:  #d4d4d8;
+  --color-n-30:  #a1a1aa;
+  --color-n-50:  #71717a;
+  --color-n-60:  #52525b;
+  --color-n-70:  #3f3f46;
+  --color-n-80:  #27272a;
+  --color-n-90:  #1c1c20;
+  --color-n-95:  #141418;
+  --color-n-100: #0a0a0d;
+
+  /* ── Color scale (accent) ── */
+  --color-accent-hue: 265;
+  --color-accent:     hsl(var(--color-accent-hue), 55%, 60%);
+  --color-accent-2:   hsl(var(--color-accent-hue), 55%, 50%);
+
+  /* ── Semantic (light default) ── */
+  --bg-primary:      var(--color-n-05);
+  --bg-secondary:    var(--color-n-0);
+  --bg-tertiary:     var(--color-n-10);
+  --bg-hover:        rgba(0,0,0,.04);
+  --bg-active:       rgba(0,0,0,.06);
+  --bg-selected:     rgba(0,0,0,.05);
+  --text-normal:     var(--color-n-100);
+  --text-muted:      var(--color-n-50);
+  --text-faint:      var(--color-n-30);
+  --text-on-accent:  var(--color-n-0);
+  --border:          var(--color-n-20);
+  --border-strong:   var(--color-n-25);
+  --accent:          var(--color-accent-2);
+
+  /* ── Spacing scale (4px 기준) ── */
+  --size-2:  2px;
+  --size-4:  4px;
+  --size-6:  6px;
+  --size-8:  8px;
+  --size-10: 10px;
+  --size-12: 12px;
+  --size-16: 16px;
+  --size-20: 20px;
+  --size-24: 24px;
+  --size-32: 32px;
+  --size-40: 40px;
+  --size-48: 48px;
+
+  /* ── Typography ── */
+  --font-interface: "Pretendard", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", sans-serif;
+  --font-mono:      "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --text-xxs: 10px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-base:13px;
+  --text-md:  14px;
+  --text-lg:  16px;
+  --text-xl:  19px;
+  --text-2xl: 24px;
+  --leading-tight:  1.25;
+  --leading-normal: 1.45;
+  --leading-loose:  1.6;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --tracking-tight:  -0.01em;
+  --tracking-wide:    0.02em;
+
+  /* ── Radius ── */
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 10px;
+
+  /* ── Layout ── */
+  --sidebar-w:            240px;
+  --sidebar-w-collapsed:  48px;
+  --header-h:             40px;
+  --tabbar-h:             36px;
+  --navbar-h:             32px;
+
+  /* ── Motion ── */
+  --dur-fast: 100ms;
+  --dur-med:  180ms;
+  --ease:     cubic-bezier(.2,.7,.3,1);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#101B24; --card:#16232E; --ink:#E4ECE7; --muted:#90A6B9;
-    --rule:#304453; --soft:#1C2A36; --hover:#22323F;
-    --accent:#A6EDB6; --accent-ink:#0F2418; --accent-soft:#1E3A2C;
-    --pos:#7ED89A; --neg:#E28A80;
+    --bg-primary:      var(--color-n-90);
+    --bg-secondary:    var(--color-n-80);
+    --bg-tertiary:     var(--color-n-95);
+    --bg-hover:        rgba(255,255,255,.05);
+    --bg-active:       rgba(255,255,255,.08);
+    --bg-selected:     rgba(255,255,255,.06);
+    --text-normal:     var(--color-n-05);
+    --text-muted:      var(--color-n-30);
+    --text-faint:      var(--color-n-50);
+    --text-on-accent:  var(--color-n-0);
+    --border:          var(--color-n-70);
+    --border-strong:   var(--color-n-60);
+    --accent:          var(--color-accent);
   }
 }
-*{box-sizing:border-box}
+
+/* ============================================================
+ * RESET · BASE
+ * ============================================================ */
+*, *::before, *::after{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{
-  background:var(--bg); color:var(--ink);
-  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
-  font-size:14px; line-height:1.4;
-  overflow:hidden;
+  background: var(--bg-primary);
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
-button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent}
-a{color:inherit;text-decoration:none}
+button{
+  font: inherit; color: inherit; cursor: pointer;
+  border: 0; background: transparent; padding: 0; margin: 0;
+}
+a{color: inherit; text-decoration: none}
+input, select, textarea{
+  font: inherit; color: inherit;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: var(--size-6) var(--size-8);
+}
+input:focus, select:focus{
+  outline: none;
+  border-color: var(--accent);
+}
+::selection{background: var(--accent); color: var(--text-on-accent)}
 
-/* ============ 앱 셸 ============ */
-.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;grid-template-rows:1fr;height:100vh}
-.app.sidebar-collapsed{grid-template-columns:var(--sidebar-w-collapsed) 1fr}
+/* ============================================================
+ * APP SHELL
+ * ============================================================ */
+.app{
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  height: 100vh;
+}
+.app.sidebar-collapsed{grid-template-columns: var(--sidebar-w-collapsed) 1fr}
 
-/* --- 사이드바 --- */
+/* ── Sidebar ── */
 .sidebar{
-  background:var(--card); border-right:1px solid var(--rule);
-  display:flex; flex-direction:column;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  min-width: 0;
 }
-.sidebar .brand{
-  display:flex; align-items:center; padding:0 14px;
-  height:var(--header-h); border-bottom:1px solid var(--rule);
-  font-weight:600; font-size:13px; letter-spacing:.02em;
+.sidebar-header{
+  height: var(--header-h);
+  display: flex; align-items: center;
+  padding: 0 var(--size-16);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-muted);
 }
-.app.sidebar-collapsed .sidebar .brand{padding:0;justify-content:center}
-.app.sidebar-collapsed .sidebar .brand-name{display:none}
-.sidebar .items{display:flex;flex-direction:column;flex:1;padding:6px 6px}
-.sidebar .item{
-  display:flex; align-items:center; gap:10px;
-  padding:7px 10px; border-radius:var(--radius);
-  color:var(--muted); font-size:13px; font-weight:400;
-}
-.sidebar .item:hover{background:var(--hover);color:var(--ink)}
-.sidebar .item.active{background:var(--hover); color:var(--ink); font-weight:500}
-.sidebar .item .icon{
-  width:16px;height:16px;flex:0 0 auto;
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:600;letter-spacing:0;
-  border:1px solid currentColor;border-radius:2px;opacity:.65;
-}
-.app.sidebar-collapsed .sidebar .item-label{display:none}
-.app.sidebar-collapsed .sidebar .item{justify-content:center;padding:7px 0}
-.sidebar .footer{padding:6px;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--rule)}
-.sidebar .footer .season{
-  padding:6px 10px; font-size:11px;
-  color:var(--muted); letter-spacing:.02em;
-}
-.app.sidebar-collapsed .sidebar .footer .season{display:none}
-.sidebar .footer .btn{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:6px 10px; border-radius:var(--radius); font-size:12px;
-  color:var(--ink); font-weight:500;
-  border:1px solid var(--rule);
-}
-.sidebar .footer .btn:hover{background:var(--hover)}
-.app.sidebar-collapsed .sidebar .footer .btn{padding:6px;justify-content:center}
-.app.sidebar-collapsed .sidebar .footer .btn-label{display:none}
-.sidebar .toggle{
-  padding:6px 10px; border-radius:var(--radius); font-size:12px; color:var(--muted);
-  display:flex;align-items:center;gap:8px;
-}
-.sidebar .toggle:hover{background:var(--hover);color:var(--ink)}
+.app.sidebar-collapsed .sidebar-header{padding: 0; justify-content: center}
+.app.sidebar-collapsed .sidebar-header .brand-full{display: none}
 
-/* --- 우측 메인 --- */
-.main{display:grid;grid-template-rows:var(--header-h) var(--tabbar-h) var(--nav-h) 1fr;min-width:0;overflow:hidden}
+.sidebar-nav{
+  flex: 1;
+  padding: var(--size-8) var(--size-6);
+  display: flex; flex-direction: column; gap: var(--size-2);
+  overflow-y: auto;
+}
+.sidebar-item{
+  display: flex; align-items: center; gap: var(--size-10);
+  padding: var(--size-6) var(--size-10);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-size: var(--text-base);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.sidebar-item:hover{background: var(--bg-hover); color: var(--text-normal)}
+.sidebar-item.active{background: var(--bg-selected); color: var(--text-normal); font-weight: var(--weight-medium)}
+.sidebar-item .item-glyph{
+  width: 14px; height: 14px;
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--text-xxs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-faint);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-s);
+}
+.sidebar-item.active .item-glyph{color: var(--accent)}
+.app.sidebar-collapsed .sidebar-item{justify-content: center; padding: var(--size-8) 0}
+.app.sidebar-collapsed .sidebar-item .item-label{display: none}
 
-/* 헤더 (글로벌) */
+.sidebar-footer{
+  padding: var(--size-8) var(--size-6);
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: var(--size-4);
+}
+.season-tag{
+  padding: var(--size-6) var(--size-10);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.app.sidebar-collapsed .season-tag{display: none}
+.button{
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--size-6);
+  padding: var(--size-6) var(--size-12);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-normal);
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.button:hover{background: var(--bg-hover); border-color: var(--border-strong)}
+.button-primary{
+  background: var(--accent); color: var(--text-on-accent); border-color: transparent;
+}
+.button-primary:hover{background: var(--accent); filter: brightness(1.1); border-color: transparent}
+.button-ghost{background: transparent; border-color: transparent; color: var(--text-muted)}
+.button-ghost:hover{background: var(--bg-hover); color: var(--text-normal)}
+.app.sidebar-collapsed .button .button-label{display: none}
+
+/* ── Main ── */
+.main{
+  display: grid;
+  grid-template-rows: var(--header-h) var(--tabbar-h) var(--navbar-h) 1fr;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 14px; border-bottom:1px solid var(--rule);
-  background:var(--card);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--size-16);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }
-.header .title{font-size:12px;color:var(--muted);font-weight:400}
-.header .right{display:flex;align-items:center;gap:4px}
-.header .settings{padding:4px 8px;border-radius:var(--radius);color:var(--muted);font-size:12px}
-.header .settings:hover{background:var(--hover);color:var(--ink)}
+.header-actions{display: flex; gap: var(--size-4)}
 
-/* 탭바 */
 .tabbar{
-  display:flex; align-items:end; padding:0;
-  border-bottom:1px solid var(--rule); background:var(--bg);
-  overflow-x:auto; scrollbar-width:none;
+  display: flex; align-items: stretch;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
-.tabbar::-webkit-scrollbar{display:none}
+.tabbar::-webkit-scrollbar{display: none}
+
 .tab{
-  display:flex; align-items:center; gap:6px;
-  padding:0 8px 0 12px; height:var(--tabbar-h);
-  font-size:12px; color:var(--muted); font-weight:400;
-  border-right:1px solid var(--rule);
-  max-width:200px; min-width:100px; white-space:nowrap;
+  display: flex; align-items: center; gap: var(--size-8);
+  padding: 0 var(--size-8) 0 var(--size-12);
+  height: var(--tabbar-h);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-weight: var(--weight-regular);
+  border-right: 1px solid var(--border);
+  min-width: 120px; max-width: 220px;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease);
+  position: relative;
 }
-.tab:hover{background:var(--hover);color:var(--ink)}
-.tab.active{background:var(--card);color:var(--ink);font-weight:500;position:relative}
-.tab.active::after{
-  content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--card);
+.tab:hover{background: var(--bg-hover); color: var(--text-normal)}
+.tab.active{
+  background: var(--bg-secondary);
+  color: var(--text-normal);
+  font-weight: var(--weight-medium);
 }
-.tab .icon{
-  font-size:9px;font-weight:600;
-  width:14px;height:14px;flex:0 0 auto;
-  display:inline-flex;align-items:center;justify-content:center;
-  border:1px solid currentColor;border-radius:2px;opacity:.55;
+.tab.active::before{
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: var(--accent);
 }
-.tab .name{overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
-.tab .close{
-  width:16px;height:16px;border-radius:2px;
-  display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;
-  color:var(--muted);
+.tab .tab-glyph{
+  font-family: var(--font-mono);
+  font-size: var(--text-xxs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-faint);
+  width: 16px; text-align: center;
+  flex: 0 0 auto;
 }
-.tab .close:hover{background:var(--rule);color:var(--ink)}
-.tab-new{padding:0 12px;color:var(--muted);font-size:14px;line-height:1;height:var(--tabbar-h);border-right:1px solid var(--rule)}
-.tab-new:hover{background:var(--hover);color:var(--ink)}
+.tab.active .tab-glyph{color: var(--accent)}
+.tab .tab-name{
+  overflow: hidden; text-overflow: ellipsis;
+  flex: 1; min-width: 0;
+}
+.tab .tab-close{
+  width: 18px; height: 18px;
+  border-radius: var(--radius-s);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; line-height: 1;
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+.tab .tab-close:hover{background: var(--bg-active); color: var(--text-normal)}
+.tab-new{
+  padding: 0 var(--size-12);
+  font-size: var(--text-lg);
+  line-height: 1;
+  color: var(--text-muted);
+}
+.tab-new:hover{background: var(--bg-hover); color: var(--text-normal)}
 
-/* Tab Navigation Bar */
 .navbar{
-  display:flex; align-items:center; gap:6px;
-  padding:0 12px; border-bottom:1px solid var(--rule);
-  background:var(--card); font-size:12px;
+  display: flex; align-items: center;
+  gap: var(--size-4);
+  padding: 0 var(--size-12);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
 }
-.navbar .navbtn{
-  padding:3px 6px;border-radius:var(--radius);color:var(--muted);
-  display:inline-flex;align-items:center;justify-content:center;min-width:22px;font-size:13px;
+.navbar-btn{
+  padding: var(--size-4) var(--size-6);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px;
+  font-size: var(--text-md);
+  line-height: 1;
 }
-.navbar .navbtn:hover{background:var(--hover);color:var(--ink)}
-.navbar .navbtn:disabled{opacity:.3;cursor:not-allowed}
-.navbar .navbtn:disabled:hover{background:transparent}
-.navbar .crumbs{display:flex;align-items:center;gap:4px;overflow:hidden;flex:1;min-width:0;margin-left:4px}
-.navbar .crumb{color:var(--muted);white-space:nowrap;padding:2px 4px;border-radius:var(--radius)}
-.navbar .crumb:hover{color:var(--ink);background:var(--hover)}
-.navbar .crumb.last{color:var(--ink);font-weight:500;pointer-events:none}
-.navbar .crumb.last:hover{background:transparent}
-.navbar .sep{color:var(--muted);font-size:11px;opacity:.5}
-
-/* 콘텐츠 */
-.content{overflow:auto;padding:20px 24px;min-width:0}
-.content h1{font-size:18px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
-.content .sub{color:var(--muted);font-size:12px;margin:0 0 20px}
-
-/* 공통 UI */
-.card{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
-.card h2{font-size:11px;letter-spacing:.02em;color:var(--muted);margin:0 0 10px;font-weight:500}
-
-/* 선수/스태프 리스트 */
-.list{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden}
-.list .row{
-  display:grid; grid-template-columns:2fr 1fr 1fr 1.5fr;
-  padding:9px 14px; border-bottom:1px solid var(--rule);
-  align-items:center; gap:12px; cursor:pointer;
-  font-size:13px;
+.navbar-btn:hover:not(:disabled){background: var(--bg-hover); color: var(--text-normal)}
+.navbar-btn:disabled{opacity: .35; cursor: not-allowed}
+.crumbs{
+  display: flex; align-items: center; gap: var(--size-4);
+  overflow: hidden; flex: 1;
+  margin-left: var(--size-6);
 }
-.list .row:last-child{border-bottom:0}
-.list .row:hover{background:var(--hover)}
-.list .row.head{
-  background:var(--soft); font-size:11px;
-  color:var(--muted); font-weight:500; letter-spacing:.02em;
-  cursor:default; padding:7px 14px;
+.crumb{
+  color: var(--text-muted);
+  padding: var(--size-2) var(--size-6);
+  border-radius: var(--radius-s);
+  white-space: nowrap;
 }
-.list .row.head:hover{background:var(--soft)}
-.list .row .name{font-weight:500;color:var(--ink)}
-.list .row .stars{color:var(--muted);font-variant-numeric:tabular-nums}
+.crumb:hover{background: var(--bg-hover); color: var(--text-normal)}
+.crumb.last{color: var(--text-normal); font-weight: var(--weight-medium); pointer-events: none}
+.crumb.last:hover{background: transparent}
+.crumb-sep{color: var(--text-faint); font-size: var(--text-xs)}
 
-/* 능력 그리드 */
-.abilities{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:2px}
-.abilities .ability{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:6px 10px; border:1px solid var(--rule); border-radius:var(--radius);
-  font-size:12px;
+.content{
+  overflow: auto;
+  padding: var(--size-24) var(--size-32);
+  min-width: 0;
+  background: var(--bg-primary);
 }
-.abilities .ability .lab{color:var(--muted)}
-.abilities .ability .val{font-weight:500;font-variant-numeric:tabular-nums}
-.set-group{margin-bottom:14px}
-.set-group h3{font-size:11px;color:var(--muted);margin:0 0 6px;font-weight:500;letter-spacing:.02em}
 
-/* 훈련 화면 */
-.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
-.slot{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:12px}
-.slot h3{margin:0 0 8px;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.02em}
-.slot select{
-  width:100%;padding:6px 8px;border-radius:var(--radius);
-  border:1px solid var(--rule);background:var(--bg);color:var(--ink);
-  font-size:12px;font-family:inherit;
+/* ============================================================
+ * COMPONENTS
+ * ============================================================ */
+
+/* Typography helpers */
+.page-title{
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-normal);
+  margin: 0 0 var(--size-4);
 }
-.slot .stars{margin-top:8px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.page-sub{
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin: 0 0 var(--size-24);
+}
+.section-title{
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 var(--size-10);
+}
 
-.placeholder{color:var(--muted);font-size:12px;padding:16px 0;text-align:center;border:1px dashed var(--rule);border-radius:var(--radius)}
+/* Card */
+.card{
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--size-16) var(--size-20);
+  margin-bottom: var(--size-12);
+}
+
+/* Data list */
+.dlist{
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.dlist-row{
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--size-12);
+  padding: var(--size-10) var(--size-16);
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+.dlist-row:last-child{border-bottom: 0}
+.dlist-row:hover{background: var(--bg-hover)}
+.dlist-row.head{
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: var(--size-8) var(--size-16);
+  cursor: default;
+}
+.dlist-row.head:hover{background: var(--bg-tertiary)}
+.dlist-row .cell-primary{font-weight: var(--weight-medium); color: var(--text-normal)}
+.dlist-row .cell-num{font-family: var(--font-mono); color: var(--text-muted); font-size: var(--text-sm)}
+
+/* Ability grid */
+.abilities{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--size-4);
+}
+.ability{
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--size-6) var(--size-10);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+}
+.ability .ability-label{color: var(--text-muted)}
+.ability .ability-value{
+  font-family: var(--font-mono);
+  font-weight: var(--weight-medium);
+  color: var(--text-normal);
+}
+.set-group{margin-bottom: var(--size-16)}
+
+/* Slots (training) */
+.slots{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--size-8);
+}
+.slot{
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--size-12) var(--size-16);
+}
+.slot-label{
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 var(--size-8);
+}
+.slot-meta{
+  margin-top: var(--size-8);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+.slot select{width: 100%; font-size: var(--text-sm)}
+
+/* Placeholder box */
+.placeholder{
+  color: var(--text-faint);
+  font-size: var(--text-sm);
+  padding: var(--size-16);
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-s);
+}
+
+/* Empty state */
+.empty{
+  max-width: 480px;
+  margin: var(--size-48) auto 0;
+}
+.empty-tiles{
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--size-8);
+  margin-top: var(--size-16);
+}
+.empty-tile{
+  padding: var(--size-16) var(--size-20);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.empty-tile:hover{border-color: var(--accent); background: var(--bg-hover)}
+.empty-tile-kind{
+  font-size: var(--text-xxs);
+  color: var(--text-faint);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  margin-bottom: var(--size-4);
+}
+.empty-tile-name{
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--text-normal);
+}
 </style>
 </head><body>
 <div class="app" id="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <span class="brand-name">OOTP</span>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-full">OOTP</span>
     </div>
-    <div class="items" id="sidebar-items"></div>
-    <div class="footer">
-      <div class="season">2026</div>
-      <button class="btn" onclick="advanceYear()">
-        <span class="btn-label">+1년</span>
-        <span>→</span>
+    <nav class="sidebar-nav" id="sidebar-items"></nav>
+    <div class="sidebar-footer">
+      <div class="season-tag">2026 시즌</div>
+      <button class="button" onclick="advanceYear()">
+        <span class="button-label">+1년 진행</span>
+        <span>›</span>
       </button>
-      <button class="toggle" onclick="toggleSidebar()">
-        <span class="btn-label">사이드바 접기</span>
+      <button class="button button-ghost" onclick="toggleSidebar()">
+        <span class="button-label">사이드바 접기</span>
       </button>
     </div>
   </aside>
+
   <div class="main">
     <header class="header">
-      <span class="title" id="doc-title">v1 스켈레톤 · 실사용 후 ADR 확정</span>
-      <div class="right"><button class="settings" title="설정">설정</button></div>
+      <span>v1 스켈레톤 · 실사용 후 확정</span>
+      <div class="header-actions">
+        <button class="button button-ghost">설정</button>
+      </div>
     </header>
+
     <div class="tabbar" id="tabbar"></div>
+
     <div class="navbar">
-      <button class="navbtn" id="nav-back" title="뒤로">‹</button>
-      <button class="navbtn" id="nav-forward" title="앞으로">›</button>
+      <button class="navbar-btn" id="nav-back" title="뒤로">‹</button>
+      <button class="navbar-btn" id="nav-forward" title="앞으로">›</button>
       <div class="crumbs" id="crumbs"></div>
     </div>
+
     <div class="content" id="content"></div>
   </div>
 </div>
@@ -256,37 +578,29 @@ a{color:inherit;text-decoration:none}
     youth_coach:'유소년 코치', gm:'단장'
   };
 
-  // ── 사이드바(Root Destinations) ──────────────────────────────
-  // 아이콘은 이모지 대신 대문자 이니셜(각 카테고리 이름 앞글자) — 중성 와이어프레임.
   const CATEGORIES = [
-    { key:'players', icon:'선', label:'선수단', home:'/players' },
-    { key:'staff',   icon:'스', label:'스태프', home:'/staff' },
-    { key:'training',icon:'훈', label:'훈련',   home:'/training' },
+    { key:'players',  glyph:'PL', label:'선수단', home:'/players' },
+    { key:'staff',    glyph:'ST', label:'스태프', home:'/staff' },
+    { key:'training', glyph:'TR', label:'훈련',   home:'/training' },
   ];
 
-  // ── 라우트 → Root Context 매핑 ───────────────────────────────
   function routeContext(route){
     if (route.startsWith('/players') || route.startsWith('/player/')) return 'players';
     if (route.startsWith('/staff'))    return 'staff';
     if (route.startsWith('/training')) return 'training';
-    return 'players';
+    return null;
   }
 
-  // ── 탭 상태 ──────────────────────────────────────────────────
-  // 각 탭: { id, route, history:[route,...], histIdx }
   let tabs = [];
   let activeTabId = null;
   let nextTabId = 1;
 
-  function makeTab(route){
-    return { id: nextTabId++, route, history:[route], histIdx:0 };
-  }
+  function makeTab(route){ return { id: nextTabId++, route, history:[route], histIdx:0 }; }
   function activeTab(){ return tabs.find(t => t.id === activeTabId); }
 
   function openTab(route){
     const t = makeTab(route);
-    tabs.push(t);
-    activeTabId = t.id;
+    tabs.push(t); activeTabId = t.id;
     render();
   }
   function closeTab(id){
@@ -299,18 +613,14 @@ a{color:inherit;text-decoration:none}
     render();
   }
   function switchTo(route, opts={}){
-    if (opts.newTab || !tabs.length) {
-      openTab(route);
-      return;
-    }
-    // 같은 카테고리 홈으로 가는 경우: 이미 열려있으면 그 탭으로 스위치
-    const cats = CATEGORIES.map(c => c.home);
-    if (cats.includes(route)) {
+    if (opts.newTab || !tabs.length){ openTab(route); return; }
+    const catHomes = CATEGORIES.map(c => c.home);
+    if (catHomes.includes(route)){
       const existing = tabs.find(t => t.route === route);
-      if (existing) { activeTabId = existing.id; render(); return; }
+      if (existing){ activeTabId = existing.id; render(); return; }
     }
     const t = activeTab();
-    if (!t) { openTab(route); return; }
+    if (!t){ openTab(route); return; }
     t.history = t.history.slice(0, t.histIdx+1);
     t.history.push(route);
     t.histIdx = t.history.length - 1;
@@ -326,95 +636,88 @@ a{color:inherit;text-decoration:none}
     t.histIdx++; t.route = t.history[t.histIdx]; render();
   }
 
-  // ── 라우트 파싱 ──────────────────────────────────────────────
-  function parseRoute(route){
-    const parts = route.split('/').filter(Boolean);
-    return parts; // ["players"] or ["player","1001"] or ["staff","2"] or ["training"]
-  }
+  function parseRoute(route){ return route.split('/').filter(Boolean); }
 
-  // ── 브레드크럼 ──────────────────────────────────────────────
   function breadcrumbFor(route){
     const parts = parseRoute(route);
     const crumbs = [];
     const ctx = routeContext(route);
     const cat = CATEGORIES.find(c => c.key === ctx);
-    crumbs.push({ label: cat.label, route: cat.home });
-    if (parts[0] === 'player' && parts[1]) {
+    if (cat) crumbs.push({ label: cat.label, route: cat.home });
+    if (parts[0] === 'player' && parts[1]){
       const p = POOL.players.find(x => String(x.id) === parts[1]);
       crumbs.push({ label: p ? p.name : parts[1], route });
-    } else if (parts[0] === 'staff' && parts[1]) {
+    } else if (parts[0] === 'staff' && parts[1]){
       const s = POOL.staff.find(x => String(x.id) === parts[1]);
       crumbs.push({ label: s ? s.name : parts[1], route });
     }
     return crumbs;
   }
 
-  // ── 탭 라벨 ─────────────────────────────────────────────────
   function tabLabel(route){
     const parts = parseRoute(route);
-    if (parts[0] === 'players') return { icon:'선', name:'선수단' };
-    if (parts[0] === 'staff' && !parts[1])   return { icon:'스', name:'스태프' };
-    if (parts[0] === 'training')return { icon:'훈', name:'훈련' };
-    if (parts[0] === 'player' && parts[1]) {
+    if (parts[0] === 'players')  return { glyph:'PL', name:'선수단' };
+    if (parts[0] === 'staff' && !parts[1]) return { glyph:'ST', name:'스태프' };
+    if (parts[0] === 'training') return { glyph:'TR', name:'훈련' };
+    if (parts[0] === 'player' && parts[1]){
       const p = POOL.players.find(x => String(x.id) === parts[1]);
-      return { icon:'P', name: p ? p.name : `선수 ${parts[1]}` };
+      return { glyph:'PL', name: p ? p.name : `선수 ${parts[1]}` };
     }
-    if (parts[0] === 'staff' && parts[1]) {
+    if (parts[0] === 'staff' && parts[1]){
       const s = POOL.staff.find(x => String(x.id) === parts[1]);
-      return { icon:'S', name: s ? s.name : `스태프 ${parts[1]}` };
+      return { glyph:'ST', name: s ? s.name : `스태프 ${parts[1]}` };
     }
-    return { icon:'·', name:'페이지' };
+    return { glyph:'·', name:'페이지' };
   }
 
-  // ── 렌더링 ──────────────────────────────────────────────────
   function render(){
     const t = activeTab();
     const ctx = t ? routeContext(t.route) : null;
 
-    // 사이드바
+    // Sidebar
     document.getElementById('sidebar-items').innerHTML = CATEGORIES.map(c =>
-      `<a class="item ${c.key === ctx ? 'active' : ''}" data-route="${c.home}">
-        <span class="icon">${c.icon}</span><span class="item-label">${c.label}</span>
+      `<a class="sidebar-item ${c.key === ctx ? 'active' : ''}" data-route="${c.home}">
+        <span class="item-glyph">${c.glyph}</span>
+        <span class="item-label">${c.label}</span>
       </a>`
     ).join('');
-    document.querySelectorAll('.sidebar .item').forEach(el => {
+    document.querySelectorAll('.sidebar-item').forEach(el => {
       el.addEventListener('click', e => {
         e.preventDefault();
         switchTo(el.dataset.route, { newTab: e.metaKey || e.ctrlKey });
       });
     });
 
-    // 탭바
+    // Tabbar
     const tabbar = document.getElementById('tabbar');
     tabbar.innerHTML = tabs.map(tab => {
       const lb = tabLabel(tab.route);
       return `<div class="tab ${tab.id===activeTabId?'active':''}" data-id="${tab.id}">
-        <span class="icon">${lb.icon}</span>
-        <span class="name">${lb.name}</span>
-        <button class="close" data-close="${tab.id}" title="닫기">×</button>
+        <span class="tab-glyph">${lb.glyph}</span>
+        <span class="tab-name">${lb.name}</span>
+        <button class="tab-close" data-close="${tab.id}" title="닫기">×</button>
       </div>`;
-    }).join('') + `<button class="tab-new" title="새 탭 (홈)">+</button>`;
+    }).join('') + `<button class="tab-new" title="새 탭">+</button>`;
     tabbar.querySelectorAll('.tab').forEach(el => {
       el.addEventListener('click', e => {
         if (e.target.dataset.close) return;
-        activeTabId = parseInt(el.dataset.id, 10);
-        render();
+        activeTabId = parseInt(el.dataset.id, 10); render();
       });
     });
-    tabbar.querySelectorAll('.close').forEach(b => {
+    tabbar.querySelectorAll('.tab-close').forEach(b => {
       b.addEventListener('click', e => { e.stopPropagation(); closeTab(parseInt(b.dataset.close, 10)); });
     });
     tabbar.querySelector('.tab-new').addEventListener('click', () => openTab('/players'));
 
-    // Nav 버튼
+    // Nav buttons
     document.getElementById('nav-back').disabled = !t || t.histIdx <= 0;
     document.getElementById('nav-forward').disabled = !t || t.histIdx >= t.history.length - 1;
 
-    // 브레드크럼
+    // Breadcrumb
     const crumbs = t ? breadcrumbFor(t.route) : [];
     document.getElementById('crumbs').innerHTML = crumbs.map((c, i) => {
       const last = i === crumbs.length - 1;
-      const sep = i > 0 ? '<span class="sep">/</span>' : '';
+      const sep = i > 0 ? '<span class="crumb-sep">/</span>' : '';
       return `${sep}<a class="crumb ${last?'last':''}" data-route="${c.route}">${c.label}</a>`;
     }).join('');
     document.querySelectorAll('.crumb').forEach(el => {
@@ -424,7 +727,7 @@ a{color:inherit;text-decoration:none}
       });
     });
 
-    // 콘텐츠
+    // Content
     if (t) renderContent(t.route);
     else renderEmpty();
   }
@@ -432,38 +735,34 @@ a{color:inherit;text-decoration:none}
   function renderEmpty(){
     const el = document.getElementById('content');
     el.innerHTML = `
-      <div style="max-width:480px;margin:64px auto 0">
-        <h1>열린 탭이 없습니다</h1>
-        <p class="sub">사이드바에서 카테고리를 고르거나 아래에서 선택하세요.</p>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div class="empty">
+        <h1 class="page-title">열린 탭이 없습니다</h1>
+        <p class="page-sub">사이드바에서 카테고리를 고르거나 아래에서 선택하세요.</p>
+        <div class="empty-tiles">
           ${CATEGORIES.map(c => `
-            <a class="card" data-route="${c.home}" style="cursor:pointer;text-align:left;margin:0;padding:14px 16px">
-              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">카테고리</div>
-              <div style="font-weight:500">${c.label}</div>
-            </a>
-          `).join('')}
+            <a class="empty-tile" data-route="${c.home}">
+              <div class="empty-tile-kind">카테고리</div>
+              <div class="empty-tile-name">${c.label}</div>
+            </a>`).join('')}
         </div>
       </div>`;
-    el.querySelectorAll('[data-route]').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        switchTo(a.dataset.route, { newTab: e.metaKey || e.ctrlKey });
-      });
-    });
+    bindRouteLinks(el);
   }
 
   function renderContent(route){
     const parts = parseRoute(route);
     const el = document.getElementById('content');
-    if (parts[0] === 'players') el.innerHTML = renderPlayersHome();
-    else if (parts[0] === 'player') el.innerHTML = renderPlayerDetail(parts[1]);
-    else if (parts[0] === 'staff' && !parts[1]) el.innerHTML = renderStaffHome();
-    else if (parts[0] === 'staff' && parts[1]) el.innerHTML = renderStaffDetail(parts[1]);
-    else if (parts[0] === 'training') el.innerHTML = renderTrainingHome();
+    if (parts[0] === 'players') el.innerHTML = viewPlayers();
+    else if (parts[0] === 'player') el.innerHTML = viewPlayer(parts[1]);
+    else if (parts[0] === 'staff' && !parts[1]) el.innerHTML = viewStaffList();
+    else if (parts[0] === 'staff' && parts[1]) el.innerHTML = viewStaff(parts[1]);
+    else if (parts[0] === 'training') el.innerHTML = viewTraining();
     else el.innerHTML = `<div class="placeholder">알 수 없는 페이지: ${route}</div>`;
+    bindRouteLinks(el);
+  }
 
-    // 링크 위임
-    el.querySelectorAll('[data-route]').forEach(a => {
+  function bindRouteLinks(root){
+    root.querySelectorAll('[data-route]').forEach(a => {
       a.addEventListener('click', e => {
         e.preventDefault();
         switchTo(a.dataset.route, { newTab: e.metaKey || e.ctrlKey });
@@ -471,76 +770,78 @@ a{color:inherit;text-decoration:none}
     });
   }
 
-  // ── 페이지들 ────────────────────────────────────────────────
-  function renderPlayersHome(){
+  function viewPlayers(){
     const rows = POOL.players.map(p => `
-      <div class="row" data-route="/player/${p.id}">
-        <div class="name">${p.name}</div>
-        <div>${p.age}</div>
+      <div class="dlist-row" data-route="/player/${p.id}">
+        <div class="cell-primary">${p.name}</div>
+        <div class="cell-num">${p.age}</div>
         <div>${p.role}</div>
-        <div class="stars">${p.talent_avg}</div>
-      </div>
-    `).join('');
+        <div class="cell-num">${p.talent_avg}</div>
+      </div>`).join('');
     return `
-      <h1>선수단</h1>
-      <p class="sub">${POOL.players.length}명 · 클릭 = 상세, Cmd+클릭 = 새 탭</p>
-      <div class="list">
-        <div class="row head"><div>이름</div><div>나이</div><div>역할</div><div>재능</div></div>
+      <h1 class="page-title">선수단</h1>
+      <p class="page-sub">${POOL.players.length}명 · 클릭 = 상세 · Cmd+클릭 = 새 탭</p>
+      <div class="dlist">
+        <div class="dlist-row head">
+          <div>이름</div><div>나이</div><div>역할</div><div>재능</div>
+        </div>
         ${rows}
-      </div>
-    `;
+      </div>`;
   }
 
-  function renderPlayerDetail(id){
+  function viewPlayer(id){
     const p = POOL.players.find(x => String(x.id) === id);
     if (!p) return `<div class="placeholder">선수 ${id} 없음</div>`;
-    const groups = ['bat','run','field','pitch','body'];
-    const groupsHtml = groups.map(g => {
+    const groupsHtml = ['bat','run','field','pitch','body'].map(g => {
       const items = POOL.ability_labels.filter(a => a[2] === g);
       if (!items.length) return '';
-      const inner = items.map(([aid, label, _]) => `
-        <div class="ability"><span class="lab">${label}</span><span class="val">${p.ability_display[aid] || '·'}</span></div>
-      `).join('');
-      return `<div class="set-group"><h3>${SET_NAMES[g]}</h3><div class="abilities">${inner}</div></div>`;
+      const inner = items.map(([aid, label]) => `
+        <div class="ability">
+          <span class="ability-label">${label}</span>
+          <span class="ability-value">${p.ability_display[aid] || '·'}</span>
+        </div>`).join('');
+      return `<div class="set-group">
+        <h3 class="section-title">${SET_NAMES[g]}</h3>
+        <div class="abilities">${inner}</div>
+      </div>`;
     }).join('');
     return `
-      <h1>${p.name}</h1>
-      <p class="sub">${p.role} · ${p.age}세 · 재능 ${p.talent_avg}</p>
+      <h1 class="page-title">${p.name}</h1>
+      <p class="page-sub">${p.role} · ${p.age}세 · 재능 ${p.talent_avg}</p>
       <div class="card">
-        <h2>능력</h2>
+        <h2 class="section-title">능력</h2>
         ${groupsHtml}
       </div>
       <div class="card">
-        <h2>개인 훈련</h2>
-        <div class="placeholder">편집 UI (다음 이터레이션)</div>
+        <h2 class="section-title">개인 훈련</h2>
+        <div class="placeholder">편집 UI · 다음 이터레이션</div>
       </div>
       <div class="card">
-        <h2>성장 곡선</h2>
-        <div class="placeholder">season 통과 시뮬 결과 (다음 이터레이션)</div>
-      </div>
-    `;
+        <h2 class="section-title">성장 곡선</h2>
+        <div class="placeholder">season 통과 시뮬 결과 · 다음 이터레이션</div>
+      </div>`;
   }
 
-  function renderStaffHome(){
+  function viewStaffList(){
     const rows = POOL.staff.map(s => `
-      <div class="row" data-route="/staff/${s.id}">
-        <div class="name">${s.name}</div>
+      <div class="dlist-row" data-route="/staff/${s.id}">
+        <div class="cell-primary">${s.name}</div>
         <div>${KIND_LABELS[s.kind] || s.kind}</div>
-        <div class="stars">${s.abilities.motivation || '-'}</div>
-        <div class="stars">—</div>
-      </div>
-    `).join('');
+        <div class="cell-num">${s.abilities.motivation || '-'}</div>
+        <div class="cell-num">—</div>
+      </div>`).join('');
     return `
-      <h1>스태프</h1>
-      <p class="sub">${POOL.staff.length}명</p>
-      <div class="list">
-        <div class="row head"><div>이름</div><div>직책</div><div>동기</div><div>배치</div></div>
+      <h1 class="page-title">스태프</h1>
+      <p class="page-sub">${POOL.staff.length}명</p>
+      <div class="dlist">
+        <div class="dlist-row head">
+          <div>이름</div><div>직책</div><div>동기</div><div>배치</div>
+        </div>
         ${rows}
-      </div>
-    `;
+      </div>`;
   }
 
-  function renderStaffDetail(id){
+  function viewStaff(id){
     const s = POOL.staff.find(x => String(x.id) === id);
     if (!s) return `<div class="placeholder">스태프 ${id} 없음</div>`;
     const labels = {
@@ -549,23 +850,24 @@ a{color:inherit;text-decoration:none}
       youth_development:'유소년 육성', motivation:'동기 부여',
     };
     const abInner = Object.entries(labels).map(([k,l]) =>
-      `<div class="ability"><span class="lab">${l}</span><span class="val">${s.abilities[k] || 1}</span></div>`
-    ).join('');
+      `<div class="ability">
+        <span class="ability-label">${l}</span>
+        <span class="ability-value">${s.abilities[k] || 1}</span>
+      </div>`).join('');
     return `
-      <h1>${s.name}</h1>
-      <p class="sub">${KIND_LABELS[s.kind] || s.kind}</p>
+      <h1 class="page-title">${s.name}</h1>
+      <p class="page-sub">${KIND_LABELS[s.kind] || s.kind}</p>
       <div class="card">
-        <h2>능력 (1–20)</h2>
+        <h2 class="section-title">능력 (1–20)</h2>
         <div class="abilities">${abInner}</div>
       </div>
       <div class="card">
-        <h2>배치</h2>
-        <div class="placeholder">실제 슬롯 연결 (다음 이터레이션)</div>
-      </div>
-    `;
+        <h2 class="section-title">배치</h2>
+        <div class="placeholder">실제 슬롯 연결 · 다음 이터레이션</div>
+      </div>`;
   }
 
-  function renderTrainingHome(){
+  function viewTraining(){
     const slots = [
       { key:'bat', label:'타격', kind:'bat_coach' },
       { key:'pitch', label:'투구', kind:'pitch_coach' },
@@ -578,41 +880,31 @@ a{color:inherit;text-decoration:none}
       const opts = ['<option value="">(비어 있음)</option>'].concat(
         coaches.map(c => `<option value="${c.id}">${c.name}</option>`)
       ).join('');
-      return `
-        <div class="slot">
-          <h3>${s.label}</h3>
-          <select>${opts}</select>
-          <div class="stars">별점 — · 비중 1.0</div>
-        </div>
-      `;
+      return `<div class="slot">
+        <div class="slot-label">${s.label}</div>
+        <select>${opts}</select>
+        <div class="slot-meta">별점 — · 비중 1.0</div>
+      </div>`;
     }).join('');
     return `
-      <h1>훈련</h1>
-      <p class="sub">팀 훈련 5슬롯</p>
+      <h1 class="page-title">훈련</h1>
+      <p class="page-sub">팀 훈련 5슬롯</p>
       <div class="slots">${cards}</div>
-      <div class="card" style="margin-top:12px">
-        <h2>결과 요약</h2>
-        <div class="placeholder">환경 요인·동기 (다음 이터레이션)</div>
-      </div>
-    `;
+      <div class="card" style="margin-top: var(--size-16)">
+        <h2 class="section-title">결과 요약</h2>
+        <div class="placeholder">환경 요인·동기 · 다음 이터레이션</div>
+      </div>`;
   }
 
-  // ── 이벤트 ──────────────────────────────────────────────────
   document.getElementById('nav-back').addEventListener('click', goBack);
   document.getElementById('nav-forward').addEventListener('click', goForward);
-  window.toggleSidebar = () => {
-    document.getElementById('app').classList.toggle('sidebar-collapsed');
-  };
-  window.advanceYear = () => {
-    alert('v1 스켈레톤: 시즌 진행은 다음 이터레이션');
-  };
+  window.toggleSidebar = () => document.getElementById('app').classList.toggle('sidebar-collapsed');
+  window.advanceYear = () => alert('시즌 진행 · 다음 이터레이션');
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { /* 자리 예약 */ }
     if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
     if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowRight') { e.preventDefault(); goForward(); }
   });
 
-  // 초기: 선수단 탭 하나 열고 시작
   openTab('/players');
 })();
 </script>
