@@ -44,42 +44,48 @@ a{color:inherit;text-decoration:none}
 /* --- 사이드바 --- */
 .sidebar{
   background:var(--card); border-right:1px solid var(--rule);
-  display:flex; flex-direction:column; padding:8px 0;
+  display:flex; flex-direction:column;
 }
 .sidebar .brand{
-  display:flex; align-items:center; gap:8px; padding:10px 14px 14px;
-  font-weight:700; font-size:15px;
+  display:flex; align-items:center; padding:0 14px;
+  height:var(--header-h); border-bottom:1px solid var(--rule);
+  font-weight:600; font-size:13px; letter-spacing:.02em;
 }
-.sidebar .brand .logo{font-size:18px}
+.app.sidebar-collapsed .sidebar .brand{padding:0;justify-content:center}
 .app.sidebar-collapsed .sidebar .brand-name{display:none}
-.sidebar .items{display:flex;flex-direction:column;flex:1;gap:2px;padding:0 8px}
+.sidebar .items{display:flex;flex-direction:column;flex:1;padding:6px 6px}
 .sidebar .item{
   display:flex; align-items:center; gap:10px;
-  padding:9px 10px; border-radius:6px;
-  color:var(--muted); font-size:13.5px; font-weight:500;
-  transition:background .12s;
+  padding:7px 10px; border-radius:var(--radius);
+  color:var(--muted); font-size:13px; font-weight:400;
 }
-.sidebar .item:hover{background:var(--hover)}
-.sidebar .item.active{background:var(--accent-soft); color:var(--accent); font-weight:600}
-.sidebar .item .icon{font-size:16px;width:20px;text-align:center;flex:0 0 auto}
+.sidebar .item:hover{background:var(--hover);color:var(--ink)}
+.sidebar .item.active{background:var(--hover); color:var(--ink); font-weight:500}
+.sidebar .item .icon{
+  width:16px;height:16px;flex:0 0 auto;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;letter-spacing:0;
+  border:1px solid currentColor;border-radius:2px;opacity:.65;
+}
 .app.sidebar-collapsed .sidebar .item-label{display:none}
-.app.sidebar-collapsed .sidebar .item{justify-content:center;padding:9px 0}
-.sidebar .footer{padding:8px;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--soft)}
+.app.sidebar-collapsed .sidebar .item{justify-content:center;padding:7px 0}
+.sidebar .footer{padding:6px;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--rule)}
 .sidebar .footer .season{
-  padding:6px 12px; font-family:"IBM Plex Mono",monospace; font-size:12px;
-  color:var(--muted);
+  padding:6px 10px; font-size:11px;
+  color:var(--muted); letter-spacing:.02em;
 }
 .app.sidebar-collapsed .sidebar .footer .season{display:none}
 .sidebar .footer .btn{
   display:flex; align-items:center; justify-content:space-between;
-  padding:8px 10px; border-radius:6px; font-size:13px;
-  background:var(--soft); color:var(--ink); font-weight:500;
+  padding:6px 10px; border-radius:var(--radius); font-size:12px;
+  color:var(--ink); font-weight:500;
+  border:1px solid var(--rule);
 }
 .sidebar .footer .btn:hover{background:var(--hover)}
-.app.sidebar-collapsed .sidebar .footer .btn{padding:8px;justify-content:center}
+.app.sidebar-collapsed .sidebar .footer .btn{padding:6px;justify-content:center}
 .app.sidebar-collapsed .sidebar .footer .btn-label{display:none}
 .sidebar .toggle{
-  padding:8px 10px; border-radius:6px; font-size:13px; color:var(--muted);
+  padding:6px 10px; border-radius:var(--radius); font-size:12px; color:var(--muted);
   display:flex;align-items:center;gap:8px;
 }
 .sidebar .toggle:hover{background:var(--hover);color:var(--ink)}
@@ -90,144 +96,149 @@ a{color:inherit;text-decoration:none}
 /* 헤더 (글로벌) */
 .header{
   display:flex; align-items:center; justify-content:space-between;
-  padding:0 16px; border-bottom:1px solid var(--rule);
+  padding:0 14px; border-bottom:1px solid var(--rule);
   background:var(--card);
 }
-.header .title{font-size:13px;color:var(--muted);font-weight:500}
-.header .right{display:flex;align-items:center;gap:8px}
-.header .settings{padding:6px 8px;border-radius:5px;color:var(--muted)}
+.header .title{font-size:12px;color:var(--muted);font-weight:400}
+.header .right{display:flex;align-items:center;gap:4px}
+.header .settings{padding:4px 8px;border-radius:var(--radius);color:var(--muted);font-size:12px}
 .header .settings:hover{background:var(--hover);color:var(--ink)}
 
 /* 탭바 */
 .tabbar{
-  display:flex; align-items:end; padding:0 8px;
+  display:flex; align-items:end; padding:0;
   border-bottom:1px solid var(--rule); background:var(--bg);
   overflow-x:auto; scrollbar-width:none;
 }
 .tabbar::-webkit-scrollbar{display:none}
 .tab{
   display:flex; align-items:center; gap:6px;
-  padding:6px 8px 6px 12px; margin-right:2px;
-  border-radius:6px 6px 0 0; height:calc(var(--tabbar-h) - 4px);
-  font-size:12.5px; color:var(--muted); font-weight:500;
-  border:1px solid transparent; border-bottom:0;
-  max-width:180px; min-width:80px; white-space:nowrap;
+  padding:0 8px 0 12px; height:var(--tabbar-h);
+  font-size:12px; color:var(--muted); font-weight:400;
+  border-right:1px solid var(--rule);
+  max-width:200px; min-width:100px; white-space:nowrap;
 }
-.tab:hover{background:var(--soft);color:var(--ink)}
-.tab.active{background:var(--card);color:var(--ink);border-color:var(--rule);position:relative;top:1px}
-.tab .icon{font-size:13px}
+.tab:hover{background:var(--hover);color:var(--ink)}
+.tab.active{background:var(--card);color:var(--ink);font-weight:500;position:relative}
+.tab.active::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--card);
+}
+.tab .icon{
+  font-size:9px;font-weight:600;
+  width:14px;height:14px;flex:0 0 auto;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid currentColor;border-radius:2px;opacity:.55;
+}
 .tab .name{overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
 .tab .close{
-  width:16px;height:16px;border-radius:3px;
+  width:16px;height:16px;border-radius:2px;
   display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;
   color:var(--muted);
 }
 .tab .close:hover{background:var(--rule);color:var(--ink)}
-.tab-new{padding:6px 10px;color:var(--muted);border-radius:5px;font-size:16px;line-height:1;height:26px;align-self:center}
-.tab-new:hover{background:var(--soft);color:var(--ink)}
+.tab-new{padding:0 12px;color:var(--muted);font-size:14px;line-height:1;height:var(--tabbar-h);border-right:1px solid var(--rule)}
+.tab-new:hover{background:var(--hover);color:var(--ink)}
 
 /* Tab Navigation Bar */
 .navbar{
-  display:flex; align-items:center; gap:8px;
+  display:flex; align-items:center; gap:6px;
   padding:0 12px; border-bottom:1px solid var(--rule);
-  background:var(--card); font-size:12.5px;
+  background:var(--card); font-size:12px;
 }
 .navbar .navbtn{
-  padding:4px 6px;border-radius:4px;color:var(--muted);
-  display:inline-flex;align-items:center;justify-content:center;min-width:22px;
+  padding:3px 6px;border-radius:var(--radius);color:var(--muted);
+  display:inline-flex;align-items:center;justify-content:center;min-width:22px;font-size:13px;
 }
 .navbar .navbtn:hover{background:var(--hover);color:var(--ink)}
 .navbar .navbtn:disabled{opacity:.3;cursor:not-allowed}
 .navbar .navbtn:disabled:hover{background:transparent}
-.navbar .crumbs{display:flex;align-items:center;gap:6px;overflow:hidden;flex:1;min-width:0}
-.navbar .crumb{color:var(--muted);white-space:nowrap;padding:2px 4px;border-radius:3px}
+.navbar .crumbs{display:flex;align-items:center;gap:4px;overflow:hidden;flex:1;min-width:0;margin-left:4px}
+.navbar .crumb{color:var(--muted);white-space:nowrap;padding:2px 4px;border-radius:var(--radius)}
 .navbar .crumb:hover{color:var(--ink);background:var(--hover)}
-.navbar .crumb.last{color:var(--ink);font-weight:600;pointer-events:none}
+.navbar .crumb.last{color:var(--ink);font-weight:500;pointer-events:none}
 .navbar .crumb.last:hover{background:transparent}
-.navbar .sep{color:var(--muted);font-size:11px;opacity:.6}
+.navbar .sep{color:var(--muted);font-size:11px;opacity:.5}
 
 /* 콘텐츠 */
 .content{overflow:auto;padding:20px 24px;min-width:0}
-.content h1{font-size:22px;margin:0 0 4px;font-weight:700}
-.content .sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+.content h1{font-size:18px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
+.content .sub{color:var(--muted);font-size:12px;margin:0 0 20px}
 
 /* 공통 UI */
-.card{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px 18px;margin-bottom:14px}
-.card h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+.card h2{font-size:11px;letter-spacing:.02em;color:var(--muted);margin:0 0 10px;font-weight:500}
 
 /* 선수/스태프 리스트 */
-.list{background:var(--card);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.list{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden}
 .list .row{
   display:grid; grid-template-columns:2fr 1fr 1fr 1.5fr;
-  padding:11px 16px; border-bottom:1px solid var(--soft);
+  padding:9px 14px; border-bottom:1px solid var(--rule);
   align-items:center; gap:12px; cursor:pointer;
+  font-size:13px;
 }
 .list .row:last-child{border-bottom:0}
 .list .row:hover{background:var(--hover)}
 .list .row.head{
-  background:var(--soft); font-size:11px; text-transform:uppercase;
-  color:var(--muted); font-weight:600; letter-spacing:.05em;
-  cursor:default; padding:8px 16px;
+  background:var(--soft); font-size:11px;
+  color:var(--muted); font-weight:500; letter-spacing:.02em;
+  cursor:default; padding:7px 14px;
 }
 .list .row.head:hover{background:var(--soft)}
-.list .row .name{font-weight:600;color:var(--ink)}
-.list .row .name.link{color:var(--accent)}
-.list .row .stars{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
+.list .row .name{font-weight:500;color:var(--ink)}
+.list .row .stars{color:var(--muted);font-variant-numeric:tabular-nums}
 
 /* 능력 그리드 */
-.abilities{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.abilities{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:2px}
 .abilities .ability{
   display:flex; justify-content:space-between; align-items:center;
-  padding:6px 10px; border-radius:5px; background:var(--soft);
-  font-size:12.5px;
+  padding:6px 10px; border:1px solid var(--rule); border-radius:var(--radius);
+  font-size:12px;
 }
 .abilities .ability .lab{color:var(--muted)}
-.abilities .ability .val{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.abilities .ability .val{font-weight:500;font-variant-numeric:tabular-nums}
 .set-group{margin-bottom:14px}
-.set-group h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:600}
+.set-group h3{font-size:11px;color:var(--muted);margin:0 0 6px;font-weight:500;letter-spacing:.02em}
 
 /* 훈련 화면 */
-.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.slot{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px}
-.slot h3{margin:0 0 8px;font-size:14px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.slot{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:12px}
+.slot h3{margin:0 0 8px;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.02em}
 .slot select{
-  width:100%;padding:6px 8px;border-radius:5px;
+  width:100%;padding:6px 8px;border-radius:var(--radius);
   border:1px solid var(--rule);background:var(--bg);color:var(--ink);
-  font-size:13px;font-family:inherit;
+  font-size:12px;font-family:inherit;
 }
-.slot .stars{margin-top:8px;font-size:12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.slot .stars{margin-top:8px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 
-.placeholder{color:var(--muted);font-size:13px;padding:20px 0;text-align:center;font-style:italic}
+.placeholder{color:var(--muted);font-size:12px;padding:16px 0;text-align:center;border:1px dashed var(--rule);border-radius:var(--radius)}
 </style>
 </head><body>
 <div class="app" id="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <span class="logo">⚾</span>
       <span class="brand-name">OOTP</span>
     </div>
     <div class="items" id="sidebar-items"></div>
     <div class="footer">
-      <div class="season">2026 시즌</div>
+      <div class="season">2026</div>
       <button class="btn" onclick="advanceYear()">
         <span class="btn-label">+1년</span>
         <span>→</span>
       </button>
       <button class="toggle" onclick="toggleSidebar()">
-        <span>↔</span>
-        <span class="btn-label">접기</span>
+        <span class="btn-label">사이드바 접기</span>
       </button>
     </div>
   </aside>
   <div class="main">
     <header class="header">
-      <span class="title" id="doc-title">게임 앱 v1 스켈레톤 (실사용 후 ADR 확정)</span>
-      <div class="right"><button class="settings" title="설정">⚙</button></div>
+      <span class="title" id="doc-title">v1 스켈레톤 · 실사용 후 ADR 확정</span>
+      <div class="right"><button class="settings" title="설정">설정</button></div>
     </header>
     <div class="tabbar" id="tabbar"></div>
     <div class="navbar">
-      <button class="navbtn" id="nav-back" title="뒤로">←</button>
-      <button class="navbtn" id="nav-forward" title="앞으로">→</button>
+      <button class="navbtn" id="nav-back" title="뒤로">‹</button>
+      <button class="navbtn" id="nav-forward" title="앞으로">›</button>
       <div class="crumbs" id="crumbs"></div>
     </div>
     <div class="content" id="content"></div>
@@ -246,10 +257,11 @@ a{color:inherit;text-decoration:none}
   };
 
   // ── 사이드바(Root Destinations) ──────────────────────────────
+  // 아이콘은 이모지 대신 대문자 이니셜(각 카테고리 이름 앞글자) — 중성 와이어프레임.
   const CATEGORIES = [
-    { key:'players', icon:'⚾', label:'선수단', home:'/players' },
-    { key:'staff',   icon:'👤', label:'스태프', home:'/staff' },
-    { key:'training',icon:'📊', label:'훈련',   home:'/training' },
+    { key:'players', icon:'선', label:'선수단', home:'/players' },
+    { key:'staff',   icon:'스', label:'스태프', home:'/staff' },
+    { key:'training',icon:'훈', label:'훈련',   home:'/training' },
   ];
 
   // ── 라우트 → Root Context 매핑 ───────────────────────────────
@@ -340,18 +352,18 @@ a{color:inherit;text-decoration:none}
   // ── 탭 라벨 ─────────────────────────────────────────────────
   function tabLabel(route){
     const parts = parseRoute(route);
-    if (parts[0] === 'players') return { icon:'⚾', name:'선수단' };
-    if (parts[0] === 'staff')   return { icon:'👤', name:'스태프' };
-    if (parts[0] === 'training')return { icon:'📊', name:'훈련' };
+    if (parts[0] === 'players') return { icon:'선', name:'선수단' };
+    if (parts[0] === 'staff' && !parts[1])   return { icon:'스', name:'스태프' };
+    if (parts[0] === 'training')return { icon:'훈', name:'훈련' };
     if (parts[0] === 'player' && parts[1]) {
       const p = POOL.players.find(x => String(x.id) === parts[1]);
-      return { icon:'👤', name: p ? p.name : `선수 ${parts[1]}` };
+      return { icon:'P', name: p ? p.name : `선수 ${parts[1]}` };
     }
     if (parts[0] === 'staff' && parts[1]) {
       const s = POOL.staff.find(x => String(x.id) === parts[1]);
-      return { icon:'👤', name: s ? s.name : `스태프 ${parts[1]}` };
+      return { icon:'S', name: s ? s.name : `스태프 ${parts[1]}` };
     }
-    return { icon:'?', name:'페이지' };
+    return { icon:'·', name:'페이지' };
   }
 
   // ── 렌더링 ──────────────────────────────────────────────────
@@ -420,15 +432,14 @@ a{color:inherit;text-decoration:none}
   function renderEmpty(){
     const el = document.getElementById('content');
     el.innerHTML = `
-      <div style="max-width:520px;margin:80px auto 0;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px;opacity:.4">⚾</div>
-        <h1 style="margin:0 0 8px">열린 탭이 없습니다</h1>
-        <p class="sub" style="margin-bottom:24px">사이드바에서 카테고리를 골라 시작하세요.</p>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div style="max-width:480px;margin:64px auto 0">
+        <h1>열린 탭이 없습니다</h1>
+        <p class="sub">사이드바에서 카테고리를 고르거나 아래에서 선택하세요.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
           ${CATEGORIES.map(c => `
-            <a class="card" data-route="${c.home}" style="cursor:pointer;text-align:center;padding:20px 12px">
-              <div style="font-size:28px;margin-bottom:6px">${c.icon}</div>
-              <div style="font-weight:600">${c.label}</div>
+            <a class="card" data-route="${c.home}" style="cursor:pointer;text-align:left;margin:0;padding:14px 16px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">카테고리</div>
+              <div style="font-weight:500">${c.label}</div>
             </a>
           `).join('')}
         </div>
@@ -464,15 +475,15 @@ a{color:inherit;text-decoration:none}
   function renderPlayersHome(){
     const rows = POOL.players.map(p => `
       <div class="row" data-route="/player/${p.id}">
-        <div class="name link">${p.name}</div>
-        <div>${p.age}세</div>
+        <div class="name">${p.name}</div>
+        <div>${p.age}</div>
         <div>${p.role}</div>
-        <div class="stars">재능 ${p.talent_avg}</div>
+        <div class="stars">${p.talent_avg}</div>
       </div>
     `).join('');
     return `
       <h1>선수단</h1>
-      <p class="sub">등록 선수 ${POOL.players.length}명. 선수 이름을 클릭해 상세 (Cmd+클릭: 새 탭)</p>
+      <p class="sub">${POOL.players.length}명 · 클릭 = 상세, Cmd+클릭 = 새 탭</p>
       <div class="list">
         <div class="row head"><div>이름</div><div>나이</div><div>역할</div><div>재능</div></div>
         ${rows}
@@ -494,18 +505,18 @@ a{color:inherit;text-decoration:none}
     }).join('');
     return `
       <h1>${p.name}</h1>
-      <p class="sub">${p.role} · ${p.age}세 · 재능 평균 ${p.talent_avg}</p>
+      <p class="sub">${p.role} · ${p.age}세 · 재능 ${p.talent_avg}</p>
       <div class="card">
         <h2>능력</h2>
         ${groupsHtml}
       </div>
       <div class="card">
-        <h2>개인 훈련 (자리 2)</h2>
-        <div class="placeholder">v1 다음 이터레이션에 편집 UI</div>
+        <h2>개인 훈련</h2>
+        <div class="placeholder">편집 UI (다음 이터레이션)</div>
       </div>
       <div class="card">
         <h2>성장 곡선</h2>
-        <div class="placeholder">v1 다음 이터레이션에 season 통과한 시뮬 결과</div>
+        <div class="placeholder">season 통과 시뮬 결과 (다음 이터레이션)</div>
       </div>
     `;
   }
@@ -513,15 +524,15 @@ a{color:inherit;text-decoration:none}
   function renderStaffHome(){
     const rows = POOL.staff.map(s => `
       <div class="row" data-route="/staff/${s.id}">
-        <div class="name link">${s.name}</div>
+        <div class="name">${s.name}</div>
         <div>${KIND_LABELS[s.kind] || s.kind}</div>
-        <div class="stars">동기 ${s.abilities.motivation || '-'}</div>
-        <div>—</div>
+        <div class="stars">${s.abilities.motivation || '-'}</div>
+        <div class="stars">—</div>
       </div>
     `).join('');
     return `
       <h1>스태프</h1>
-      <p class="sub">등록 스태프 ${POOL.staff.length}명. 이름을 클릭해 상세.</p>
+      <p class="sub">${POOL.staff.length}명</p>
       <div class="list">
         <div class="row head"><div>이름</div><div>직책</div><div>동기</div><div>배치</div></div>
         ${rows}
@@ -544,12 +555,12 @@ a{color:inherit;text-decoration:none}
       <h1>${s.name}</h1>
       <p class="sub">${KIND_LABELS[s.kind] || s.kind}</p>
       <div class="card">
-        <h2>능력 (1~20)</h2>
+        <h2>능력 (1–20)</h2>
         <div class="abilities">${abInner}</div>
       </div>
       <div class="card">
-        <h2>배치 슬롯</h2>
-        <div class="placeholder">v1 다음 이터레이션에 실제 배치 연결</div>
+        <h2>배치</h2>
+        <div class="placeholder">실제 슬롯 연결 (다음 이터레이션)</div>
       </div>
     `;
   }
@@ -569,19 +580,19 @@ a{color:inherit;text-decoration:none}
       ).join('');
       return `
         <div class="slot">
-          <h3>${s.label} 슬롯</h3>
+          <h3>${s.label}</h3>
           <select>${opts}</select>
-          <div class="stars">별점: — · 비중: 1.0</div>
+          <div class="stars">별점 — · 비중 1.0</div>
         </div>
       `;
     }).join('');
     return `
       <h1>훈련</h1>
-      <p class="sub">팀 훈련 5슬롯. 각 슬롯에 코치 배치.</p>
+      <p class="sub">팀 훈련 5슬롯</p>
       <div class="slots">${cards}</div>
-      <div class="card" style="margin-top:16px">
+      <div class="card" style="margin-top:12px">
         <h2>결과 요약</h2>
-        <div class="placeholder">v1 다음 이터레이션에 계산 결과 (환경 요인·동기)</div>
+        <div class="placeholder">환경 요인·동기 (다음 이터레이션)</div>
       </div>
     `;
   }
