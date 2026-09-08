@@ -5,20 +5,16 @@
 :root{
   --bg:#F3F6F4;--card:#FFFFFF;--ink:#1B2A24;--muted:#66766E;--rule:#D5DCD7;--soft:#E9EFEB;
   --accent:#1F6F4A;--accent-ink:#FFFFFF;--accent-soft:#DDEFE4;
-  --hi:#1E8E4A;--hi-bg:rgba(30,142,74,.14);
-  --lo:#2F6FD6;--lo-bg:rgba(47,111,214,.14);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
     --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;
-    --hi:#6FE09A;--hi-bg:rgba(111,224,154,.16);
-    --lo:#7FB3FF;--lo-bg:rgba(127,179,255,.16);
   }
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px}
-.wrap{max-width:1400px;margin:0 auto}
+.wrap{max-width:1600px;margin:0 auto}
 h1{font-size:22px;margin:0 0 4px;font-weight:700}
 .sub{color:var(--muted);font-size:14px;margin:0 0 20px}
 .card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 18px;margin-bottom:14px}
@@ -30,35 +26,26 @@ h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .scenarios label input{accent-color:var(--accent);cursor:pointer}
 .scenarios label.on{background:var(--accent-soft);border-color:var(--accent)}
 .scenarios .swatch{display:inline-block;width:14px;height:14px;border-radius:3px}
-.age-row{display:flex;gap:14px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-.age-row .age-big{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;min-width:60px}
-.age-row input[type=range]{flex:1;min-width:260px;accent-color:var(--accent)}
 .grid{overflow-x:auto}
-table{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;table-layout:fixed;min-width:100%}
-th,td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--soft);white-space:nowrap}
-th{color:var(--muted);font-weight:500;font-size:12px;position:sticky;top:0;background:var(--card);z-index:1}
+table{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;table-layout:fixed;min-width:100%}
+th,td{padding:4px 6px;border-bottom:1px solid var(--soft);white-space:nowrap;text-align:right}
+thead th{background:var(--card);color:var(--muted);font-weight:500;font-size:11px;position:sticky;top:0;z-index:2}
+th.name,td.name{text-align:left;font-family:inherit;color:var(--ink);position:sticky;left:0;background:var(--card);z-index:3;width:100px}
+thead th.name{z-index:4}
 tr.g th{text-align:left;padding-top:10px;color:var(--muted);font-size:11px;letter-spacing:.04em;border-bottom:0;font-weight:600;background:var(--card)}
-td{font-family:"IBM Plex Mono",monospace}
-td.name,th.name{text-align:left;font-family:inherit;color:var(--ink);position:sticky;left:0;background:var(--card);z-index:2;width:110px}
-th.name{z-index:3}
-td.base{color:var(--ink);font-weight:600}
-td.on.hi{color:var(--hi);background:var(--hi-bg)}
-td.on.lo{color:var(--lo);background:var(--lo-bg)}
-td.on.eq{color:var(--muted)}
-td.off{color:transparent;background:var(--soft);opacity:.35}
-td small{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--muted);margin-left:4px;font-weight:400}
-td.on.hi small{color:var(--hi)}
-td.on.lo small{color:var(--lo)}
-th .head{display:block;font-weight:600;color:var(--ink);font-size:12px}
-th .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
-.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:8px}
-.legend b{color:var(--hi);font-weight:600}
-.legend em{color:var(--lo);font-weight:600;font-style:normal}
+tr.base td{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+tr.delta td{padding-top:0;padding-bottom:6px;font-family:"IBM Plex Mono",monospace;font-size:11px}
+tr.delta td.name{font-size:11px;color:var(--muted);font-weight:400;font-family:inherit}
+.badge{display:inline-block;padding:1px 5px;border-radius:3px;color:#fff;margin:1px 0;line-height:1.35}
+.badge.zero{background:transparent;color:var(--muted);border:1px dashed var(--rule)}
+tr.delta td .badges{display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+th.age-highlight{color:var(--ink)}
+.legend{color:var(--muted);font-size:12px;margin-top:8px}
 </style>
 
 <div class="wrap">
 <h1>성장 시연</h1>
-<p class="sub">표준 선수 하나를 시나리오 요인으로 시뮬. 요인이 전부 1.0이면 기본 경로(판정 앱 곡선)와 같다. <a href="../">← OOTP Lab</a> · <a href="../judge/">판정 앱</a></p>
+<p class="sub">표준 선수 하나를 시나리오 요인으로 시뮬. 요인이 전부 1.0이면 판정 앱 곡선과 같다. <a href="../">← OOTP Lab</a> · <a href="../judge/">판정 앱</a></p>
 
 <div class="card">
   <h2>이 선수</h2>
@@ -71,13 +58,9 @@ th .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-
 </div>
 
 <div class="card">
-  <h2>능력 × 시나리오</h2>
-  <div class="age-row">
-    <span class="age-big" id="age-big">27세</span>
-    <input type="range" id="age" min="16" max="40" step="1" value="27">
-  </div>
+  <h2>능력 × 나이</h2>
   <div class="grid"><table id="grid"></table></div>
-  <p class="legend">숫자는 표시값(1~20), 작은 숫자는 기본 대비 내부 차이. <b>초록</b> 기본보다 더 큰 능력 · <em>파랑</em> 잘 안 오르는(기본보다 낮은) 능력. 체크 안 한 시나리오는 빈 칸으로 자리만 잡습니다.</p>
+  <p class="legend">위 줄 = 기본 경로의 표시값(1~20). 아래 줄 = 시나리오별 내부 차이(같은 색 배지). +면 더 컸음, −면 덜 컸음. 회색 점선 = 차이 없음.</p>
 </div>
 </div>
 
@@ -86,12 +69,13 @@ th .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-
 (function(){
   const pool = JSON.parse(document.getElementById('pool').textContent);
   const AGES = pool.scenarios[0].ages.map(a => a.age);
+  // 짝수 나이만
+  const SHOW = AGES.filter(a => a % 2 === 0);
   const abilities = pool.ability_labels;
   const SET_NAMES = {bat:'타격', run:'주루', field:'수비', pitch:'투구', common:'공통'};
   const groups = ['bat','run','field','pitch','common'];
   const OPTIONAL = pool.scenarios.filter(s => s.id !== 'baseline');
   let selected = new Set(['contact_focus', 'work_ethic_high', 'best_coach']);
-  let age = 27;
   const $ = id => document.getElementById(id);
 
   const talText = pool.talents.map(([id, label, v]) => `${label.replace(' 재능','')} <b>${v}</b>`).join(' · ');
@@ -107,37 +91,42 @@ th .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-
     });
   });
 
-  $('age').addEventListener('input', e => { age = +e.target.value; $('age-big').textContent = age + '세'; renderGrid(); });
-
   function renderGrid(){
-    const ageIdx = AGES.indexOf(age);
     const base = pool.scenarios.find(s => s.id === 'baseline');
+    const active = OPTIONAL.filter(s => selected.has(s.id));
+    const ageIdx = a => AGES.indexOf(a);
     // 머리
-    let head = '<colgroup><col style="width:110px"><col style="width:80px">' + OPTIONAL.map(()=>'<col style="width:110px">').join('') + '</colgroup>';
-    head += '<thead><tr><th class="name">능력</th><th><span class="head">기본</span></th>' + OPTIONAL.map(s => `<th><span class="head"><span class="swatch" style="background:${s.color}"></span>${s.label}</span></th>`).join('') + '</tr></thead><tbody>';
+    let head = '<colgroup><col style="width:96px">' + SHOW.map(() => '<col style="width:56px">').join('') + '</colgroup>';
+    head += '<thead><tr><th class="name">능력</th>' + SHOW.map(a => `<th>${a}</th>`).join('') + '</tr></thead><tbody>';
     let body = '';
     for (const g of groups) {
       const list = abilities.filter(a => a[2] === g);
       if (!list.length) continue;
-      body += `<tr class="g"><th class="name">${SET_NAMES[g]}</th>` + '<th></th>'.repeat(OPTIONAL.length + 1) + `</tr>`;
+      body += `<tr class="g"><th class="name">${SET_NAMES[g]}</th>` + SHOW.map(() => '<th></th>').join('') + `</tr>`;
       for (const [id, label] of list) {
-        body += `<tr><td class="name">${label}</td>`;
-        const b = base.ages[ageIdx].abilities[id];
-        const bd = base.ages[ageIdx].display[id];
-        body += `<td class="base">${bd}</td>`;
-        for (const sc of OPTIONAL) {
-          if (!selected.has(sc.id)) {
-            body += `<td class="off">·</td>`;
-            continue;
-          }
-          const v = sc.ages[ageIdx].abilities[id];
-          const vd = sc.ages[ageIdx].display[id];
-          const diff = v - b;
-          const cls = Math.abs(diff) < 0.5 ? 'eq' : diff > 0 ? 'hi' : 'lo';
-          const sign = diff > 0 ? '+' : '';
-          body += `<td class="on ${cls}">${vd}<small>${cls === 'eq' ? '' : sign + diff.toFixed(1)}</small></td>`;
+        // 기본 줄
+        body += `<tr class="base"><td class="name">${label}</td>`;
+        for (const a of SHOW) {
+          const bd = base.ages[ageIdx(a)].display[id];
+          body += `<td>${bd}</td>`;
         }
         body += '</tr>';
+        // 델타 줄 (활성 시나리오 있으면)
+        if (active.length) {
+          body += `<tr class="delta"><td class="name"></td>`;
+          for (const a of SHOW) {
+            const b = base.ages[ageIdx(a)].abilities[id];
+            const badges = active.map(sc => {
+              const v = sc.ages[ageIdx(a)].abilities[id];
+              const diff = v - b;
+              if (Math.abs(diff) < 0.1) return `<span class="badge zero">·</span>`;
+              const sign = diff > 0 ? '+' : '';
+              return `<span class="badge" style="background:${sc.color}">${sign}${diff.toFixed(1)}</span>`;
+            }).join('');
+            body += `<td><div class="badges">${badges}</div></td>`;
+          }
+          body += `</tr>`;
+        }
       }
     }
     $('grid').innerHTML = head + body + '</tbody>';
