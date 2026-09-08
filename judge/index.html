@@ -2,26 +2,196 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+/* ============================================================
+ * DESIGN TOKENS — OOTP Lab 공통. Obsidian 감각의 얇은 시스템.
+ * 이 파일이 유일한 원시 값 자리. 각 앱은 var(--...)만 참조한다.
+ * build 시점에 각 앱 HTML로 인라인된다 (web/*/build.js).
+ * ============================================================ */
 :root{
-  --bg:#F3F6F4;--card:#FFFFFF;--ink:#1B2A24;--muted:#66766E;--rule:#D5DCD7;--soft:#E9EFEB;
-  --accent:#1F6F4A;--accent-ink:#FFFFFF;--accent-soft:#DDEFE4;--lo:#C0392B;--hi:#1E8E4A;--warn:#B8860B;--now:#2F6FD6;--now-soft:rgba(47,111,214,.16);
-  --bar-bg:#E4EFE7;--bar-ink:#14352A;--bar-muted:#5B7A6A;--bar-rule:#C0D2C6;--bar-field:#F5FAF6;--bar-accent:#1F6F4A;--bar-accent-ink:#FFFFFF;
+  /* ── Color scale (neutral) ── */
+  --color-n-0:   #ffffff;
+  --color-n-05:  #fafafa;
+  --color-n-10:  #f4f4f5;
+  --color-n-20:  #e4e4e7;
+  --color-n-25:  #d4d4d8;
+  --color-n-30:  #a1a1aa;
+  --color-n-50:  #71717a;
+  --color-n-60:  #52525b;
+  --color-n-70:  #3f3f46;
+  --color-n-80:  #27272a;
+  --color-n-90:  #1c1c20;
+  --color-n-95:  #141418;
+  --color-n-100: #0a0a0d;
+
+  /* ── Color scale (accent · 판정 hi/lo) ── */
+  --color-accent-hue: 265;
+  --color-accent:     hsl(var(--color-accent-hue), 55%, 60%);
+  --color-accent-2:   hsl(var(--color-accent-hue), 55%, 50%);
+  --color-hi:         #1E8E4A;
+  --color-hi-dark:    #6FE09A;
+  --color-lo:         #C0392B;
+  --color-lo-dark:    #F08A8A;
+  --color-warn:       #B8860B;
+  --color-warn-dark:  #E8C36A;
+  --color-now:        #2F6FD6;
+  --color-now-dark:   #7FB3FF;
+
+  /* ── Semantic (light default) ── */
+  --bg-primary:      var(--color-n-05);
+  --bg-secondary:    var(--color-n-0);
+  --bg-tertiary:     var(--color-n-10);
+  --bg-hover:        rgba(0,0,0,.04);
+  --bg-active:       rgba(0,0,0,.06);
+  --bg-selected:     rgba(0,0,0,.05);
+  --text-normal:     var(--color-n-100);
+  --text-muted:      var(--color-n-50);
+  --text-faint:      var(--color-n-30);
+  --text-on-accent:  var(--color-n-0);
+  --border:          var(--color-n-20);
+  --border-strong:   var(--color-n-25);
+  --accent:          var(--color-accent-2);
+  --hi:              var(--color-hi);
+  --lo:              var(--color-lo);
+  --warn:            var(--color-warn);
+  --now:             var(--color-now);
+  --now-soft:        rgba(47,111,214,.16);
+
+  /* ── Spacing (4px 기준) ── */
+  --size-2:  2px;
+  --size-4:  4px;
+  --size-6:  6px;
+  --size-8:  8px;
+  --size-10: 10px;
+  --size-12: 12px;
+  --size-16: 16px;
+  --size-20: 20px;
+  --size-24: 24px;
+  --size-32: 32px;
+  --size-40: 40px;
+  --size-48: 48px;
+
+  /* ── Typography ── */
+  --font-interface: "Pretendard", "Inter", "IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", sans-serif;
+  --font-mono:      "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --text-xxs: 10px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-base:13px;
+  --text-md:  14px;
+  --text-lg:  16px;
+  --text-xl:  19px;
+  --text-2xl: 24px;
+  --leading-tight:  1.25;
+  --leading-normal: 1.45;
+  --leading-loose:  1.6;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --tracking-tight:  -0.01em;
+  --tracking-wide:    0.02em;
+
+  /* ── Radius ── */
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 10px;
+
+  /* ── Layout ── */
+  --sidebar-w:            240px;
+  --sidebar-w-collapsed:  48px;
+  --header-h:             40px;
+  --tabbar-h:             36px;
+  --navbar-h:             32px;
+
+  /* ── Motion ── */
+  --dur-fast: 100ms;
+  --dur-med:  180ms;
+  --ease:     cubic-bezier(.2,.7,.3,1);
 }
+
+/* Dark: prefers-color-scheme + explicit override */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
-    --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;--lo:#F08A8A;--hi:#6FE09A;--warn:#E8C36A;--now:#7FB3FF;--now-soft:rgba(127,179,255,.18);
-    --bar-bg:#182B23;--bar-ink:#E4ECE7;--bar-muted:#8FA69A;--bar-rule:#2C3E36;--bar-field:#213730;--bar-accent:#A6EDB6;--bar-accent-ink:#0F2418;
+    --bg-primary:      var(--color-n-90);
+    --bg-secondary:    var(--color-n-80);
+    --bg-tertiary:     var(--color-n-95);
+    --bg-hover:        rgba(255,255,255,.05);
+    --bg-active:       rgba(255,255,255,.08);
+    --bg-selected:     rgba(255,255,255,.06);
+    --text-normal:     var(--color-n-05);
+    --text-muted:      var(--color-n-30);
+    --text-faint:      var(--color-n-50);
+    --text-on-accent:  var(--color-n-0);
+    --border:          var(--color-n-70);
+    --border-strong:   var(--color-n-60);
+    --accent:          var(--color-accent);
+    --hi:              var(--color-hi-dark);
+    --lo:              var(--color-lo-dark);
+    --warn:            var(--color-warn-dark);
+    --now:             var(--color-now-dark);
+    --now-soft:        rgba(127,179,255,.18);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
-  --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;--lo:#F08A8A;--hi:#6FE09A;--warn:#E8C36A;--now:#7FB3FF;--now-soft:rgba(127,179,255,.18);
-  --bar-bg:#182B23;--bar-ink:#E4ECE7;--bar-muted:#8FA69A;--bar-rule:#2C3E36;--bar-field:#213730;--bar-accent:#A6EDB6;--bar-accent-ink:#0F2418;
+  --bg-primary:      var(--color-n-90);
+  --bg-secondary:    var(--color-n-80);
+  --bg-tertiary:     var(--color-n-95);
+  --bg-hover:        rgba(255,255,255,.05);
+  --bg-active:       rgba(255,255,255,.08);
+  --bg-selected:     rgba(255,255,255,.06);
+  --text-normal:     var(--color-n-05);
+  --text-muted:      var(--color-n-30);
+  --text-faint:      var(--color-n-50);
+  --text-on-accent:  var(--color-n-0);
+  --border:          var(--color-n-70);
+  --border-strong:   var(--color-n-60);
+  --accent:          var(--color-accent);
+  --hi:              var(--color-hi-dark);
+  --lo:              var(--color-lo-dark);
+  --warn:            var(--color-warn-dark);
+  --now:             var(--color-now-dark);
+  --now-soft:        rgba(127,179,255,.18);
 }
-*{box-sizing:border-box}
+
+/* ============================================================
+ * RESET · BASE
+ * ============================================================ */
+*, *::before, *::after{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background: var(--bg-primary);
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+button{font: inherit; color: inherit; cursor: pointer}
+a{color: inherit; text-decoration: none}
+::selection{background: var(--accent); color: var(--text-on-accent)}
+
+
+/* 판정 앱 로컬 별칭 — 기존 컴포넌트 스타일이 참조하는 이름을 토큰에 매핑 */
+:root{
+  --bg: var(--bg-primary);
+  --card: var(--bg-secondary);
+  --ink: var(--text-normal);
+  --muted: var(--text-muted);
+  --rule: var(--border);
+  --soft: var(--bg-tertiary);
+  --accent-ink: var(--text-on-accent);
+  --accent-soft: var(--bg-selected);
+  --bar-bg: var(--bg-tertiary);
+  --bar-ink: var(--text-normal);
+  --bar-muted: var(--text-muted);
+  --bar-rule: var(--border);
+  --bar-field: var(--bg-secondary);
+  --bar-accent: var(--accent);
+  --bar-accent-ink: var(--text-on-accent);
+}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.45;word-break:keep-all}
+body{font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;word-break:keep-all}
 body{display:flex;flex-direction:column;min-height:100vh}
 .app{flex:1 1 auto;display:flex;flex-direction:column;gap:10px;padding:10px 14px 0;min-height:0}
 .app > header{flex:0 0 auto}
@@ -329,7 +499,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '0231744 2026-09-08';
+  const BUILD = 'b17603e 2026-09-08';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
