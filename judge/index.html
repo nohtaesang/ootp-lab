@@ -127,8 +127,11 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .toggle{display:flex;gap:6px;margin-bottom:8px;align-items:center}
 .toggle button{flex:1;font-weight:500}
 .toggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.toggle .tip{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);background:transparent;color:var(--muted);font-size:12px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:help;user-select:none}
-.toggle .tip:hover,.toggle .tip:focus{border-color:var(--accent);color:var(--ink);outline:none}
+.toggle .tip{position:relative;flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);background:transparent;color:var(--muted);font-size:12px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;user-select:none}
+.toggle .tip:hover,.toggle .tip:focus,.toggle .tip.on{border-color:var(--accent);color:var(--ink);outline:none}
+.toggle .tip .pop{display:none;position:absolute;right:0;top:calc(100% + 6px);width:min(320px,80vw);background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:400;line-height:1.5;color:var(--ink);text-align:left;box-shadow:0 6px 20px rgba(0,0,0,0.15);z-index:20;white-space:normal;cursor:auto}
+.toggle .tip.on .pop{display:block}
+.toggle .tip .pop b{color:var(--accent)}
 .toggle.small{margin:0 0 4px}
 .toggle.small button{padding:3px 10px;font-size:13px;flex:0 0 auto}
 .recheck{background:var(--soft);border-left:4px solid var(--warn);border-radius:6px;padding:8px 12px;font-size:14px;margin:0 0 8px}
@@ -253,7 +256,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   <div class="summary" id="summary"></div>
   <p class="covers" id="covers" hidden></p>
   <div class="talcols three">
-    <div class="tgroup" id="tg-bat"><h4>타자 <small class="hint" style="font-weight:400">· 재능은 다 크면 닿는 최대예요</small></h4><div class="list" id="tal-bat"></div></div>
+    <div class="tgroup" id="tg-bat"><h4>타자</h4><div class="list" id="tal-bat"></div></div>
     <div class="tgroup" id="tg-pit"><h4>투수</h4><div class="list" id="tal-pit"></div></div>
     <div class="tgroup"><h4>공통</h4><div class="list" id="tal-common"></div></div>
   </div>
@@ -275,7 +278,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     <button data-role="batter">타자로 키워요</button>
     <button data-role="pitcher">투수로 키워요</button>
     <button data-role="two_way">둘 다 키워요</button>
-    <span class="tip" tabindex="0" role="button" aria-label="육성 방향 설명" title="재능(왼쪽 목록)은 이 능력 계열의 이론 상한이에요 — 역할과 무관.&#10;실제 능력치(오른쪽 표·차트)는 지금 고른 역할로 발현된 값이에요.&#10;예) 재능 수비 20인 선수라도 '투수로 키워요'를 누르면 야수 수비 실력은 낮게 나와요. '타자로 키워요'를 누르면 살아나요.">?</span>
+    <span class="tip" tabindex="0" role="button" aria-label="육성 방향 설명">?<span class="pop"><b>재능</b>(왼쪽 목록)은 이 능력 계열의 이론 상한이에요 — 역할과 무관해요.<br><b>실제 능력치</b>(오른쪽 표·차트)는 지금 고른 역할로 발현된 값이에요.<br><br>예) 재능 <b>수비 20</b>인 선수라도 <b>투수로 키워요</b>를 누르면 야수 수비 실력은 낮게 나오고, <b>타자로 키워요</b>를 누르면 살아나요.</span></span>
   </div>
   <svg class="chart" id="chart" viewBox="0 0 860 240" role="img" aria-label="나이별 OVR" tabindex="0"></svg>
   <div class="sliderrow"><input type="range" id="age" min="16" max="40" step="1" value="18" aria-label="나이"></div>
@@ -319,7 +322,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '7cc6a90 2026-09-08';
+  const BUILD = 'b5fb88d 2026-09-08';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
@@ -710,6 +713,12 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
 
   // ── 이동 ──
   document.querySelectorAll('.toggle button[data-role]').forEach(b => b.addEventListener('click', () => { role = b.dataset.role; renderTalentDim(); renderWho(); renderToggle(); renderChart(); renderNow(); renderHeat(); }));
+  document.querySelectorAll('.toggle .tip').forEach(t => {
+    t.addEventListener('click', e => { e.stopPropagation(); t.classList.toggle('on'); });
+    t.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t.classList.toggle('on'); } if (e.key === 'Escape') t.classList.remove('on'); });
+    t.querySelector('.pop')?.addEventListener('click', e => e.stopPropagation());
+  });
+  document.addEventListener('click', () => document.querySelectorAll('.toggle .tip.on').forEach(t => t.classList.remove('on')));
   document.addEventListener('keydown', e => {
     if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.id === 'chart')) return;
     if (e.key === ']') setAge(age + 1); else if (e.key === '[') setAge(age - 1);
