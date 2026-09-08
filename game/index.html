@@ -613,9 +613,107 @@ input:focus, select:focus{
 .subtab:hover{color: var(--text-normal)}
 .subtab.active{color: var(--text-normal); border-bottom-color: var(--accent); font-weight: var(--weight-medium)}
 
-/* Lineup */
-.lineup-wrap{display: grid; grid-template-columns: 1fr 320px; gap: var(--size-24)}
-@media (max-width: 900px){.lineup-wrap{grid-template-columns: 1fr}}
+/* Selection (라인업/로테이션/뎁스 공용 좌우 레이아웃) */
+.lineup-wrap, .rotation-wrap, .depth-wrap, .bullpen-wrap{
+  display: grid; grid-template-columns: 1fr 320px; gap: var(--size-24)
+}
+@media (max-width: 900px){.lineup-wrap, .rotation-wrap, .depth-wrap, .bullpen-wrap{grid-template-columns: 1fr}}
+
+/* Depth chart (포지션별 리스트) */
+.depth-list{display: flex; flex-direction: column; gap: var(--size-4)}
+.depth-pos{
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: var(--size-10) var(--size-12);
+}
+.depth-pos-head{
+  display: flex; align-items: center; gap: var(--size-8);
+  margin-bottom: var(--size-8);
+}
+.depth-pos-label{
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+  min-width: 40px;
+}
+.depth-pos-name{
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+.depth-slots{display: flex; flex-direction: column; gap: var(--size-2)}
+.depth-slot{
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: var(--size-8);
+  padding: var(--size-6) var(--size-10);
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.depth-slot:hover{border-color: var(--accent)}
+.depth-slot.empty{border-style: dashed; color: var(--text-faint)}
+.depth-rank{
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+.depth-clear{
+  padding: var(--size-2) var(--size-6);
+  color: var(--text-faint);
+  font-size: var(--text-md);
+  border-radius: var(--radius-s);
+}
+.depth-clear:hover{background: var(--bg-hover); color: var(--text-normal)}
+
+/* Bullpen (역할별) */
+.bullpen-list{display: flex; flex-direction: column; gap: var(--size-8)}
+.bullpen-role{
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: var(--size-10) var(--size-12);
+}
+.bullpen-role-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--size-8);
+}
+.bullpen-role-name{
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+}
+.bullpen-role-count{
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.bullpen-members{
+  display: flex; flex-wrap: wrap; gap: var(--size-4);
+  min-height: 32px;
+}
+.bullpen-chip{
+  display: inline-flex; align-items: center; gap: var(--size-6);
+  padding: var(--size-4) var(--size-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+  background: var(--bg-tertiary);
+}
+.bullpen-chip-x{
+  color: var(--text-faint);
+  cursor: pointer; padding: 0 2px;
+}
+.bullpen-chip-x:hover{color: var(--text-normal)}
+.bullpen-empty{
+  color: var(--text-faint);
+  font-size: var(--text-xs);
+  font-style: italic;
+  padding: var(--size-4) 0;
+}
 
 .lineup-list{
   display: flex; flex-direction: column; gap: var(--size-4);
@@ -1165,9 +1263,9 @@ input:focus, select:focus{
   // ── 편성 (Selection) ─────────────────────────────────────────
   const SELECTION_TABS = [
     { key:'lineup',   label:'라인업', active:true },
-    { key:'rotation', label:'로테이션', active:false },
-    { key:'bullpen',  label:'불펜', active:false },
-    { key:'depth',    label:'뎁스 차트', active:false },
+    { key:'rotation', label:'로테이션', active:true },
+    { key:'bullpen',  label:'불펜', active:true },
+    { key:'depth',    label:'뎁스 차트', active:true },
   ];
 
   const LINEUP_KEYS = { rhp:'lineup:rhp', lhp:'lineup:lhp' };
@@ -1194,7 +1292,10 @@ input:focus, select:focus{
     ).join('');
     let body = '';
     if (sub === 'lineup') body = viewLineup();
-    else body = `<div class="placeholder">${SELECTION_TABS.find(t=>t.key===sub)?.label || sub} — 다음 이터레이션</div>`;
+    else if (sub === 'rotation') body = viewRotation();
+    else if (sub === 'bullpen') body = viewBullpen();
+    else if (sub === 'depth') body = viewDepth();
+    else body = `<div class="placeholder">${SELECTION_TABS.find(t=>t.key===sub)?.label || sub}</div>`;
     return `<div class="subtabs">${subtabs}</div>${body}`;
   }
 
@@ -1250,7 +1351,211 @@ input:focus, select:focus{
     `;
   }
 
-  let selectedSlot = null;
+  // ── 로테이션 (선발 5) ─────────────────────────────────────────
+  const ROTATION_KEY = 'rotation';
+  function loadRotation(){
+    try { return JSON.parse(localStorage.getItem(ROTATION_KEY)) || new Array(5).fill(null); }
+    catch { return new Array(5).fill(null); }
+  }
+  function saveRotation(arr){ try { localStorage.setItem(ROTATION_KEY, JSON.stringify(arr)); } catch {} }
+  function isSP(p){ return p.position === 'SP'; }
+
+  function viewRotation(){
+    const arr = loadRotation();
+    const used = new Set(arr.filter(Boolean));
+    const rotationLabels = ['1선발','2선발','3선발','4선발','5선발'];
+    const slotHtml = arr.map((pid, idx) => {
+      const p = pid != null ? POOL.players.find(x => x.id === pid) : null;
+      if (!p) return `<div class="lineup-slot empty" data-slot="${idx}">
+        <div class="slot-order">${idx+1}</div>
+        <div class="slot-pos">${rotationLabels[idx]}</div>
+        <div class="slot-name">비어 있음</div>
+        <div></div>
+      </div>`;
+      return `<div class="lineup-slot" data-slot="${idx}">
+        <div class="slot-order">${idx+1}</div>
+        <div class="slot-pos">${rotationLabels[idx]}</div>
+        <div class="slot-name">${p.name} <span class="hand-marker">${p.throws}/${p.bats}</span></div>
+        <button class="slot-clear" data-clear="${idx}" title="비우기">×</button>
+      </div>`;
+    }).join('');
+
+    const eligible = POOL.players.filter(isSP);
+    const pickerItems = eligible.map(p => {
+      const isUsed = used.has(p.id);
+      return `<div class="picker-item ${isUsed?'used':''}" data-pick="${p.id}">
+        <div class="pi-pos">SP</div>
+        <div class="pi-name">${p.name}</div>
+        <div class="pi-ovr">${p.ovr}</div>
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="filterbar" style="justify-content:flex-start">
+        <span class="count">${arr.filter(Boolean).length}/5</span>
+      </div>
+      <div class="rotation-wrap">
+        <div class="lineup-list">${slotHtml}</div>
+        <div class="picker">
+          <h3 class="picker-title">선발 후보 (${eligible.length})</h3>
+          <p class="picker-hint">슬롯을 클릭하고 선수를 골라 배치.</p>
+          <div class="picker-list">${pickerItems}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── 불펜 (역할별) ──────────────────────────────────────────────
+  const BULLPEN_KEY = 'bullpen';
+  const BULLPEN_ROLES = [
+    { key:'closer',  label:'마무리',   short:'CL' },
+    { key:'setup',   label:'셋업',    short:'SU' },
+    { key:'middle',  label:'미들',    short:'MR' },
+    { key:'long',    label:'롱릴리프', short:'LR' },
+    { key:'mopup',   label:'패전조',  short:'MU' },
+  ];
+  function loadBullpen(){
+    try {
+      const raw = JSON.parse(localStorage.getItem(BULLPEN_KEY)) || {};
+      const out = {};
+      BULLPEN_ROLES.forEach(r => out[r.key] = Array.isArray(raw[r.key]) ? raw[r.key] : []);
+      return out;
+    } catch {
+      const out = {}; BULLPEN_ROLES.forEach(r => out[r.key] = []); return out;
+    }
+  }
+  function saveBullpen(obj){ try { localStorage.setItem(BULLPEN_KEY, JSON.stringify(obj)); } catch {} }
+  function isRP(p){ return p.position === 'RP'; }
+
+  function viewBullpen(){
+    const state = loadBullpen();
+    const usedAll = new Set(Object.values(state).flat());
+    const rolesHtml = BULLPEN_ROLES.map(r => {
+      const members = state[r.key];
+      const chips = members.map(pid => {
+        const p = POOL.players.find(x => x.id === pid);
+        if (!p) return '';
+        return `<span class="bullpen-chip">${p.name} <span class="hand-marker">${p.throws}</span> <span class="bullpen-chip-x" data-bpx="${r.key}:${pid}">×</span></span>`;
+      }).join('');
+      return `<div class="bullpen-role">
+        <div class="bullpen-role-head">
+          <div><span class="bullpen-role-name">${r.short}</span> <span style="color:var(--text-muted);font-size:var(--text-sm);margin-left:6px">${r.label}</span></div>
+          <div class="bullpen-role-count">${members.length}명 · 클릭해 여기에 추가</div>
+        </div>
+        <div class="bullpen-members" data-role-target="${r.key}">
+          ${chips || `<div class="bullpen-empty">비어 있음</div>`}
+        </div>
+      </div>`;
+    }).join('');
+
+    const eligible = POOL.players.filter(isRP);
+    const pickerItems = eligible.map(p => {
+      const isUsed = usedAll.has(p.id);
+      return `<div class="picker-item ${isUsed?'used':''}" data-pick="${p.id}">
+        <div class="pi-pos">RP</div>
+        <div class="pi-name">${p.name}</div>
+        <div class="pi-ovr">${p.ovr}</div>
+      </div>`;
+    }).join('');
+
+    const totalAssigned = Object.values(state).flat().length;
+    return `
+      <div class="filterbar" style="justify-content:flex-start">
+        <span class="count">${totalAssigned}명 배치</span>
+      </div>
+      <div class="bullpen-wrap">
+        <div class="bullpen-list">${rolesHtml}</div>
+        <div class="picker">
+          <h3 class="picker-title">구원 투수 (${eligible.length})</h3>
+          <p class="picker-hint">역할 영역을 먼저 클릭하고 선수를 골라 추가. 다시 다른 역할로 옮기면 자동 이동.</p>
+          <div class="picker-list">${pickerItems}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── 뎁스 차트 ─────────────────────────────────────────────────
+  const DEPTH_KEY = 'depth_chart';
+  const DEPTH_POSITIONS = [
+    { key:'C',  label:'포수' },
+    { key:'1B', label:'1루수' },
+    { key:'2B', label:'2루수' },
+    { key:'3B', label:'3루수' },
+    { key:'SS', label:'유격수' },
+    { key:'LF', label:'좌익수' },
+    { key:'CF', label:'중견수' },
+    { key:'RF', label:'우익수' },
+    { key:'DH', label:'지명타자' },
+  ];
+  const DEPTH_RANKS = ['주전','백업','긴급'];
+  function loadDepth(){
+    try {
+      const raw = JSON.parse(localStorage.getItem(DEPTH_KEY)) || {};
+      const out = {};
+      DEPTH_POSITIONS.forEach(pos => {
+        out[pos.key] = Array.isArray(raw[pos.key]) ? raw[pos.key].slice(0,3) : [null,null,null];
+        while (out[pos.key].length < 3) out[pos.key].push(null);
+      });
+      return out;
+    } catch {
+      const out = {}; DEPTH_POSITIONS.forEach(pos => out[pos.key] = [null,null,null]); return out;
+    }
+  }
+  function saveDepth(obj){ try { localStorage.setItem(DEPTH_KEY, JSON.stringify(obj)); } catch {} }
+
+  function viewDepth(){
+    const state = loadDepth();
+    const positionsHtml = DEPTH_POSITIONS.map(pos => {
+      const slots = state[pos.key].map((pid, rankIdx) => {
+        const p = pid != null ? POOL.players.find(x => x.id === pid) : null;
+        if (!p) return `<div class="depth-slot empty" data-depth-slot="${pos.key}:${rankIdx}">
+          <div class="depth-rank">${DEPTH_RANKS[rankIdx]}</div>
+          <div>비어 있음</div>
+          <div></div>
+        </div>`;
+        return `<div class="depth-slot" data-depth-slot="${pos.key}:${rankIdx}">
+          <div class="depth-rank">${DEPTH_RANKS[rankIdx]}</div>
+          <div>${p.name} <span class="hand-marker">${p.throws}/${p.bats}</span></div>
+          <button class="depth-clear" data-depth-clear="${pos.key}:${rankIdx}" title="비우기">×</button>
+        </div>`;
+      }).join('');
+      return `<div class="depth-pos">
+        <div class="depth-pos-head">
+          <div class="depth-pos-label">${pos.key}</div>
+          <div class="depth-pos-name">${pos.label}</div>
+        </div>
+        <div class="depth-slots">${slots}</div>
+      </div>`;
+    }).join('');
+
+    const eligible = POOL.players.filter(isPositionPlayer);
+    const pickerItems = eligible.map(p => `
+      <div class="picker-item" data-pick="${p.id}">
+        <div class="pi-pos">${p.position}</div>
+        <div class="pi-name">${p.name}</div>
+        <div class="pi-ovr">${p.ovr}</div>
+      </div>`).join('');
+
+    return `
+      <div class="filterbar" style="justify-content:flex-start">
+        <span style="font-size:var(--text-sm);color:var(--text-muted)">포지션별 주전·백업·긴급</span>
+      </div>
+      <div class="depth-wrap">
+        <div class="depth-list">${positionsHtml}</div>
+        <div class="picker">
+          <h3 class="picker-title">야수 (${eligible.length})</h3>
+          <p class="picker-hint">슬롯을 클릭한 뒤 선수를 골라 배치. 한 선수가 여러 포지션 백업으로 등록될 수 있음.</p>
+          <div class="picker-list">${pickerItems}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── 편성 이벤트 바인딩 (라인업·로테이션·불펜·뎁스 공용) ─────
+  let selectedSlot = null;         // for lineup/rotation
+  let selectedBullpenRole = null;
+  let selectedDepthSlot = null;    // "POS:rank"
+
   function bindSelection(el, sub){
     // 서브탭 라우팅
     el.querySelectorAll('.subtab').forEach(t => {
@@ -1259,59 +1564,140 @@ input:focus, select:focus{
         switchTo(t.dataset.route, { newTab: e.metaKey || e.ctrlKey });
       });
     });
-    if (sub !== 'lineup') return;
 
-    // vs 우/좌 스위치
-    el.querySelectorAll('[data-versus]').forEach(b => {
-      b.addEventListener('click', () => {
-        lineupState.versus = b.dataset.versus;
-        selectedSlot = null;
-        renderContent(activeTab().route);
-      });
-    });
+    if (sub === 'lineup') return bindLineup(el);
+    if (sub === 'rotation') return bindRotation(el);
+    if (sub === 'bullpen') return bindBullpen(el);
+    if (sub === 'depth') return bindDepth(el);
+  }
 
-    // 슬롯 클릭 = 선택
-    el.querySelectorAll('.lineup-slot').forEach(s => {
-      s.addEventListener('click', e => {
-        if (e.target.dataset.clear) return;
-        selectedSlot = parseInt(s.dataset.slot, 10);
-        // 시각적 선택
-        el.querySelectorAll('.lineup-slot').forEach(x => x.style.borderColor = '');
-        s.style.borderColor = 'var(--accent)';
-      });
-    });
+  function bindLineup(el){
+    el.querySelectorAll('[data-versus]').forEach(b => b.addEventListener('click', () => {
+      lineupState.versus = b.dataset.versus; selectedSlot = null;
+      renderContent(activeTab().route);
+    }));
+    el.querySelectorAll('.lineup-slot').forEach(s => s.addEventListener('click', e => {
+      if (e.target.dataset.clear) return;
+      selectedSlot = parseInt(s.dataset.slot, 10);
+      el.querySelectorAll('.lineup-slot').forEach(x => x.style.borderColor = '');
+      s.style.borderColor = 'var(--accent)';
+    }));
+    el.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = parseInt(b.dataset.clear, 10);
+      const arr = loadLineup(lineupState.versus);
+      arr[idx] = null;
+      saveLineup(lineupState.versus, arr);
+      renderContent(activeTab().route);
+    }));
+    el.querySelectorAll('[data-pick]').forEach(item => item.addEventListener('click', () => {
+      const pid = parseInt(item.dataset.pick, 10);
+      const arr = loadLineup(lineupState.versus);
+      if (selectedSlot == null) {
+        const empty = arr.findIndex(x => x == null);
+        if (empty < 0) return;
+        selectedSlot = empty;
+      }
+      for (let i = 0; i < arr.length; i++) if (arr[i] === pid) arr[i] = null;
+      arr[selectedSlot] = pid;
+      saveLineup(lineupState.versus, arr);
+      selectedSlot = null;
+      renderContent(activeTab().route);
+    }));
+  }
 
-    // × 비우기
-    el.querySelectorAll('[data-clear]').forEach(b => {
-      b.addEventListener('click', e => {
-        e.stopPropagation();
-        const idx = parseInt(b.dataset.clear, 10);
-        const arr = loadLineup(lineupState.versus);
-        arr[idx] = null;
-        saveLineup(lineupState.versus, arr);
-        renderContent(activeTab().route);
-      });
-    });
+  function bindRotation(el){
+    el.querySelectorAll('.lineup-slot').forEach(s => s.addEventListener('click', e => {
+      if (e.target.dataset.clear) return;
+      selectedSlot = parseInt(s.dataset.slot, 10);
+      el.querySelectorAll('.lineup-slot').forEach(x => x.style.borderColor = '');
+      s.style.borderColor = 'var(--accent)';
+    }));
+    el.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = parseInt(b.dataset.clear, 10);
+      const arr = loadRotation();
+      arr[idx] = null; saveRotation(arr);
+      renderContent(activeTab().route);
+    }));
+    el.querySelectorAll('[data-pick]').forEach(item => item.addEventListener('click', () => {
+      const pid = parseInt(item.dataset.pick, 10);
+      const arr = loadRotation();
+      if (selectedSlot == null) {
+        const empty = arr.findIndex(x => x == null);
+        if (empty < 0) return;
+        selectedSlot = empty;
+      }
+      for (let i = 0; i < arr.length; i++) if (arr[i] === pid) arr[i] = null;
+      arr[selectedSlot] = pid;
+      saveRotation(arr);
+      selectedSlot = null;
+      renderContent(activeTab().route);
+    }));
+  }
 
-    // 픽커: 선수 클릭 = 선택된 슬롯에 배정
-    el.querySelectorAll('[data-pick]').forEach(item => {
-      item.addEventListener('click', () => {
-        const pid = parseInt(item.dataset.pick, 10);
-        const arr = loadLineup(lineupState.versus);
-        if (selectedSlot == null) {
-          // 첫 빈 슬롯에 자동 배치
-          const empty = arr.findIndex(x => x == null);
-          if (empty < 0) return;
-          selectedSlot = empty;
-        }
-        // 같은 선수가 다른 슬롯에 있으면 제거
-        for (let i = 0; i < arr.length; i++) if (arr[i] === pid) arr[i] = null;
-        arr[selectedSlot] = pid;
-        saveLineup(lineupState.versus, arr);
-        selectedSlot = null;
-        renderContent(activeTab().route);
-      });
-    });
+  function bindBullpen(el){
+    // 역할 영역 클릭 = 대상 지정
+    el.querySelectorAll('[data-role-target]').forEach(area => area.addEventListener('click', () => {
+      selectedBullpenRole = area.dataset.roleTarget;
+      el.querySelectorAll('.bullpen-role').forEach(r => r.style.borderColor = '');
+      area.closest('.bullpen-role').style.borderColor = 'var(--accent)';
+    }));
+    // 칩 × 제거
+    el.querySelectorAll('[data-bpx]').forEach(x => x.addEventListener('click', e => {
+      e.stopPropagation();
+      const [role, pidStr] = x.dataset.bpx.split(':');
+      const pid = parseInt(pidStr, 10);
+      const state = loadBullpen();
+      state[role] = state[role].filter(id => id !== pid);
+      saveBullpen(state);
+      renderContent(activeTab().route);
+    }));
+    // 픽커 = 선택 역할에 추가 (다른 역할에서 자동 제거)
+    el.querySelectorAll('[data-pick]').forEach(item => item.addEventListener('click', () => {
+      const pid = parseInt(item.dataset.pick, 10);
+      const state = loadBullpen();
+      if (!selectedBullpenRole) {
+        // 미선택 시 middle에 추가
+        selectedBullpenRole = 'middle';
+      }
+      // 어느 역할에 있으면 제거
+      BULLPEN_ROLES.forEach(r => { state[r.key] = state[r.key].filter(id => id !== pid); });
+      state[selectedBullpenRole].push(pid);
+      saveBullpen(state);
+      renderContent(activeTab().route);
+    }));
+  }
+
+  function bindDepth(el){
+    el.querySelectorAll('.depth-slot').forEach(s => s.addEventListener('click', e => {
+      if (e.target.dataset.depthClear) return;
+      selectedDepthSlot = s.dataset.depthSlot;
+      el.querySelectorAll('.depth-slot').forEach(x => x.style.borderColor = '');
+      s.style.borderColor = 'var(--accent)';
+    }));
+    el.querySelectorAll('[data-depth-clear]').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      const [pos, rankStr] = b.dataset.depthClear.split(':');
+      const rank = parseInt(rankStr, 10);
+      const state = loadDepth();
+      state[pos][rank] = null;
+      saveDepth(state);
+      renderContent(activeTab().route);
+    }));
+    el.querySelectorAll('[data-pick]').forEach(item => item.addEventListener('click', () => {
+      if (!selectedDepthSlot) return;
+      const pid = parseInt(item.dataset.pick, 10);
+      const [pos, rankStr] = selectedDepthSlot.split(':');
+      const rank = parseInt(rankStr, 10);
+      const state = loadDepth();
+      // 같은 포지션 안에서만 중복 제거 (다른 포지션 백업 허용)
+      for (let i = 0; i < 3; i++) if (state[pos][i] === pid) state[pos][i] = null;
+      state[pos][rank] = pid;
+      saveDepth(state);
+      selectedDepthSlot = null;
+      renderContent(activeTab().route);
+    }));
   }
 
   function viewTraining(){
