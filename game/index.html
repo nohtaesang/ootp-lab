@@ -1859,33 +1859,92 @@ input:focus, select:focus{
     }));
   }
 
+  // 훈련 카테고리 & 능력→별점→env
+  const CATEGORIES_TRAIN = [
+    { key:'bat',   label:'타격', kind:'bat_coach',   ability:'bat_training' },
+    { key:'pitch', label:'투구', kind:'pitch_coach', ability:'pitch_training' },
+    { key:'field', label:'수비', kind:'field_coach', ability:'field_training' },
+    { key:'run',   label:'주루·작전', kind:'run_coach', ability:'run_training' },
+    { key:'body',  label:'체력', kind:'body_coach',  ability:'body_training' },
+  ];
+  const TRAIN_KEY = 'training_assign';
+  function loadTrainingAssign(){
+    try { return JSON.parse(localStorage.getItem(TRAIN_KEY)) || {}; } catch { return {}; }
+  }
+  function saveTrainingAssign(obj){ try { localStorage.setItem(TRAIN_KEY, JSON.stringify(obj)); } catch {} }
+  function starOf(v){ return Math.max(1, Math.min(5, Math.floor((Math.max(1,v)-1)/4) + 1)); }
+  const STAR_ENV = { 1:0.85, 2:0.925, 3:1.00, 4:1.075, 5:1.15 };
+
   function viewTraining(){
-    const slots = [
-      { key:'bat', label:'타격', kind:'bat_coach' },
-      { key:'pitch', label:'투구', kind:'pitch_coach' },
-      { key:'field', label:'수비', kind:'field_coach' },
-      { key:'run', label:'주루·작전', kind:'run_coach' },
-      { key:'body', label:'체력', kind:'body_coach' },
-    ];
-    const cards = slots.map(s => {
+    const assign = loadTrainingAssign();
+    const cards = CATEGORIES_TRAIN.map(s => {
       const coaches = POOL.staff.filter(x => x.kind === s.kind);
+      const curId = assign[s.key];
+      const cur = curId != null ? POOL.staff.find(c => c.id === curId) : null;
       const opts = ['<option value="">(비어 있음)</option>'].concat(
-        coaches.map(c => `<option value="${c.id}">${c.name}</option>`)
+        coaches.map(c => `<option value="${c.id}" ${cur && cur.id===c.id?'selected':''}>${c.name} (${c.abilities[s.ability]||1})</option>`)
       ).join('');
+      const abilityVal = cur ? (cur.abilities[s.ability] || 1) : 0;
+      const stars = cur ? starOf(abilityVal) : 1;
+      const env = STAR_ENV[stars];
       return `<div class="slot">
         <div class="slot-label">${s.label}</div>
-        <select>${opts}</select>
-        <div class="slot-meta">별점 — · 비중 1.0</div>
+        <select data-slot="${s.key}">${opts}</select>
+        <div class="slot-meta">${cur ? `능력 ${abilityVal} · ${stars}성 · env ${env.toFixed(2)}` : '비어 있음 · 1성 · env 0.85'}</div>
       </div>`;
     }).join('');
+
+    const summary = CATEGORIES_TRAIN.map(s => {
+      const curId = assign[s.key];
+      const cur = curId != null ? POOL.staff.find(c => c.id === curId) : null;
+      const stars = cur ? starOf(cur.abilities[s.ability] || 1) : 1;
+      const motivStars = cur ? starOf(cur.abilities.motivation || 1) : 1;
+      return `<tr>
+        <td style="padding:6px 12px;color:var(--text-muted)">${s.label}</td>
+        <td style="padding:6px 12px">${cur ? cur.name : '—'}</td>
+        <td style="padding:6px 12px;font-family:var(--font-mono);text-align:right">${stars}성</td>
+        <td style="padding:6px 12px;font-family:var(--font-mono);text-align:right">${STAR_ENV[stars].toFixed(2)}</td>
+        <td style="padding:6px 12px;font-family:var(--font-mono);text-align:right">${motivStars}성</td>
+      </tr>`;
+    }).join('');
+
     return `
-      <h1 class="page-title">훈련</h1>
-      <p class="page-sub">팀 훈련 5슬롯</p>
+      <p class="page-sub">팀 훈련 5슬롯 · 코치 배치 → 별점 → 환경 요인 계산</p>
       <div class="slots">${cards}</div>
       <div class="card" style="margin-top: var(--size-16)">
         <h2 class="section-title">결과 요약</h2>
-        <div class="placeholder">환경 요인·동기 · 다음 이터레이션</div>
+        <table style="width:100%;border-collapse:collapse;font-size:var(--text-sm)">
+          <thead>
+            <tr style="color:var(--text-muted);text-align:left">
+              <th style="padding:6px 12px;font-weight:var(--weight-medium);font-size:var(--text-xs);text-transform:uppercase">카테고리</th>
+              <th style="padding:6px 12px;font-weight:var(--weight-medium);font-size:var(--text-xs);text-transform:uppercase">배치</th>
+              <th style="padding:6px 12px;font-weight:var(--weight-medium);font-size:var(--text-xs);text-transform:uppercase;text-align:right">별점</th>
+              <th style="padding:6px 12px;font-weight:var(--weight-medium);font-size:var(--text-xs);text-transform:uppercase;text-align:right">환경 요인</th>
+              <th style="padding:6px 12px;font-weight:var(--weight-medium);font-size:var(--text-xs);text-transform:uppercase;text-align:right">동기</th>
+            </tr>
+          </thead>
+          <tbody>${summary}</tbody>
+        </table>
+        <p style="font-size:var(--text-xs);color:var(--text-faint);margin-top:12px">별점→env: 1성 0.85 · 3성 1.00 · 5성 1.15. 이 값이 성장 코어의 env 요인이 됩니다.</p>
       </div>`;
+  }
+
+  function bindTraining(el){
+    el.querySelectorAll('[data-slot]').forEach(sel => {
+      sel.addEventListener('change', e => {
+        const slot = sel.dataset.slot;
+        const val = e.target.value;
+        const assign = loadTrainingAssign();
+        if (val === '') delete assign[slot];
+        else {
+          const numVal = parseInt(val, 10);
+          Object.keys(assign).forEach(k => { if (assign[k] === numVal) delete assign[k]; });
+          assign[slot] = numVal;
+        }
+        saveTrainingAssign(assign);
+        renderContent(activeTab().route);
+      });
+    });
   }
 
   document.getElementById('nav-back').addEventListener('click', goBack);
