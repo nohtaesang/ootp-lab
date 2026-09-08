@@ -92,11 +92,6 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .list span{border-bottom:1px solid var(--soft);padding:3px 0;font-size:14px;line-height:1.3;display:flex;align-items:center}
 .list span.n{justify-content:flex-end;font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;min-width:34px}
 .list span.n.hi{color:var(--hi)}.list span.n.lo{color:var(--lo)}
-/* 재능 오른쪽에 예상 정점 능력값 (실제 도달 최대) */
-.list span.peak{justify-content:flex-end;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;min-width:44px;padding-left:6px}
-.list span.peak::before{content:"→";margin-right:3px;color:var(--rule);font-weight:400}
-.list span.peak.gap{color:var(--lo)}
-.tgroup .list{display:grid;grid-template-columns:1fr auto auto;column-gap:8px}
 .hidden{margin-top:12px;border-top:1px solid var(--rule);padding-top:10px}
 .hidden h4{font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:600;letter-spacing:.04em}
 .hgrid{display:grid;grid-template-columns:1fr;gap:0;font-size:14px}
@@ -256,7 +251,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   <div class="summary" id="summary"></div>
   <p class="covers" id="covers" hidden></p>
   <div class="talcols three">
-    <div class="tgroup" id="tg-bat"><h4>타자 <small class="hint" style="font-weight:400">· 재능(상한) → 다 크면 도달값</small></h4><div class="list" id="tal-bat"></div></div>
+    <div class="tgroup" id="tg-bat"><h4>타자 <small class="hint" style="font-weight:400">· 재능은 다 크면 닿는 최대예요</small></h4><div class="list" id="tal-bat"></div></div>
     <div class="tgroup" id="tg-pit"><h4>투수</h4><div class="list" id="tal-pit"></div></div>
     <div class="tgroup"><h4>공통</h4><div class="list" id="tal-common"></div></div>
   </div>
@@ -321,7 +316,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '290820f 2026-09-08';
+  const BUILD = '59a612c 2026-09-08';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
@@ -451,33 +446,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     const peakOvr = Math.max(...v.ages.map(ovrOf));
     $('summary').innerHTML = `<span>지금 <b>${nowOvr}</b></span><span>→</span><span>다 크면 <b>${peakOvr}</b></span><span class="lvl">${stars ? stars[3] + '이에요' : ''}</span>`;
     if (e.covers && e.covers.length) { $('covers').hidden = false; $('covers').textContent = '이번엔 이걸 봐요: ' + e.covers.join(' × '); } else { $('covers').hidden = true; }
-    // 재능 → 대표 능력. 정점(다 크면) 값을 병기해서 "재능=상한, 실제=도달" 관계를 눈에 보이게.
-    const TALENT_REPR = {
-      batting: 'contact', power: 'power',
-      velocity: 'velocity', control: 'control', breaking: 'movement',
-      fielding: 'range', arm: 'arm_str', speed: 'speed',
-      endurance: 'stamina', judgment: 'eye',
-    };
-    // 야수 능력은 배터 variant에서, 투수 능력은 피처 variant에서 정점. 3 variants 중 최대를 취해 role_toggle에 안 흔들리게.
-    const peakOf = abilId => {
-      if (!abilId) return 0;
-      let max = 0;
-      Object.values(e.variants || {}).forEach(vt => {
-        (vt.ages || []).forEach(row => {
-          const val = row.display && row.display[abilId];
-          if (typeof val === 'number' && val > max) max = val;
-        });
-      });
-      return max;
-    };
-    const talRow = t => {
-      const abilId = TALENT_REPR[t.id];
-      const peak = abilId ? peakOf(abilId) : 0;
-      const gap = t.display - peak;
-      const peakCls = gap >= 5 ? 'peak gap' : 'peak';
-      const peakHtml = peak > 0 ? `<span class="${peakCls}" title="다 크면 실제로 도달하는 최대값 (재능은 상한, 도달은 나이 곡선·실현율 반영)">${peak}</span>` : `<span class="peak"></span>`;
-      return `<span>${t.label.replace(' 재능','')}</span><span class="n ${talCls(t.display)}">${t.display}</span>${peakHtml}`;
-    };
+    const talRow = t => `<span>${t.label.replace(' 재능','')}</span><span class="n ${talCls(t.display)}">${t.display}</span>`;
     const tal = ids => ids.map(id => talRow(e.talents.find(t => t.id === id))).join('');
     $('tal-bat').innerHTML = tal(['batting','power']);
     $('tal-pit').innerHTML = tal(['velocity','control','breaking']);
