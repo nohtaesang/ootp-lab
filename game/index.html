@@ -596,6 +596,109 @@ input:focus, select:focus{
   border-radius: var(--radius-s);
 }
 
+/* Sub-tabs (페이지 안 로컬 뷰) */
+.subtabs{
+  display: flex; gap: var(--size-4);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--size-16);
+}
+.subtab{
+  padding: var(--size-8) var(--size-12);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+.subtab:hover{color: var(--text-normal)}
+.subtab.active{color: var(--text-normal); border-bottom-color: var(--accent); font-weight: var(--weight-medium)}
+
+/* Lineup */
+.lineup-wrap{display: grid; grid-template-columns: 1fr 320px; gap: var(--size-24)}
+@media (max-width: 900px){.lineup-wrap{grid-template-columns: 1fr}}
+
+.lineup-list{
+  display: flex; flex-direction: column; gap: var(--size-4);
+}
+.lineup-slot{
+  display: grid;
+  grid-template-columns: 32px 60px 1fr auto;
+  gap: var(--size-12);
+  align-items: center;
+  padding: var(--size-10) var(--size-12);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.lineup-slot:hover{border-color: var(--accent)}
+.lineup-slot.empty{border-style: dashed; color: var(--text-faint)}
+.lineup-slot.empty:hover{color: var(--text-normal)}
+.slot-order{
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--accent);
+  text-align: center;
+}
+.slot-pos{
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+}
+.slot-name{font-weight: var(--weight-medium)}
+.slot-clear{
+  padding: var(--size-2) var(--size-6);
+  color: var(--text-faint);
+  font-size: var(--text-md);
+  border-radius: var(--radius-s);
+}
+.slot-clear:hover{background: var(--bg-hover); color: var(--text-normal)}
+
+/* Player picker (오른쪽 사이드) */
+.picker{
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: var(--size-12) var(--size-16);
+}
+.picker-title{
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 var(--size-10);
+}
+.picker-hint{
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  margin-bottom: var(--size-10);
+}
+.picker-list{
+  max-height: 480px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: var(--size-2);
+}
+.picker-item{
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: var(--size-8);
+  padding: var(--size-6) var(--size-8);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  align-items: center;
+}
+.picker-item:hover{background: var(--bg-hover)}
+.picker-item.used{opacity: .35}
+.picker-item.selected{background: var(--bg-selected); border: 1px solid var(--accent); padding: calc(var(--size-6) - 1px) calc(var(--size-8) - 1px)}
+.picker-item .pi-pos{font-family: var(--font-mono); color: var(--text-muted); font-size: var(--text-xs)}
+.picker-item .pi-name{font-weight: var(--weight-medium)}
+.picker-item .pi-ovr{font-family: var(--font-mono); color: var(--text-muted); font-size: var(--text-xs)}
+
 /* Empty state */
 .empty{
   max-width: 480px;
@@ -674,13 +777,15 @@ input:focus, select:focus{
   };
 
   const CATEGORIES = [
-    { key:'players',  glyph:'PL', label:'선수단', home:'/players' },
-    { key:'staff',    glyph:'ST', label:'스태프', home:'/staff' },
-    { key:'training', glyph:'TR', label:'훈련',   home:'/training' },
+    { key:'players',   glyph:'PL', label:'선수단', home:'/players' },
+    { key:'selection', glyph:'SE', label:'편성',   home:'/selection/lineup' },
+    { key:'staff',     glyph:'ST', label:'스태프', home:'/staff' },
+    { key:'training',  glyph:'TR', label:'훈련',   home:'/training' },
   ];
 
   function routeContext(route){
     if (route.startsWith('/players') || route.startsWith('/player/')) return 'players';
+    if (route.startsWith('/selection')) return 'selection';
     if (route.startsWith('/staff'))    return 'staff';
     if (route.startsWith('/training')) return 'training';
     return null;
@@ -745,6 +850,9 @@ input:focus, select:focus{
     } else if (parts[0] === 'staff' && parts[1]){
       const s = POOL.staff.find(x => String(x.id) === parts[1]);
       crumbs.push({ label: s ? s.name : parts[1], route });
+    } else if (parts[0] === 'selection' && parts[1]) {
+      const subLabels = { lineup:'라인업', rotation:'로테이션', bullpen:'불펜', depth:'뎁스 차트' };
+      crumbs.push({ label: subLabels[parts[1]] || parts[1], route });
     }
     return crumbs;
   }
@@ -754,6 +862,10 @@ input:focus, select:focus{
     if (parts[0] === 'players')  return { glyph:'PL', name:'선수단' };
     if (parts[0] === 'staff' && !parts[1]) return { glyph:'ST', name:'스태프' };
     if (parts[0] === 'training') return { glyph:'TR', name:'훈련' };
+    if (parts[0] === 'selection') {
+      const names = { lineup:'라인업', rotation:'로테이션', bullpen:'불펜', depth:'뎁스' };
+      return { glyph:'SE', name: names[parts[1]] || '편성' };
+    }
     if (parts[0] === 'player' && parts[1]){
       const p = POOL.players.find(x => String(x.id) === parts[1]);
       return { glyph:'PL', name: p ? p.name : `선수 ${parts[1]}` };
@@ -859,9 +971,11 @@ input:focus, select:focus{
     else if (parts[0] === 'staff' && !parts[1]) el.innerHTML = viewStaffList();
     else if (parts[0] === 'staff' && parts[1]) el.innerHTML = viewStaff(parts[1]);
     else if (parts[0] === 'training') el.innerHTML = viewTraining();
+    else if (parts[0] === 'selection') el.innerHTML = viewSelection(parts[1] || 'lineup');
     else el.innerHTML = `<div class="placeholder">알 수 없는 페이지: ${route}</div>`;
     bindRouteLinks(el);
     if (parts[0] === 'players') bindPlayersFilters(el);
+    if (parts[0] === 'selection') bindSelection(el, parts[1] || 'lineup');
   }
 
   function bindRouteLinks(root){
@@ -1046,6 +1160,158 @@ input:focus, select:focus{
         <h2 class="section-title">배치</h2>
         <div class="placeholder">실제 슬롯 연결 · 다음 이터레이션</div>
       </div>`;
+  }
+
+  // ── 편성 (Selection) ─────────────────────────────────────────
+  const SELECTION_TABS = [
+    { key:'lineup',   label:'라인업', active:true },
+    { key:'rotation', label:'로테이션', active:false },
+    { key:'bullpen',  label:'불펜', active:false },
+    { key:'depth',    label:'뎁스 차트', active:false },
+  ];
+
+  const LINEUP_KEYS = { rhp:'lineup:rhp', lhp:'lineup:lhp' };
+  const lineupState = { versus: 'rhp' };  // 'rhp' or 'lhp'
+
+  function loadLineup(versus){
+    try {
+      const raw = localStorage.getItem(LINEUP_KEYS[versus]);
+      return raw ? JSON.parse(raw) : new Array(9).fill(null);
+    } catch { return new Array(9).fill(null); }
+  }
+  function saveLineup(versus, arr){
+    try { localStorage.setItem(LINEUP_KEYS[versus], JSON.stringify(arr)); } catch {}
+  }
+
+  function isPositionPlayer(p){
+    // 투수는 라인업 후보에서 제외 (DH 리그니까 야수만)
+    return p.role !== '투수' && p.position !== 'SP' && p.position !== 'RP';
+  }
+
+  function viewSelection(sub){
+    const subtabs = SELECTION_TABS.map(t =>
+      `<a class="subtab ${t.key===sub?'active':''}" data-route="/selection/${t.key}">${t.label}${t.active?'':' <span style="opacity:.4">(준비 중)</span>'}</a>`
+    ).join('');
+    let body = '';
+    if (sub === 'lineup') body = viewLineup();
+    else body = `<div class="placeholder">${SELECTION_TABS.find(t=>t.key===sub)?.label || sub} — 다음 이터레이션</div>`;
+    return `<div class="subtabs">${subtabs}</div>${body}`;
+  }
+
+  function viewLineup(){
+    const versus = lineupState.versus;
+    const arr = loadLineup(versus);
+    const used = new Set(arr.filter(Boolean));
+
+    const slotHtml = arr.map((pid, idx) => {
+      const p = pid != null ? POOL.players.find(x => x.id === pid) : null;
+      const orderNum = idx + 1;
+      if (!p) {
+        return `<div class="lineup-slot empty" data-slot="${idx}">
+          <div class="slot-order">${orderNum}</div>
+          <div class="slot-pos">—</div>
+          <div class="slot-name">비어 있음</div>
+          <div></div>
+        </div>`;
+      }
+      return `<div class="lineup-slot" data-slot="${idx}">
+        <div class="slot-order">${orderNum}</div>
+        <div class="slot-pos">${p.position}</div>
+        <div class="slot-name">${p.name} <span class="hand-marker">${p.throws}/${p.bats}</span></div>
+        <button class="slot-clear" data-clear="${idx}" title="비우기">×</button>
+      </div>`;
+    }).join('');
+
+    const eligible = POOL.players.filter(isPositionPlayer);
+    const pickerItems = eligible.map(p => {
+      const isUsed = used.has(p.id);
+      return `<div class="picker-item ${isUsed?'used':''}" data-pick="${p.id}">
+        <div class="pi-pos">${p.position}</div>
+        <div class="pi-name">${p.name}</div>
+        <div class="pi-ovr">${p.ovr}</div>
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="filterbar" style="justify-content:flex-start;gap:8px">
+        <span style="font-size:var(--text-sm);color:var(--text-muted)">상대 투수</span>
+        <button class="button ${versus==='rhp'?'button-primary':''}" data-versus="rhp">우투수</button>
+        <button class="button ${versus==='lhp'?'button-primary':''}" data-versus="lhp">좌투수</button>
+        <span class="count">${arr.filter(Boolean).length}/9</span>
+      </div>
+      <div class="lineup-wrap">
+        <div class="lineup-list">${slotHtml}</div>
+        <div class="picker">
+          <h3 class="picker-title">야수 (${eligible.length})</h3>
+          <p class="picker-hint">슬롯을 클릭하고 선수를 골라 배치. 이미 배치된 선수는 흐리게.</p>
+          <div class="picker-list">${pickerItems}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  let selectedSlot = null;
+  function bindSelection(el, sub){
+    // 서브탭 라우팅
+    el.querySelectorAll('.subtab').forEach(t => {
+      t.addEventListener('click', e => {
+        e.preventDefault();
+        switchTo(t.dataset.route, { newTab: e.metaKey || e.ctrlKey });
+      });
+    });
+    if (sub !== 'lineup') return;
+
+    // vs 우/좌 스위치
+    el.querySelectorAll('[data-versus]').forEach(b => {
+      b.addEventListener('click', () => {
+        lineupState.versus = b.dataset.versus;
+        selectedSlot = null;
+        renderContent(activeTab().route);
+      });
+    });
+
+    // 슬롯 클릭 = 선택
+    el.querySelectorAll('.lineup-slot').forEach(s => {
+      s.addEventListener('click', e => {
+        if (e.target.dataset.clear) return;
+        selectedSlot = parseInt(s.dataset.slot, 10);
+        // 시각적 선택
+        el.querySelectorAll('.lineup-slot').forEach(x => x.style.borderColor = '');
+        s.style.borderColor = 'var(--accent)';
+      });
+    });
+
+    // × 비우기
+    el.querySelectorAll('[data-clear]').forEach(b => {
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        const idx = parseInt(b.dataset.clear, 10);
+        const arr = loadLineup(lineupState.versus);
+        arr[idx] = null;
+        saveLineup(lineupState.versus, arr);
+        renderContent(activeTab().route);
+      });
+    });
+
+    // 픽커: 선수 클릭 = 선택된 슬롯에 배정
+    el.querySelectorAll('[data-pick]').forEach(item => {
+      item.addEventListener('click', () => {
+        const pid = parseInt(item.dataset.pick, 10);
+        const arr = loadLineup(lineupState.versus);
+        if (selectedSlot == null) {
+          // 첫 빈 슬롯에 자동 배치
+          const empty = arr.findIndex(x => x == null);
+          if (empty < 0) return;
+          selectedSlot = empty;
+        }
+        // 같은 선수가 다른 슬롯에 있으면 제거
+        for (let i = 0; i < arr.length; i++) if (arr[i] === pid) arr[i] = null;
+        arr[selectedSlot] = pid;
+        saveLineup(lineupState.versus, arr);
+        selectedSlot = null;
+        renderContent(activeTab().route);
+      });
+    });
   }
 
   function viewTraining(){
