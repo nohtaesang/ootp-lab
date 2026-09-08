@@ -236,18 +236,7 @@ input:focus, select:focus{
 .app.sidebar-collapsed .sidebar-item{justify-content: center; padding: var(--size-8) 0}
 .app.sidebar-collapsed .sidebar-item .item-label{display: none}
 
-.sidebar-footer{
-  padding: var(--size-8) var(--size-6);
-  border-top: 1px solid var(--border);
-  display: flex; flex-direction: column; gap: var(--size-4);
-}
-.season-tag{
-  padding: var(--size-6) var(--size-10);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-}
-.app.sidebar-collapsed .season-tag{display: none}
+/* sidebar-footer 제거됨 — topbar로 이동 */
 .button{
   display: inline-flex; align-items: center; justify-content: center;
   gap: var(--size-6);
@@ -272,10 +261,34 @@ input:focus, select:focus{
 /* ── Main ── */
 .main{
   display: grid;
-  grid-template-rows: var(--tabbar-h) var(--navbar-h) 1fr;
+  grid-template-rows: var(--header-h) var(--tabbar-h) var(--navbar-h) 1fr;
   min-width: 0;
   overflow: hidden;
 }
+
+.topbar{
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 0 var(--size-16);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  gap: var(--size-8);
+}
+.topbar-season{
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.topbar-advance{
+  display: inline-flex; align-items: center; gap: var(--size-6);
+  padding: var(--size-4) var(--size-10);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-normal);
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+}
+.topbar-advance:hover{background: var(--bg-hover); border-color: var(--border-strong)}
 
 .tabbar{
   display: flex; align-items: stretch;
@@ -417,6 +430,29 @@ input:focus, select:focus{
   margin-bottom: var(--size-12);
 }
 
+/* Filter bar */
+.filterbar{
+  display: flex; align-items: center; gap: var(--size-8);
+  margin-bottom: var(--size-12);
+  padding: 0;
+}
+.filterbar .search{
+  flex: 1;
+  max-width: 320px;
+  padding: var(--size-6) var(--size-10);
+  font-size: var(--text-sm);
+}
+.filterbar select{
+  padding: var(--size-6) var(--size-10);
+  font-size: var(--text-sm);
+}
+.filterbar .count{
+  margin-left: auto;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 /* Data list */
 .dlist{
   background: var(--bg-secondary);
@@ -426,7 +462,7 @@ input:focus, select:focus{
 }
 .dlist-row{
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   gap: var(--size-12);
   padding: var(--size-10) var(--size-16);
   align-items: center;
@@ -448,6 +484,18 @@ input:focus, select:focus{
   cursor: default;
 }
 .dlist-row.head:hover{background: var(--bg-tertiary)}
+.dlist-row.head .sort-th{
+  display: inline-flex; align-items: center; gap: var(--size-4);
+  cursor: pointer;
+  user-select: none;
+}
+.dlist-row.head .sort-th:hover{color: var(--text-normal)}
+.dlist-row.head .sort-th.active{color: var(--text-normal)}
+.dlist-row.head .sort-indicator{
+  opacity: 0.6;
+  font-size: var(--text-xxs);
+}
+.dlist-row.head .sort-th.active .sort-indicator{opacity: 1; color: var(--accent)}
 .dlist-row .cell-primary{font-weight: var(--weight-medium); color: var(--text-normal)}
 .dlist-row .cell-num{font-family: var(--font-mono); color: var(--text-muted); font-size: var(--text-sm)}
 
@@ -550,16 +598,16 @@ input:focus, select:focus{
       <button class="sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기">‹</button>
     </div>
     <nav class="sidebar-nav" id="sidebar-items"></nav>
-    <div class="sidebar-footer">
-      <div class="season-tag">2026 시즌</div>
-      <button class="button" onclick="advanceYear()">
-        <span class="button-label">+1년 진행</span>
-        <span>›</span>
-      </button>
-    </div>
   </aside>
 
   <div class="main">
+    <header class="topbar">
+      <span class="topbar-season">2026 시즌</span>
+      <button class="topbar-advance" onclick="advanceYear()">
+        +1년
+        <span>›</span>
+      </button>
+    </header>
     <div class="tabbar" id="tabbar"></div>
 
     <div class="navbar">
@@ -771,6 +819,7 @@ input:focus, select:focus{
     else if (parts[0] === 'training') el.innerHTML = viewTraining();
     else el.innerHTML = `<div class="placeholder">알 수 없는 페이지: ${route}</div>`;
     bindRouteLinks(el);
+    if (parts[0] === 'players') bindPlayersFilters(el);
   }
 
   function bindRouteLinks(root){
@@ -782,23 +831,93 @@ input:focus, select:focus{
     });
   }
 
+  // 리스트 상태 (검색·필터·정렬)
+  const listState = {
+    players: { search: '', role: 'all', sortBy: 'name', sortDir: 'asc' },
+    staff:   { search: '', kind: 'all', sortBy: 'name', sortDir: 'asc' },
+  };
+
+  function sortRows(items, sortBy, sortDir, keyFn){
+    const dir = sortDir === 'asc' ? 1 : -1;
+    return items.slice().sort((a,b) => {
+      const va = keyFn(a, sortBy), vb = keyFn(b, sortBy);
+      if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
+      return String(va).localeCompare(String(vb), 'ko') * dir;
+    });
+  }
+
   function viewPlayers(){
-    const rows = POOL.players.map(p => `
+    const st = listState.players;
+    let items = POOL.players;
+    if (st.role !== 'all') items = items.filter(p => p.role === st.role);
+    if (st.search) {
+      const q = st.search.toLowerCase();
+      items = items.filter(p => p.name.toLowerCase().includes(q));
+    }
+    const sortKey = (p, by) => by === 'age' ? p.age : by === 'talent' ? p.talent_avg : by === 'role' ? p.role : p.name;
+    items = sortRows(items, st.sortBy, st.sortDir, sortKey);
+
+    const th = (key, label) => {
+      const active = st.sortBy === key;
+      const arrow = !active ? '↕' : (st.sortDir === 'asc' ? '↑' : '↓');
+      return `<span class="sort-th ${active?'active':''}" data-sort="${key}">${label}<span class="sort-indicator">${arrow}</span></span>`;
+    };
+
+    const rows = items.map(p => `
       <div class="dlist-row" data-route="/player/${p.id}">
         <div class="cell-primary">${p.name}</div>
+        <div>—</div>
         <div class="cell-num">${p.age}</div>
         <div>${p.role}</div>
         <div class="cell-num">${p.talent_avg}</div>
       </div>`).join('');
+
+    const roles = Array.from(new Set(POOL.players.map(p => p.role)));
+    const roleOpts = ['<option value="all">전체 역할</option>']
+      .concat(roles.map(r => `<option value="${r}" ${st.role===r?'selected':''}>${r}</option>`))
+      .join('');
+
     return `
-      <h1 class="page-title">선수단</h1>
-      <p class="page-sub">${POOL.players.length}명 · 클릭 = 상세 · Cmd+클릭 = 새 탭</p>
+      <div class="filterbar">
+        <input type="search" class="search" placeholder="이름 검색" value="${st.search}" id="filter-search">
+        <select id="filter-role">${roleOpts}</select>
+        <span class="count">${items.length} / ${POOL.players.length}</span>
+      </div>
       <div class="dlist">
         <div class="dlist-row head">
-          <div>이름</div><div>나이</div><div>역할</div><div>재능</div>
+          <div>${th('name','이름')}</div>
+          <div>포지션</div>
+          <div>${th('age','나이')}</div>
+          <div>${th('role','역할')}</div>
+          <div>${th('talent','재능')}</div>
         </div>
-        ${rows}
+        ${rows.length ? rows : `<div class="dlist-row" style="cursor:default"><div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:var(--size-16)">일치하는 선수 없음</div></div>`}
       </div>`;
+  }
+
+  function bindPlayersFilters(el){
+    const st = listState.players;
+    const search = el.querySelector('#filter-search');
+    if (search) search.addEventListener('input', e => {
+      st.search = e.target.value;
+      renderContent(activeTab().route);
+      // 검색 후 포커스 유지
+      const s = document.getElementById('filter-search');
+      if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
+    });
+    const role = el.querySelector('#filter-role');
+    if (role) role.addEventListener('change', e => {
+      st.role = e.target.value;
+      renderContent(activeTab().route);
+    });
+    el.querySelectorAll('.sort-th').forEach(t => {
+      t.addEventListener('click', () => {
+        const key = t.dataset.sort;
+        if (st.sortBy === key) st.sortDir = st.sortDir === 'asc' ? 'desc' : 'asc';
+        else { st.sortBy = key; st.sortDir = 'asc'; }
+        renderContent(activeTab().route);
+      });
+    });
   }
 
   function viewPlayer(id){
@@ -836,18 +955,20 @@ input:focus, select:focus{
 
   function viewStaffList(){
     const rows = POOL.staff.map(s => `
-      <div class="dlist-row" data-route="/staff/${s.id}">
+      <div class="dlist-row" data-route="/staff/${s.id}" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr">
         <div class="cell-primary">${s.name}</div>
         <div>${KIND_LABELS[s.kind] || s.kind}</div>
+        <div class="cell-num">—</div>
         <div class="cell-num">${s.abilities.motivation || '-'}</div>
         <div class="cell-num">—</div>
       </div>`).join('');
     return `
-      <h1 class="page-title">스태프</h1>
-      <p class="page-sub">${POOL.staff.length}명</p>
+      <div class="filterbar">
+        <span class="count">${POOL.staff.length}명</span>
+      </div>
       <div class="dlist">
-        <div class="dlist-row head">
-          <div>이름</div><div>직책</div><div>동기</div><div>배치</div>
+        <div class="dlist-row head" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1fr">
+          <div>이름</div><div>직책</div><div>주 능력</div><div>동기</div><div>배치</div>
         </div>
         ${rows}
       </div>`;
