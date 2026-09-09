@@ -509,16 +509,59 @@ input:focus, select:focus{
 }
 
 /* ─── 팀 홈 (대시보드) ─── */
-.home-page{padding: var(--size-24); max-width: 1280px; margin: 0 auto}
-.home-header{display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--size-24); padding-bottom: var(--size-16); border-bottom: 1px solid var(--border)}
+.home-page{padding: var(--size-24); max-width: 1280px; margin: 0 auto; overflow-y: auto}
+.home-header{display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--size-24); padding-bottom: var(--size-16); border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: var(--size-16)}
 .home-title{margin: 0; font-size: var(--text-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight)}
 .home-subtitle{margin: var(--size-4) 0 0; color: var(--text-muted); font-size: var(--text-sm)}
+.home-header-meta{display: flex; gap: var(--size-20)}
+.home-meta-item{display: flex; flex-direction: column; align-items: flex-end}
+.home-meta-label{font-size: var(--text-xs); color: var(--text-muted); letter-spacing: var(--tracking-wide); text-transform: uppercase}
+.home-meta-item b{font-family: var(--font-mono); font-size: var(--text-lg); font-weight: var(--weight-semibold)}
+
 .home-grid{display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--size-16)}
 .home-card{background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-m); padding: var(--size-16)}
-.home-card h3{margin: 0 0 var(--size-8); font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--text-normal)}
-.home-card-cta{grid-column: span 2}
+.home-card h3{margin: 0 0 var(--size-12); font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--text-normal); letter-spacing: -0.005em}
+.home-card-cta{grid-column: span 2; background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary))}
 @media (max-width: 800px){.home-card-cta{grid-column: span 1}}
 .home-empty{margin: 0; color: var(--text-faint); font-size: var(--text-sm); font-style: italic}
+
+/* Hero CTA */
+.home-cta-body{display: flex; flex-direction: column; gap: var(--size-12)}
+.home-cta-context{margin: 0; color: var(--text-muted); font-size: var(--text-sm); line-height: var(--leading-normal)}
+.home-cta-actions{display: flex; gap: var(--size-8); flex-wrap: wrap}
+.btn-primary{background: var(--primary); color: var(--primary-on); border: 0; border-radius: var(--radius-s); padding: var(--size-8) var(--size-16); font-size: var(--text-sm); font-weight: var(--weight-semibold); cursor: pointer; transition: transform var(--dur-fast), background var(--dur-fast)}
+.btn-primary:hover{filter: brightness(1.1)}
+.btn-secondary{background: transparent; color: var(--text-normal); border: 1px solid var(--border-strong); border-radius: var(--radius-s); padding: var(--size-8) var(--size-16); font-size: var(--text-sm); font-weight: var(--weight-medium); cursor: pointer}
+.btn-secondary:hover{background: var(--bg-hover)}
+
+/* 알림 인박스 */
+.home-inbox{list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--size-8)}
+.home-inbox-item{display: flex; align-items: flex-start; gap: var(--size-8); font-size: var(--text-sm); color: var(--text-normal); line-height: var(--leading-normal)}
+.dot{flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; margin-top: 6px}
+.dot-danger{background: var(--danger-text)}
+.dot-attention{background: var(--attention-text)}
+.dot-info{background: var(--info-text)}
+.dot-success{background: var(--success-text)}
+.home-inbox-text{flex: 1 1 auto}
+
+/* 팀 지표 KPI */
+.home-kpi{display: flex; flex-direction: column; gap: var(--size-8)}
+.kpi{display: flex; justify-content: space-between; align-items: baseline; padding: var(--size-6) 0; border-bottom: 1px solid var(--border)}
+.kpi:last-child{border-bottom: 0}
+.kpi-label{color: var(--text-muted); font-size: var(--text-sm)}
+.kpi-value{font-family: var(--font-mono); font-size: var(--text-xl); font-weight: var(--weight-semibold); color: var(--text-normal); font-variant-numeric: tabular-nums}
+.kpi-value-sm{font-family: var(--font-sans); font-size: var(--text-sm); font-weight: var(--weight-medium)}
+
+/* 캘린더 */
+.home-calendar{list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--size-8)}
+.home-cal-item{display: flex; gap: var(--size-12); font-size: var(--text-sm)}
+.home-cal-date{font-family: var(--font-mono); color: var(--text-muted); font-variant-numeric: tabular-nums; min-width: 96px}
+.home-cal-label{color: var(--text-normal)}
+
+/* Empty state */
+.home-empty-state{display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--size-24) 0; color: var(--text-faint); text-align: center}
+.home-empty-glyph{font-size: var(--text-2xl); line-height: 1; margin-bottom: var(--size-8); opacity: .5}
+.home-empty-state p{margin: 0; font-size: var(--text-sm)}
 
 /* Sub-tabs (페이지 안 로컬 뷰) */
 .subtabs{
@@ -1041,38 +1084,85 @@ input:focus, select:focus{
     if (parts[0] === 'training') bindTraining(el);
   }
 
-  // 팀 홈 (대시보드) — Phase 15 뼈대. Phase 16에서 컴포넌트 확장.
+  // 팀 홈 (대시보드) Phase 16 — 5카드 실제 컴포넌트
   function viewHome(){
     const team = POOL.team || {};
     const league = POOL.league || {};
+    const players = POOL.players || [];
+    const avg = (arr, key) => arr.length ? Math.round(arr.reduce((s,p) => s + (p[key]||0), 0) / arr.length * 10) / 10 : 0;
+    const teamOvr = avg(players, 'ovr');
+    const teamTal = avg(players, 'talent_avg');
+    const foreignCount = players.filter(p => p.foreign).length;
+    const registered = (POOL.registrations || []).length;
+    const topOvr = players.slice().sort((a,b) => b.ovr - a.ovr).slice(0, 3);
+
+    // 임시 알림 (Phase 미구현이라 예시로)
+    const inbox = [
+      { level:'danger',    text:'안치홍(2B) · 계약 만료 예정 (2026-11-30)', route:null },
+      { level:'attention', text:'김동헌(C) · 재능 상승 감지', route:null },
+      { level:'info',      text:'다음 회의: 코치 배치 확정', route:null },
+    ];
+
+    // 임시 캘린더 (시즌 이벤트 자리)
+    const calendar = [
+      { date:'2026-04-01', label:'정규 시즌 개막' },
+      { date:'2026-07-31', label:'트레이드 마감' },
+      { date:'2026-10-10', label:'포스트시즌 시작' },
+    ];
+
     return `
       <div class="home-page">
         <header class="home-header">
           <div>
             <h1 class="home-title">${team.name || '팀'}</h1>
-            <p class="home-subtitle">${league.name || ''} · ${team.season || ''} 시즌</p>
+            <p class="home-subtitle">${league.name || ''} · ${team.season || ''} 시즌 · ${team.home_stadium || ''}</p>
+          </div>
+          <div class="home-header-meta">
+            <span class="home-meta-item"><span class="home-meta-label">등록</span><b>${registered}</b></span>
+            <span class="home-meta-item"><span class="home-meta-label">외국인</span><b>${foreignCount}</b></span>
           </div>
         </header>
         <section class="home-grid">
           <article class="home-card home-card-cta">
-            <h3>다음 액션</h3>
-            <p class="home-empty">Phase 16에서 시즌 진행·훈련 캠프 CTA 자리.</p>
+            <div class="home-cta-body">
+              <h3>다음 액션</h3>
+              <p class="home-cta-context">시즌 개막까지 남은 준비: 코치 배치 · 로스터 확정 · 훈련 계획</p>
+              <div class="home-cta-actions">
+                <button class="btn-primary">프리시즌 시작</button>
+                <button class="btn-secondary">훈련 계획 짜기</button>
+              </div>
+            </div>
           </article>
+
           <article class="home-card">
             <h3>알림</h3>
-            <p class="home-empty">부상·계약만료·이적소문 인박스 자리.</p>
+            <ul class="home-inbox">
+              ${inbox.map(n => `<li class="home-inbox-item"><span class="dot dot-${n.level}"></span><span class="home-inbox-text">${n.text}</span></li>`).join('')}
+            </ul>
           </article>
+
           <article class="home-card">
             <h3>팀 지표</h3>
-            <p class="home-empty">승률·팀 OVR·재정 카드 자리.</p>
+            <div class="home-kpi">
+              <div class="kpi"><span class="kpi-label">팀 OVR</span><b class="kpi-value">${teamOvr}</b></div>
+              <div class="kpi"><span class="kpi-label">평균 재능</span><b class="kpi-value">${teamTal}</b></div>
+              <div class="kpi"><span class="kpi-label">주전 3인</span><b class="kpi-value kpi-value-sm">${topOvr.map(p => p.name).join(' · ')}</b></div>
+            </div>
           </article>
+
           <article class="home-card">
             <h3>다음 일정</h3>
-            <p class="home-empty">캘린더·데드라인 자리.</p>
+            <ul class="home-calendar">
+              ${calendar.map(c => `<li class="home-cal-item"><span class="home-cal-date">${c.date}</span><span class="home-cal-label">${c.label}</span></li>`).join('')}
+            </ul>
           </article>
+
           <article class="home-card">
             <h3>최근 결과</h3>
-            <p class="home-empty">마지막 3-5경기 스코어.</p>
+            <div class="home-empty-state">
+              <span class="home-empty-glyph">·</span>
+              <p>아직 경기가 시작되지 않았습니다.</p>
+            </div>
           </article>
         </section>
       </div>`;
