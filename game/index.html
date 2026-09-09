@@ -508,6 +508,18 @@ input:focus, select:focus{
   border-radius: var(--radius-s);
 }
 
+/* ─── 팀 홈 (대시보드) ─── */
+.home-page{padding: var(--size-24); max-width: 1280px; margin: 0 auto}
+.home-header{display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--size-24); padding-bottom: var(--size-16); border-bottom: 1px solid var(--border)}
+.home-title{margin: 0; font-size: var(--text-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight)}
+.home-subtitle{margin: var(--size-4) 0 0; color: var(--text-muted); font-size: var(--text-sm)}
+.home-grid{display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--size-16)}
+.home-card{background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-m); padding: var(--size-16)}
+.home-card h3{margin: 0 0 var(--size-8); font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--text-normal)}
+.home-card-cta{grid-column: span 2}
+@media (max-width: 800px){.home-card-cta{grid-column: span 1}}
+.home-empty{margin: 0; color: var(--text-faint); font-size: var(--text-sm); font-style: italic}
+
 /* Sub-tabs (페이지 안 로컬 뷰) */
 .subtabs{
   display: flex; gap: var(--size-4);
@@ -808,6 +820,7 @@ input:focus, select:focus{
   }
 
   const CATEGORIES = [
+    { key:'home',      glyph:'HM', label:'홈',     home:'/' },
     { key:'players',   glyph:'PL', label:'선수단', home:'/players/overview' },
     { key:'selection', glyph:'SE', label:'편성',   home:'/selection/lineup' },
     { key:'staff',     glyph:'ST', label:'스태프', home:'/staff' },
@@ -815,6 +828,7 @@ input:focus, select:focus{
   ];
 
   function routeContext(route){
+    if (route === '/' || route === '') return 'home';
     if (route.startsWith('/players') || route.startsWith('/player/')) return 'players';
     if (route.startsWith('/selection')) return 'selection';
     if (route.startsWith('/staff'))    return 'staff';
@@ -899,6 +913,7 @@ input:focus, select:focus{
 
   function tabLabel(route){
     const parts = parseRoute(route);
+    if (route === '/' || parts.length === 0) return { glyph:'HM', name:'홈' };
     if (parts[0] === 'players')  return { glyph:'PL', name:'선수단' };
     if (parts[0] === 'staff' && !parts[1]) return { glyph:'ST', name:'스태프' };
     if (parts[0] === 'training') return { glyph:'TR', name:'훈련' };
@@ -965,7 +980,7 @@ input:focus, select:focus{
     tabbar.querySelectorAll('.tab-close').forEach(b => {
       b.addEventListener('click', e => { e.stopPropagation(); closeTab(parseInt(b.dataset.close, 10)); });
     });
-    tabbar.querySelector('.tab-new').addEventListener('click', () => openTab('/players'));
+    tabbar.querySelector('.tab-new').addEventListener('click', () => openTab('/'));
 
     // Nav buttons
     document.getElementById('nav-back').disabled = !t || t.histIdx <= 0;
@@ -1010,7 +1025,8 @@ input:focus, select:focus{
   function renderContent(route){
     const parts = parseRoute(route);
     const el = document.getElementById('content');
-    if (parts[0] === 'players') el.innerHTML = viewPlayersHub(parts[1] || 'overview');
+    if (route === '/' || parts.length === 0) el.innerHTML = viewHome();
+    else if (parts[0] === 'players') el.innerHTML = viewPlayersHub(parts[1] || 'overview');
     else if (parts[0] === 'player') el.innerHTML = viewPlayer(parts[1]);
     else if (parts[0] === 'staff' && !parts[1]) el.innerHTML = viewStaffList();
     else if (parts[0] === 'staff' && parts[1]) el.innerHTML = viewStaff(parts[1]);
@@ -1023,6 +1039,43 @@ input:focus, select:focus{
     if (parts[0] === 'player' && parts[1]) bindPlayerDetail(el, parseInt(parts[1], 10));
     if (parts[0] === 'staff' && !parts[1]) bindStaffFilters(el);
     if (parts[0] === 'training') bindTraining(el);
+  }
+
+  // 팀 홈 (대시보드) — Phase 15 뼈대. Phase 16에서 컴포넌트 확장.
+  function viewHome(){
+    const team = POOL.team || {};
+    const league = POOL.league || {};
+    return `
+      <div class="home-page">
+        <header class="home-header">
+          <div>
+            <h1 class="home-title">${team.name || '팀'}</h1>
+            <p class="home-subtitle">${league.name || ''} · ${team.season || ''} 시즌</p>
+          </div>
+        </header>
+        <section class="home-grid">
+          <article class="home-card home-card-cta">
+            <h3>다음 액션</h3>
+            <p class="home-empty">Phase 16에서 시즌 진행·훈련 캠프 CTA 자리.</p>
+          </article>
+          <article class="home-card">
+            <h3>알림</h3>
+            <p class="home-empty">부상·계약만료·이적소문 인박스 자리.</p>
+          </article>
+          <article class="home-card">
+            <h3>팀 지표</h3>
+            <p class="home-empty">승률·팀 OVR·재정 카드 자리.</p>
+          </article>
+          <article class="home-card">
+            <h3>다음 일정</h3>
+            <p class="home-empty">캘린더·데드라인 자리.</p>
+          </article>
+          <article class="home-card">
+            <h3>최근 결과</h3>
+            <p class="home-empty">마지막 3-5경기 스코어.</p>
+          </article>
+        </section>
+      </div>`;
   }
 
   function bindRouteLinks(root){
@@ -2080,7 +2133,7 @@ input:focus, select:focus{
     document.getElementById('topbar-season').textContent = `${POOL.team.season} 시즌`;
   }
 
-  openTab('/players');
+  openTab('/');
 })();
 </script>
 </body></html>
