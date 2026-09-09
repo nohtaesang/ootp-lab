@@ -104,7 +104,7 @@
     --rating-elite-tint:    rgba(74,222,128,.20);
     --rating-elite-border:  rgba(74,222,128,.42);
     --rating-elite-on:      var(--c-n-100);
-    --rating-good-text:     #86efac;                    /* 밝은 초록 (약한 강조) */
+    --rating-good-text:     #fbbf24;                    /* 노랑 (사용자 결정: 초록→노랑→흰→회색) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-100);
@@ -188,7 +188,7 @@
     --rating-elite-tint:    rgba(21,128,61,.14);
     --rating-elite-border:  rgba(21,128,61,.34);
     --rating-elite-on:      var(--c-n-0);
-    --rating-good-text:     #4d7c0f;
+    --rating-good-text:     #a16207;    /* 진한 노랑 (라이트) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-0);
