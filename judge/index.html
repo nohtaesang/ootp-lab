@@ -163,10 +163,11 @@ summary{cursor:pointer;font-size:13px;color:var(--text-muted)}
 .heat th:first-child,.heat td:first-child{text-align:left;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:0}
 .heat td{font-family:var(--font-mono);font-size:13px;font-weight:500}
 .heat td.hi{color:var(--rating-elite-text);background:var(--rating-elite-tint);font-weight:600}.heat td.lo{color:var(--rating-terrible-text);background:var(--rating-terrible-tint);font-weight:600}
-/* rating 5구간 열지도: elite/terrible은 굵은 강조, good/poor는 약한 tint, average는 배경 없음 */
+/* rating 5구간 열지도: 극단(elite/terrible)만 tint 배경 + 굵음.
+ * 중간(good/poor)은 배경 없이 텍스트 색만 → 시각 노이즈 축소, 극단이 진짜로 눈에 튐 */
 .heat td.rating-elite{color:var(--rating-elite-text);background:var(--rating-elite-tint);font-weight:700}
-.heat td.rating-good{color:var(--rating-good-text);background:var(--rating-good-tint);font-weight:500}
-.heat td.rating-poor{color:var(--rating-poor-text);background:var(--rating-poor-tint);font-weight:500}
+.heat td.rating-good{color:var(--rating-good-text);background:transparent;font-weight:500}
+.heat td.rating-poor{color:var(--rating-poor-text);background:transparent;font-weight:500}
 .heat td.rating-terrible{color:var(--rating-terrible-text);background:var(--rating-terrible-tint);font-weight:700}
 .heat tr.g th{font-size:11px;color:var(--text-muted);letter-spacing:.04em;text-align:left;padding-top:var(--space-2);border-bottom:0}
 .heat tr.dim td,.heat tr.dim th{opacity:.4}
@@ -331,7 +332,7 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '9a7eba5 2026-09-09';
+  const BUILD = '0368e23 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
