@@ -109,7 +109,7 @@
     --rating-elite-tint:    transparent;
     --rating-elite-border:  transparent;
     --rating-elite-on:      var(--c-n-100);
-    --rating-good-text:     #eab308;                    /* 진한 노랑 (elite와 비슷한 밝기) */
+    --rating-good-text:     #facc15;                    /* 밝은 노랑 (attention 앰버와 다른 톤) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-100);
