@@ -105,11 +105,11 @@
      *   나쁨 (poor+terrible)= 회색 muted
      * 빨강 없음 (semantic danger 축이 별도로 담당).
      */
-    --rating-elite-text:    var(--c-cyan-60);           /* 청록 (옵션 D) */
+    --rating-elite-text:    #4ade80;                    /* 초록 (semantic success와 같은 톤) */
     --rating-elite-tint:    transparent;
     --rating-elite-border:  transparent;
     --rating-elite-on:      var(--c-n-100);
-    --rating-good-text:     #fda4af;                    /* 산호 (옵션 D) */
+    --rating-good-text:     #eab308;                    /* 진한 노랑 (elite와 비슷한 밝기) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-100);
@@ -196,11 +196,11 @@
     --primary-on:   var(--c-n-0);
     --primary-tint: rgba(109,40,217,.08);
 
-    --rating-elite-text:    var(--c-cyan-40);           /* 진한 청록 (라이트) */
+    --rating-elite-text:    #15803d;                    /* 진한 초록 (라이트) */
     --rating-elite-tint:    transparent;
     --rating-elite-border:  transparent;
     --rating-elite-on:      var(--c-n-0);
-    --rating-good-text:     #e11d48;                    /* 진한 로즈 (라이트) */
+    --rating-good-text:     #a16207;                    /* 진한 노랑 (라이트) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-0);
