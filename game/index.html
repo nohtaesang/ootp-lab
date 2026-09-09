@@ -184,7 +184,20 @@ input:focus, select:focus{
   display: flex; flex-direction: column;
   min-width: 0;
   overflow: hidden;
+  position: relative;
 }
+.sidebar-resize{
+  position: absolute;
+  top: 0; right: -3px; bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 3;
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease);
+}
+.sidebar-resize:hover,
+.sidebar-resize.dragging{background: var(--primary); opacity: 0.5}
+.app.sidebar-collapsed .sidebar-resize{display: none}
 
 .sidebar-nav{
   flex: 1;
@@ -609,6 +622,59 @@ input:focus, select:focus{
 .dist-fill{height: 100%; background: var(--primary); border-radius: 999px}
 .dist-count{font-family: var(--font-mono); text-align: right; color: var(--text-muted); font-variant-numeric: tabular-nums}
 .kpi-of{margin-left: 4px; font-size: var(--text-sm); color: var(--text-muted); font-weight: var(--weight-normal); font-family: var(--font-sans)}
+.meta-of{font-size: var(--text-xs); color: var(--text-faint); font-weight: var(--weight-normal); font-family: var(--font-sans)}
+.meta-over{color: var(--danger-text)}
+
+/* 부문별 전력 */
+.power-grid{display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--size-16)}
+@media (max-width: 800px){.power-grid{grid-template-columns: repeat(2, 1fr)}}
+.power-cell{display: flex; flex-direction: column; gap: var(--size-4)}
+.power-label{font-size: var(--text-xs); color: var(--text-muted); letter-spacing: var(--tracking-wide); text-transform: uppercase}
+.power-value{font-family: var(--font-mono); font-size: var(--text-xl); font-weight: var(--weight-semibold); color: var(--text-normal); font-variant-numeric: tabular-nums; line-height: 1.1}
+.power-bar{height: 4px; background: var(--bg-tertiary); border-radius: 999px; overflow: hidden}
+.power-fill{height: 100%; background: var(--primary); border-radius: 999px}
+.power-summary{margin: var(--size-16) 0 0; font-size: var(--text-sm); color: var(--text-muted)}
+.power-summary b{color: var(--text-normal); font-weight: var(--weight-semibold); font-family: var(--font-mono)}
+
+/* 포지션 커버리지 */
+.cov-table{width: 100%; border-collapse: collapse; font-size: var(--text-sm)}
+.cov-table th{text-align: left; padding: var(--size-6) var(--size-8); color: var(--text-muted); font-weight: var(--weight-medium); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; border-bottom: 1px solid var(--border)}
+.cov-table td{padding: var(--size-6) var(--size-8); border-bottom: 1px solid var(--border); color: var(--text-normal)}
+.cov-table tr:last-child td{border-bottom: 0}
+.cov-code{font-family: var(--font-mono); color: var(--text-muted); font-size: var(--text-xs); width: 40px}
+.cov-pos{color: var(--text-muted); width: 80px}
+.cov-name{color: var(--text-normal); display: inline-flex; align-items: baseline; gap: var(--size-6); text-decoration: none}
+.cov-name:hover{color: var(--primary)}
+.cov-ovr{font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); font-variant-numeric: tabular-nums}
+.cov-empty{color: var(--text-faint); font-style: italic}
+.cov-sep{color: var(--text-faint); margin: 0 var(--size-6)}
+.cov-line{display: flex; flex-wrap: wrap; gap: 2px var(--size-4); font-size: var(--text-sm); align-items: baseline}
+.cov-status{display: inline-block; padding: 1px var(--size-6); border-radius: var(--radius-s); font-size: var(--text-xs); font-weight: var(--weight-medium); border: 1px solid currentColor}
+.status-good{color: var(--success-text)}
+.status-need-backup{color: var(--attention-text)}
+.status-empty{color: var(--danger-text)}
+.alert-line{margin: var(--size-6) 0 0; font-size: var(--text-xs); color: var(--danger-text)}
+.rot-block{display: flex; flex-direction: column; gap: var(--size-4); padding: var(--size-8) 0}
+.rot-block + .rot-block{border-top: 1px solid var(--border)}
+.rot-label{font-size: var(--text-xs); color: var(--text-muted); letter-spacing: var(--tracking-wide); text-transform: uppercase}
+
+/* 미니 선수 리스트 */
+.mini-list{display: flex; flex-direction: column; gap: var(--size-2)}
+.mini-player{display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: var(--size-10); padding: var(--size-6) var(--size-8); border-radius: var(--radius-s); color: var(--text-normal); text-decoration: none}
+.mini-player:hover{background: var(--bg-hover)}
+.mini-name{font-weight: var(--weight-medium)}
+.mini-meta{font-size: var(--text-xs); color: var(--text-muted)}
+.mini-value{font-family: var(--font-mono); font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--text-normal); font-variant-numeric: tabular-nums}
+
+/* 접이식 */
+.fold summary{cursor: pointer; font-weight: var(--weight-semibold); color: var(--text-normal); padding: var(--size-4) 0; list-style: none; display: flex; align-items: center; gap: var(--size-6)}
+.fold summary::-webkit-details-marker{display: none}
+.fold summary::before{content: '›'; color: var(--text-muted); transition: transform var(--dur-fast) var(--ease); font-family: var(--font-mono); font-size: var(--text-md)}
+.fold[open] summary::before{transform: rotate(90deg)}
+.fold-body{padding-top: var(--size-16)}
+.stats-2{display: grid; grid-template-columns: 1fr 1fr; gap: var(--size-24)}
+.stats-2 h4{margin: 0 0 var(--size-8); font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--text-normal)}
+@media (max-width: 700px){.stats-2{grid-template-columns: 1fr}}
 
 /* Sub-tabs (페이지 안 로컬 뷰) */
 .subtabs{
@@ -850,7 +916,6 @@ input:focus, select:focus{
       <div class="brand-logo" id="brand-logo"></div>
       <div class="brand-info">
         <span class="brand-team" id="brand-team"></span>
-        <span class="brand-season" id="brand-season"></span>
       </div>
       <button class="topbar-toggle" onclick="toggleSidebar()" title="사이드바 토글" aria-label="사이드바 토글"><i data-lucide="chevron-left"></i></button>
     </div>
@@ -866,6 +931,7 @@ input:focus, select:focus{
 
   <aside class="sidebar">
     <nav class="sidebar-nav" id="sidebar-items"></nav>
+    <div class="sidebar-resize" id="sidebar-resize" title="사이드바 폭 조정"></div>
   </aside>
 
   <div class="main">
@@ -1264,59 +1330,131 @@ input:focus, select:focus{
 
   // ── 개요 (Team Overview) ─────────────────────────────────────
   function viewPlayersOverview(){
-    const players = POOL.players;
-    const positions = (POOL.constants && POOL.constants.positions) || [];
-    const n = players.length;
-    const avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0) / arr.length) : 0;
-    const avgAge = avg(players.map(p => p.age));
-    const foreign = players.filter(p => p.foreign).length;
+    const players    = POOL.players;
+    const constants  = POOL.constants || {};
+    const league     = POOL.league || {};
+    const positions  = constants.positions || [];
+    const offPos     = constants.offensive_positions || [];
+    const posLabelOf = id => (positions.find(p => p[0] === id) || [id, id])[1];
+    const abilityLabels = POOL.ability_labels || [];
 
-    // 손·타 (투수의 좌완 / 야수의 좌타·양타)
-    const pitchers = players.filter(p => p.role === '투수');
+    const n = players.length;
     const batters  = players.filter(p => p.role === '야수');
+    const pitchers = players.filter(p => p.role === '투수');
+    const foreign  = players.filter(p => p.foreign).length;
+    const rosterLimit  = league.roster_active_limit || 0;
+    const foreignLimit = league.foreign_max || 0;
+
+    // ── 부문별 전력 (bat/pitch/field/run/body) ──
+    const catFilter = {
+      bat:   p => p.role === '야수',
+      pitch: p => p.role === '투수',
+      field: p => p.role === '야수',
+      run:   p => p.role === '야수',
+      body:  () => true,
+    };
+    const catLabels = { bat:'타격', pitch:'투구', field:'수비', run:'주루', body:'체력' };
+    const catAbilities = {};
+    abilityLabels.forEach(([key, _label, cat]) => {
+      (catAbilities[cat] = catAbilities[cat] || []).push(key);
+    });
+    const catStats = Object.keys(catLabels).map(cat => {
+      const target = players.filter(catFilter[cat] || (() => true));
+      const abilities = catAbilities[cat] || [];
+      let sum = 0, cnt = 0;
+      target.forEach(p => {
+        abilities.forEach(k => {
+          const v = p.ability_display && p.ability_display[k];
+          if (typeof v === 'number') { sum += v; cnt++; }
+        });
+      });
+      return { cat, label: catLabels[cat], avg: cnt ? sum / cnt : 0 };
+    });
+    const powerMax = Math.max(...catStats.map(x => x.avg), 1);
+    const sortedCat = catStats.slice().sort((a,b) => b.avg - a.avg);
+    const strong = sortedCat[0];
+    const weak = sortedCat[sortedCat.length - 1];
+
+    // ── 포지션 커버리지 ──
+    const listByPos = id => players.filter(p => p.position === id).sort((a,b) => b.ovr - a.ovr);
+    const offRows = offPos.map(id => {
+      const list = listByPos(id);
+      const starter = list[0] || null;
+      const backup  = list[1] || null;
+      let status = 'good';
+      if (!starter) status = 'empty';
+      else if (!backup) status = 'need-backup';
+      return { id, label: posLabelOf(id), starter, backup, status };
+    });
+    const rotation = listByPos('SP').slice(0, 5);
+    const bullpen  = listByPos('RP').slice(0, 5);
+    const rotationLack = Math.max(0, 5 - rotation.length);
+
+    // ── 핵심 선수 · 육성 후보 (겹침 제거) ──
+    const key3 = players.slice().sort((a,b) => b.ovr - a.ovr).slice(0, 3);
+    const keyIds = new Set(key3.map(p => p.id));
+    const dev3 = players
+      .filter(p => p.age <= 25 && !keyIds.has(p.id))
+      .sort((a,b) => b.talent_avg - a.talent_avg)
+      .slice(0, 3);
+
+    // ── 접이식 구성 통계 ──
+    const avgAge = n ? players.reduce((s,p) => s + p.age, 0) / n : 0;
     const leftThrows = pitchers.filter(p => p.throws === 'L').length;
     const leftBats   = batters.filter(p => p.bats === 'L' || p.bats === 'S').length;
-
-    // 포지션 분포
-    const byPos = {};
-    players.forEach(p => { byPos[p.position] = (byPos[p.position] || 0) + 1; });
-    const posMax = Math.max(1, ...Object.values(byPos));
-
-    // 연령대 분포
     const buckets = [
-      { label: '20세 이하', test: p => p.age <= 20 },
-      { label: '21~25세',  test: p => p.age >= 21 && p.age <= 25 },
-      { label: '26~30세',  test: p => p.age >= 26 && p.age <= 30 },
-      { label: '31~35세',  test: p => p.age >= 31 && p.age <= 35 },
-      { label: '36세 이상', test: p => p.age >= 36 },
-    ].map(b => ({ ...b, count: players.filter(b.test).length }));
+      { label:'20세 이하', test: p => p.age <= 20 },
+      { label:'21~25세',  test: p => p.age >= 21 && p.age <= 25 },
+      { label:'26~30세',  test: p => p.age >= 26 && p.age <= 30 },
+      { label:'31~35세',  test: p => p.age >= 31 && p.age <= 35 },
+      { label:'36세 이상', test: p => p.age >= 36 },
+    ].map(b => ({...b, count: players.filter(b.test).length}));
     const ageMax = Math.max(1, ...buckets.map(x => x.count));
 
-    // 톱 리스트
-    const topOvr    = players.slice().sort((a,b) => b.ovr - a.ovr).slice(0, 5);
-    const topTal    = players.slice().sort((a,b) => b.talent_avg - a.talent_avg).slice(0, 5);
-    const prospects = players.filter(p => p.age <= 25).sort((a,b) => b.talent_avg - a.talent_avg).slice(0, 5);
+    // ── Render helpers ──
+    const playerLink = p => p
+      ? `<a class="cov-name" data-route="/player/${p.id}">${p.name}<span class="cov-ovr">${p.ovr}</span></a>`
+      : `<span class="cov-empty">—</span>`;
+    const statusLabel = { good:'충분', 'need-backup':'백업 필요', empty:'공백' };
 
-    const listCols = '2fr 40px 40px 40px';
-    const listHead = `<div class="dlist-row head" style="grid-template-columns:${listCols}"><div>선수</div><div>나이</div><div>OVR</div><div>재능</div></div>`;
-    const listItem = p => `<div class="dlist-row" data-route="/player/${p.id}" style="grid-template-columns:${listCols}">
-      <div class="cell-primary">${p.name} <span class="hand-marker">${p.position}</span></div>
-      <div class="cell-num">${p.age}</div>
-      <div class="cell-num">${p.ovr}</div>
-      <div class="cell-num">${p.talent_avg}</div>
-    </div>`;
-
-    const posBars = positions.filter(([id]) => byPos[id]).map(([id, label]) => `
-      <div class="dist-row">
-        <span class="dist-label"><span class="dist-code">${id}</span>${label}</span>
-        <div class="dist-bar"><div class="dist-fill" style="width:${(byPos[id]/posMax*100).toFixed(0)}%"></div></div>
-        <span class="dist-count">${byPos[id]}</span>
+    const powerCells = catStats.map(c => `
+      <div class="power-cell">
+        <div class="power-label">${c.label}</div>
+        <div class="power-value">${c.avg.toFixed(1)}</div>
+        <div class="power-bar"><div class="power-fill" style="width:${(c.avg/powerMax*100).toFixed(0)}%"></div></div>
       </div>`).join('');
+
+    const covRows = offRows.map(r => `
+      <tr>
+        <td class="cov-code">${r.id}</td>
+        <td class="cov-pos">${r.label}</td>
+        <td>${playerLink(r.starter)}</td>
+        <td>${playerLink(r.backup)}</td>
+        <td><span class="cov-status status-${r.status}">${statusLabel[r.status]}</span></td>
+      </tr>`).join('');
+
+    const rotationLine = rotation.length
+      ? rotation.map(playerLink).join('<span class="cov-sep">·</span>')
+      : '<span class="cov-empty">없음</span>';
+    const bullpenLine  = bullpen.length
+      ? bullpen.map(playerLink).join('<span class="cov-sep">·</span>')
+      : '<span class="cov-empty">없음</span>';
+
+    const miniItem = (p, metric) => `
+      <a class="mini-player" data-route="/player/${p.id}">
+        <span class="mini-name">${p.name}</span>
+        <span class="mini-meta">${p.position} · ${p.age}세</span>
+        <span class="mini-value">${metric}</span>
+      </a>`;
+    const keyList = key3.map(p => miniItem(p, p.ovr)).join('');
+    const devList = dev3.length
+      ? dev3.map(p => miniItem(p, p.talent_avg)).join('')
+      : '<div class="cov-empty" style="padding:var(--size-6)">25세 이하 선수 없음</div>';
 
     const ageBars = buckets.map(b => `
       <div class="dist-row">
         <span class="dist-label">${b.label}</span>
-        <div class="dist-bar"><div class="dist-fill" style="width:${b.count ? (b.count/ageMax*100).toFixed(0) : 0}%"></div></div>
+        <div class="dist-bar"><div class="dist-fill" style="width:${b.count/ageMax*100}%"></div></div>
         <span class="dist-count">${b.count}</span>
       </div>`).join('');
 
@@ -1325,46 +1463,74 @@ input:focus, select:focus{
         <header class="home-header">
           <div>
             <h1 class="home-title">선수단 개요</h1>
-            <p class="home-subtitle">등록 로스터 구성 요약</p>
+            <p class="home-subtitle">부문 전력 · 포지션 커버리지 · 핵심 인물</p>
           </div>
           <div class="home-header-meta">
-            <span class="home-meta-item"><span class="home-meta-label">등록</span><b>${n}</b></span>
-            <span class="home-meta-item"><span class="home-meta-label">외국인</span><b>${foreign}</b></span>
-            <span class="home-meta-item"><span class="home-meta-label">평균 나이</span><b>${avgAge.toFixed(1)}</b></span>
+            <span class="home-meta-item"><span class="home-meta-label">등록</span><b class="${rosterLimit && n > rosterLimit ? 'meta-over' : ''}">${n}${rosterLimit ? ` <span class="meta-of">/ ${rosterLimit}</span>` : ''}</b></span>
+            <span class="home-meta-item"><span class="home-meta-label">야수</span><b>${batters.length}</b></span>
+            <span class="home-meta-item"><span class="home-meta-label">투수</span><b>${pitchers.length}</b></span>
+            <span class="home-meta-item"><span class="home-meta-label">외국인</span><b class="${foreignLimit && foreign > foreignLimit ? 'meta-over' : ''}">${foreign}${foreignLimit ? ` <span class="meta-of">/ ${foreignLimit}</span>` : ''}</b></span>
           </div>
         </header>
+
         <section class="home-grid">
           <article class="home-card home-card-wide">
-            <h3>포지션 분포</h3>
-            <div class="dist">${posBars}</div>
+            <h3>부문별 전력</h3>
+            <div class="power-grid">${powerCells}</div>
+            <p class="power-summary">강점 <b>${strong.label}</b> ${strong.avg.toFixed(1)} · 약점 <b>${weak.label}</b> ${weak.avg.toFixed(1)}</p>
           </article>
 
-          <article class="home-card">
-            <h3>연령대</h3>
-            <div class="dist">${ageBars}</div>
+          <article class="home-card home-card-wide">
+            <h3>포지션 커버리지 · 야수</h3>
+            <table class="cov-table">
+              <thead><tr><th>코드</th><th>포지션</th><th>주전</th><th>백업</th><th>상태</th></tr></thead>
+              <tbody>${covRows}</tbody>
+            </table>
           </article>
 
-          <article class="home-card">
-            <h3>손·타</h3>
-            <div class="home-kpi">
-              <div class="kpi"><span class="kpi-label">좌투</span><b class="kpi-value">${leftThrows}<span class="kpi-of">/ ${pitchers.length}</span></b></div>
-              <div class="kpi"><span class="kpi-label">좌타·양타</span><b class="kpi-value">${leftBats}<span class="kpi-of">/ ${batters.length}</span></b></div>
+          <article class="home-card home-card-wide">
+            <h3>포지션 커버리지 · 투수</h3>
+            <div class="rot-block">
+              <div class="rot-label">선발 로테이션 (상위 5)</div>
+              <div class="cov-line">${rotationLine}</div>
+              ${rotationLack > 0 ? `<p class="alert-line">로테이션 ${rotationLack}명 부족</p>` : ''}
+            </div>
+            <div class="rot-block">
+              <div class="rot-label">불펜 (상위 5)</div>
+              <div class="cov-line">${bullpenLine}</div>
             </div>
           </article>
 
           <article class="home-card">
-            <h3>현재 상위 (OVR)</h3>
-            <div class="dlist" style="border:0">${listHead}${topOvr.map(listItem).join('')}</div>
+            <h3>핵심 선수 · OVR 상위 3</h3>
+            <div class="mini-list">${keyList}</div>
           </article>
 
           <article class="home-card">
-            <h3>잠재 상위 (재능)</h3>
-            <div class="dlist" style="border:0">${listHead}${topTal.map(listItem).join('')}</div>
+            <h3>육성 후보 · 25세 이하 재능 상위 3</h3>
+            <div class="mini-list">${devList}</div>
           </article>
 
-          <article class="home-card">
-            <h3>유망주 (25세 이하 · 재능순)</h3>
-            <div class="dlist" style="border:0">${listHead}${prospects.map(listItem).join('')}</div>
+          <article class="home-card home-card-wide">
+            <details class="fold">
+              <summary>구성 통계 (연령대 · 손·타 · 평균)</summary>
+              <div class="fold-body">
+                <div class="stats-2">
+                  <div>
+                    <h4>연령대</h4>
+                    <div class="dist">${ageBars}</div>
+                  </div>
+                  <div>
+                    <h4>손·타 / 평균</h4>
+                    <div class="home-kpi">
+                      <div class="kpi"><span class="kpi-label">평균 나이</span><b class="kpi-value">${avgAge.toFixed(1)}</b></div>
+                      <div class="kpi"><span class="kpi-label">좌투 / 투수</span><b class="kpi-value">${leftThrows}<span class="kpi-of">/ ${pitchers.length}</span></b></div>
+                      <div class="kpi"><span class="kpi-label">좌타·양타 / 야수</span><b class="kpi-value">${leftBats}<span class="kpi-of">/ ${batters.length}</span></b></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </details>
           </article>
         </section>
       </div>
@@ -2301,8 +2467,45 @@ input:focus, select:focus{
       logo.style.background = `linear-gradient(135deg, ${t.color_primary}, ${c2})`;
     }
     document.getElementById('brand-team').textContent = t.name || '';
-    document.getElementById('brand-season').textContent = t.season ? `${t.season} 시즌` : '';
   }
+
+  // 사이드바 리사이즈 (드래그로 폭 조정 · localStorage 저장)
+  (function initSidebarResize(){
+    const MIN_W = 180, MAX_W = 400, KEY = 'game.sidebarWidth';
+    const app = document.getElementById('app');
+    const handle = document.getElementById('sidebar-resize');
+    const saved = parseInt(localStorage.getItem(KEY) || '', 10);
+    if (saved >= MIN_W && saved <= MAX_W) app.style.setProperty('--sidebar-w', saved + 'px');
+    handle.addEventListener('mousedown', (e) => {
+      if (app.classList.contains('sidebar-collapsed')) return;
+      const startX = e.clientX;
+      const startW = parseInt(getComputedStyle(app).getPropertyValue('--sidebar-w'), 10) || 240;
+      handle.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      const onMove = (ev) => {
+        const w = Math.max(MIN_W, Math.min(MAX_W, startW + (ev.clientX - startX)));
+        app.style.setProperty('--sidebar-w', w + 'px');
+      };
+      const onUp = () => {
+        handle.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        const w = parseInt(app.style.getPropertyValue('--sidebar-w'), 10);
+        if (w) localStorage.setItem(KEY, String(w));
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+      e.preventDefault();
+    });
+    // 더블클릭으로 기본값 복원
+    handle.addEventListener('dblclick', () => {
+      app.style.removeProperty('--sidebar-w');
+      localStorage.removeItem(KEY);
+    });
+  })();
 
   const startRoute = (location.hash || '').replace(/^#/, '') || '/';
   if (/[?&]sidebar=collapsed(&|$)/.test(location.search)) {
