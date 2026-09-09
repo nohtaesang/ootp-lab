@@ -4,18 +4,47 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <style>
-/* 게임 앱과 톤 통일: zinc + 보라 accent. 기본 다크. accent 위 텍스트는 흰색으로 대비 확보. */
+/* ─── 색 시스템 (semantic + 대비 확보) ─────────────────────────────
+ * primary = 보라(상호작용·활성), success = 초록(좋은 값·상승),
+ * danger  = 빨강(나쁜 값·하락), warning = 노랑(특이·주의),
+ * info    = 파랑(현재 위치·중립 강조).
+ * 각 색은 -text(전경 텍스트), -tint(배경 배지), -border(경계).
+ * 다크·라이트 모두 카드 배경 대비 최소 4.5:1 이상.
+ * ────────────────────────────────────────────────────────────── */
 :root{
+  /* 표면/텍스트 (zinc) */
   --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
-  --accent:hsl(265,55%,60%);--accent-ink:#ffffff;--accent-soft:rgba(167,139,250,.14);
-  --lo:#F08A8A;--hi:#6FE09A;--warn:#E8C36A;--now:#7FB3FF;--now-soft:rgba(127,179,255,.18);
-  --bar-bg:#27272a;--bar-ink:#fafafa;--bar-muted:#a1a1aa;--bar-rule:#3f3f46;--bar-field:#1c1c20;--bar-accent:hsl(265,55%,60%);--bar-accent-ink:#ffffff;
+
+  /* semantic 팔레트 (다크: 카드 #27272a 위 텍스트 대비 확보) */
+  --primary-text:#c4b5fd;   --primary-tint:rgba(167,139,250,.14);  --primary-border:rgba(167,139,250,.35);
+  --success-text:#6FE09A;   --success-tint:rgba(111,224,154,.14);  --success-border:rgba(111,224,154,.35);
+  --danger-text:#F08A8A;    --danger-tint:rgba(240,138,138,.14);   --danger-border:rgba(240,138,138,.35);
+  --warning-text:#FBBF24;   --warning-tint:rgba(251,191,36,.14);   --warning-border:rgba(251,191,36,.40);
+  --info-text:#7FB3FF;      --info-tint:rgba(127,179,255,.16);     --info-border:rgba(127,179,255,.35);
+
+  /* 채워진 강조(primary 버튼): 흰 텍스트로 대비 확보 */
+  --accent:hsl(265,55%,60%); --accent-ink:#ffffff; --accent-soft:var(--primary-tint);
+
+  /* 판정 앱 컴포넌트가 참조하는 이름 → semantic으로 매핑 */
+  --hi:var(--success-text); --lo:var(--danger-text); --warn:var(--warning-text); --now:var(--info-text); --now-soft:var(--info-tint);
+
+  /* 판정 바(하단) — 카드와 같은 톤 */
+  --bar-bg:#27272a;--bar-ink:#fafafa;--bar-muted:#a1a1aa;--bar-rule:#3f3f46;--bar-field:#1c1c20;--bar-accent:var(--accent);--bar-accent-ink:#ffffff;
 }
 :root[data-theme="light"]{
   --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
-  --accent:hsl(265,55%,50%);--accent-ink:#ffffff;--accent-soft:rgba(139,92,246,.10);
-  --lo:#C0392B;--hi:#1E8E4A;--warn:#B8860B;--now:#2F6FD6;--now-soft:rgba(47,111,214,.16);
-  --bar-bg:#f4f4f5;--bar-ink:#0a0a0d;--bar-muted:#71717a;--bar-rule:#e4e4e7;--bar-field:#ffffff;--bar-accent:hsl(265,55%,50%);--bar-accent-ink:#ffffff;
+
+  --primary-text:#6d28d9;   --primary-tint:rgba(139,92,246,.10);  --primary-border:rgba(139,92,246,.30);
+  --success-text:#15803d;   --success-tint:rgba(21,128,61,.10);   --success-border:rgba(21,128,61,.30);
+  --danger-text:#b91c1c;    --danger-tint:rgba(185,28,28,.09);    --danger-border:rgba(185,28,28,.30);
+  --warning-text:#a16207;   --warning-tint:rgba(161,98,7,.10);    --warning-border:rgba(161,98,7,.30);
+  --info-text:#1d4ed8;      --info-tint:rgba(29,78,216,.10);      --info-border:rgba(29,78,216,.30);
+
+  --accent:hsl(265,55%,50%); --accent-ink:#ffffff; --accent-soft:var(--primary-tint);
+
+  --hi:var(--success-text); --lo:var(--danger-text); --warn:var(--warning-text); --now:var(--info-text); --now-soft:var(--info-tint);
+
+  --bar-bg:#f4f4f5;--bar-ink:#0a0a0d;--bar-muted:#71717a;--bar-rule:#e4e4e7;--bar-field:#ffffff;--bar-accent:var(--accent);--bar-accent-ink:#ffffff;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -327,7 +356,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'a1c4d93 2026-09-09';
+  const BUILD = 'dbbb141 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
