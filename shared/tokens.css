@@ -126,11 +126,18 @@
     --chart-2: var(--c-amber-60);
     --chart-3: var(--c-n-30);
 
-    /* ─ ROLE: attention (이벤트 노티) ─ */
+    /* ─ ROLE: attention (특이점·이벤트 노티, 앰버) ─ */
     --attention-text:   var(--c-amber-60);
     --attention-tint:   rgba(251,191,36,.14);
     --attention-border: rgba(251,191,36,.42);
     --attention-on:     var(--c-n-100);
+
+    /* ─ ROLE: success/danger (강점/약점 semantic — rating과 별개)
+     * rating = 값의 좋고 나쁨 (초록/노랑/흰/회색)
+     * success/danger = 정보성 강조 (강점/약점 배지, 성장 특징의 좋음/나쁨 텍스트)
+     */
+    --success-text:   #4ade80;   --success-tint: rgba(74,222,128,.20);   --success-border: rgba(74,222,128,.42);   --success-on: var(--c-n-100);
+    --danger-text:    #f87171;   --danger-tint:  rgba(248,113,113,.20);  --danger-border:  rgba(248,113,113,.42);  --danger-on:  var(--c-n-100);
 
     /* ─ 게임 앱 호환 별칭 (기존 컴포넌트 이름 유지) ─ */
     --accent:          var(--primary);
@@ -213,6 +220,9 @@
     --attention-tint:   rgba(161,98,7,.10);
     --attention-border: rgba(161,98,7,.34);
     --attention-on:     var(--c-n-0);
+
+    --success-text:   #15803d;   --success-tint: rgba(21,128,61,.10);   --success-border: rgba(21,128,61,.30);   --success-on: var(--c-n-0);
+    --danger-text:    #b91c1c;   --danger-tint:  rgba(185,28,28,.10);   --danger-border:  rgba(185,28,28,.30);   --danger-on:  var(--c-n-0);
 
     --accent:         var(--primary);
     --text-on-accent: var(--primary-on);
