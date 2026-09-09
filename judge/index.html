@@ -185,11 +185,11 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .heat th:first-child,.heat td:first-child{text-align:left;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:0}
 .heat td{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px;font-weight:500}
 .heat td.hi{color:var(--hi);background:var(--rating-elite-tint);font-weight:600}.heat td.lo{color:var(--lo);background:var(--rating-terrible-tint);font-weight:600}
-/* rating 5구간 열지도 */
-.heat td.rating-elite{color:var(--rating-elite-text);background:var(--rating-elite-tint);font-weight:600}
-.heat td.rating-good{color:var(--rating-good-text);background:var(--rating-good-tint)}
-.heat td.rating-poor{color:var(--rating-poor-text);background:var(--rating-poor-tint)}
-.heat td.rating-terrible{color:var(--rating-terrible-text);background:var(--rating-terrible-tint);font-weight:600}
+/* rating 5구간 열지도: elite/terrible은 굵은 강조, good/poor는 약한 tint, average는 배경 없음 */
+.heat td.rating-elite{color:var(--rating-elite-text);background:var(--rating-elite-tint);font-weight:700}
+.heat td.rating-good{color:var(--rating-good-text);background:var(--rating-good-tint);font-weight:500}
+.heat td.rating-poor{color:var(--rating-poor-text);background:var(--rating-poor-tint);font-weight:500}
+.heat td.rating-terrible{color:var(--rating-terrible-text);background:var(--rating-terrible-tint);font-weight:700}
 .heat tr.g th{font-size:11px;color:var(--muted);letter-spacing:.04em;text-align:left;padding-top:8px;border-bottom:0}
 .heat tr.dim td,.heat tr.dim th{opacity:.4}
 .heat td.now,.heat th.now{background:var(--now-soft)}
@@ -352,7 +352,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'd945c90 2026-09-09';
+  const BUILD = '27e5067 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
@@ -404,7 +404,15 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const FIELD = [['CF',100,24],['LF',30,50],['RF',170,50],['SS',68,80],['2B',132,80],['3B',36,118],['1B',164,118],['P',100,116],['C',100,154]];
   function fieldSvg(P, mains){
     // 능력 → 색: 강점(초록) / 낮음(빨강) / 매우 낮음(회색) / 보통(기본)
-    const col = v => v >= DR.talent_hi ? 'var(--success-text)' : v <= 3 ? 'var(--muted)' : v <= DR.ability_lo ? 'var(--danger-text)' : 'var(--ink)';
+    // rating 5구간으로 색 결정. average는 --ink (다크에서 흰) 로 잘 보이게
+    const col = v => {
+      if (v == null) return 'var(--muted)';
+      if (v >= 17) return 'var(--rating-elite-text)';
+      if (v >= 13) return 'var(--rating-good-text)';
+      if (v >= 9)  return 'var(--ink)';
+      if (v >= 5)  return 'var(--rating-poor-text)';
+      return 'var(--rating-terrible-text)';
+    };
     let s = '<svg viewBox="0 0 200 172" xmlns="http://www.w3.org/2000/svg">';
     // 다이아그램 위치 감만 남기고 그라운드 색은 뺌 (점선 다이아몬드)
     s += '<path d="M100 148 L30 90 L100 32 L170 90 Z" fill="none" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>';

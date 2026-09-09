@@ -93,22 +93,26 @@
     --primary-on:   var(--c-n-0);
     --primary-tint: rgba(167,139,250,.14);
 
-    /* ─ ROLE: rating scale 5구간 ─ */
-    --rating-elite-text:    var(--c-green-60);
-    --rating-elite-tint:    rgba(111,224,154,.14);
-    --rating-elite-border:  rgba(111,224,154,.36);
-    --rating-good-text:     var(--c-lime-60);
-    --rating-good-tint:     rgba(163,230,53,.14);
-    --rating-good-border:   rgba(163,230,53,.32);
-    --rating-average-text:  var(--c-n-30);
+    /* ─ ROLE: rating scale 5구간 ─
+     *   elite/terrible = 강한 초록/빨강 강조 (진한 tint + 굵은 텍스트)
+     *   good/poor      = 약한 톤 (얕은 tint)
+     *   average        = muted (배경 없음)
+     */
+    --rating-elite-text:    #4ade80;                    /* 강한 초록 */
+    --rating-elite-tint:    rgba(74,222,128,.20);
+    --rating-elite-border:  rgba(74,222,128,.42);
+    --rating-good-text:     #a3e635;                    /* 라임 (약함) */
+    --rating-good-tint:     rgba(163,230,53,.10);
+    --rating-good-border:   rgba(163,230,53,.28);
+    --rating-average-text:  var(--c-n-30);              /* muted, 배경 없음 */
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
-    --rating-poor-text:     var(--c-orange-60);
-    --rating-poor-tint:     rgba(251,146,60,.14);
-    --rating-poor-border:   rgba(251,146,60,.34);
-    --rating-terrible-text: var(--c-red-60);
-    --rating-terrible-tint: rgba(240,138,138,.16);
-    --rating-terrible-border:rgba(240,138,138,.36);
+    --rating-poor-text:     #fb923c;                    /* 앰버 (약함) */
+    --rating-poor-tint:     rgba(251,146,60,.10);
+    --rating-poor-border:   rgba(251,146,60,.28);
+    --rating-terrible-text: #ef4444;                    /* 강한 빨강 */
+    --rating-terrible-tint: rgba(239,68,68,.20);
+    --rating-terrible-border:rgba(239,68,68,.42);
 
     /* ─ ROLE: chart series ─ */
     --chart-1: var(--c-teal-60);
@@ -173,21 +177,21 @@
     --primary-on:   var(--c-n-0);
     --primary-tint: rgba(139,92,246,.10);
 
-    --rating-elite-text:    var(--c-green-40);
-    --rating-elite-tint:    rgba(21,128,61,.10);
-    --rating-elite-border:  rgba(21,128,61,.28);
-    --rating-good-text:     var(--c-lime-40);
-    --rating-good-tint:     rgba(77,124,15,.10);
-    --rating-good-border:   rgba(77,124,15,.28);
+    --rating-elite-text:    #15803d;
+    --rating-elite-tint:    rgba(21,128,61,.14);
+    --rating-elite-border:  rgba(21,128,61,.34);
+    --rating-good-text:     #4d7c0f;
+    --rating-good-tint:     rgba(77,124,15,.08);
+    --rating-good-border:   rgba(77,124,15,.22);
     --rating-average-text:  var(--c-n-50);
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
-    --rating-poor-text:     var(--c-orange-40);
-    --rating-poor-tint:     rgba(194,65,12,.10);
-    --rating-poor-border:   rgba(194,65,12,.28);
-    --rating-terrible-text: var(--c-red-40);
-    --rating-terrible-tint: rgba(185,28,28,.10);
-    --rating-terrible-border:rgba(185,28,28,.28);
+    --rating-poor-text:     #c2410c;
+    --rating-poor-tint:     rgba(194,65,12,.08);
+    --rating-poor-border:   rgba(194,65,12,.22);
+    --rating-terrible-text: #dc2626;
+    --rating-terrible-tint: rgba(220,38,38,.14);
+    --rating-terrible-border:rgba(220,38,38,.34);
 
     --chart-1: var(--c-teal-40);
     --chart-2: var(--c-amber-40);
