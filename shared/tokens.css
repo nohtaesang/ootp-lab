@@ -1,28 +1,43 @@
 /* ============================================================
- * OOTP Lab · 디자인 토큰 (Design System v1)
+ * OOTP Lab · Design Tokens (v1, 2026-09-10)
  *
- * 3계층: PRIMITIVE → ROLE → COMPONENT
- * - PRIMITIVE : 원시 hex/px. 의미 없음. 이 파일에만 존재.
- * - ROLE      : 게임의 5축(rating · chart · primary · attention · muted).
- * - COMPONENT : 각 앱의 부품 스타일이 참조. 이 파일에는 없음.
+ * 3계층: PRIMITIVE → ROLE → COMPONENT.
+ * 컴포넌트 CSS는 오직 ROLE(--bg-*, --text-*, --border, --primary,
+ * --rating-*, --chart-*, --success-*, --danger-*, --attention-*,
+ * --info-*, --space-*, --radius-*, --font-*, --text-*, --leading-*
+ * --weight-*)만 참조. 원시 hex/px 직접 참조 금지.
  *
- * 원칙: 컴포넌트는 var(--rating-*), var(--chart-*), var(--primary-*),
- *       var(--attention-*), var(--text-*), var(--bg-*), var(--border-*)만 참조.
- *       원시 hex/px 직접 참조 금지.
+ * @layer 우선순위: tokens < components < app < unlayered
  *
- * @layer: 이 파일은 `tokens` 레이어. 각 앱의 컴포넌트 CSS는
- *   `@layer app`으로 감싸서 tokens < app 우선순위를 명시한다.
+ * ─ 색 축 (다섯 축, 서로 다른 문제를 푼다) ─────────────────
+ *   primary   (indigo)  — 사용자 조작: 버튼·활성 탭·슬라이더·링크
+ *   rating    (능력값)  — 초록 elite · 노랑 good · 흰 average · 회색 poor
+ *                        rating은 정보이지 오류가 아님. 낮은 값은 흐릿하게.
+ *   semantic (강점/약점/특이점/알림)
+ *     success  (초록)   — 강점 · 좋은 결과 · 완료
+ *     danger   (빨강)   — 약점 · 위험 · 실패
+ *     attention(앰버)   — 특이점 · 재검 · 주의 필요
+ *     info     (하늘)   — 안내 팁 · "이번엔 이걸 봐요"
+ *   chart     (데이터)  — chart-1은 primary 재활용(단일 곡선), 2/3은 별도
+ *   muted/faint(회색)   — 비활성 · 힌트 · 일반 정보
+ *
+ * ─ 이름 규칙 ──────────────────────────────────────────────
+ *   --{semantic}-text   전경 텍스트 색
+ *   --{semantic}-tint   반투명 배경 (배지·강조 블록)
+ *   --{semantic}-border 경계선 색
+ *   --{semantic}-on     그 색을 배경으로 채웠을 때 위 텍스트 (WCAG 4.5:1)
  * ============================================================ */
 
 @layer tokens {
-  /* ─── 기본 다크 (모든 원시값 · role) ─────────────────── */
+  /* ──────────────────────────────────────────────────────
+   * :root — 기본 다크. 모든 primitive와 role의 유일한 자리.
+   * ────────────────────────────────────────────────────── */
   :root {
-    /* ─ PRIMITIVE: neutral (zinc) ─ */
+    /* ─ PRIMITIVE ─ neutral (zinc) ────────────────────── */
     --c-n-0:   #ffffff;
     --c-n-05:  #fafafa;
     --c-n-10:  #f4f4f5;
     --c-n-20:  #e4e4e7;
-    --c-n-25:  #d4d4d8;
     --c-n-30:  #a1a1aa;
     --c-n-50:  #71717a;
     --c-n-60:  #52525b;
@@ -32,139 +47,150 @@
     --c-n-95:  #141418;
     --c-n-100: #0a0a0d;
 
-    /* ─ PRIMITIVE: hue ─ */
-    --c-purple-40: #6d28d9;   --c-purple-60: hsl(265,55%,55%);
-    --c-green-40:  #15803d;   --c-green-60:  #6FE09A;
-    --c-lime-40:   #4d7c0f;   --c-lime-60:   #a3e635;
+    /* ─ PRIMITIVE ─ hue (Tailwind 스케일 기준: -40 라이트 진한 · -60 다크 밝은) ─ */
+    --c-indigo-40: #4f46e5;   --c-indigo-60: #6366f1;
+    --c-green-40:  #15803d;   --c-green-60:  #4ade80;
+    --c-yellow-40: #a16207;   --c-yellow-60: #facc15;
     --c-amber-40:  #a16207;   --c-amber-60:  #FBBF24;
-    --c-red-40:    #b91c1c;   --c-red-60:    #F08A8A;
-    --c-teal-40:   #0f766e;   --c-teal-60:   #4dd4c0;
-    --c-orange-40: #c2410c;   --c-orange-60: #fb923c;
-    --c-cyan-40:   #0e7490;   --c-cyan-60:   hsl(190,75%,55%);
-    --c-pink-40:   #be185d;   --c-pink-60:   #f472b6;
-    --c-pink-light:#fbcfe8;
-    --c-indigo-40: #4f46e5;   --c-indigo-60: hsl(235,60%,60%);
-    --c-sage-40:   #556b2f;   --c-sage-60:   hsl(95,25%,55%);
+    --c-red-40:    #b91c1c;   --c-red-60:    #f87171;
+    --c-sky-40:    #0369a1;   --c-sky-60:    #7dd3fc;
 
-    /* ─ PRIMITIVE: spacing (4px grid) ─ */
-    --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
-    --space-4: 16px;  --space-5: 20px;  --space-6: 24px;
-    --space-8: 32px;  --space-10:40px;  --space-12:48px;
+    /* ─ PRIMITIVE ─ spacing (4px grid) ────────────────── */
+    --space-1:  4px;
+    --space-2:  8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10:40px;
+    --space-12:48px;
 
-    /* ─ PRIMITIVE: radius ─ */
+    /* ─ PRIMITIVE ─ radius ────────────────────────────── */
     --radius-s: 4px;
     --radius-m: 6px;
     --radius-l: 10px;
 
-    /* ─ PRIMITIVE: typography ─ */
+    /* ─ PRIMITIVE ─ typography ────────────────────────── */
     --font-sans: "Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
     --font-mono: "JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
-    --text-xxs: 10px; --text-xs:  11px; --text-sm:  12px; --text-base:13px;
-    --text-md:  14px; --text-lg:  16px; --text-xl:  19px; --text-2xl: 24px;
+    --text-xxs:  10px;
+    --text-xs:   11px;
+    --text-sm:   12px;
+    --text-base: 13px;
+    --text-md:   14px;
+    --text-lg:   16px;
+    --text-xl:   19px;
+    --text-2xl:  24px;
     --leading-tight:  1.25;
     --leading-normal: 1.45;
     --leading-loose:  1.6;
-    --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700;
+    --weight-regular:  400;
+    --weight-medium:   500;
+    --weight-semibold: 600;
+    --weight-bold:     700;
     --tracking-tight: -0.01em;
     --tracking-wide:   0.02em;
 
-    /* ─ PRIMITIVE: layout ─ */
-    --sidebar-w: 240px;
-    --sidebar-w-collapsed: 48px;
+    /* ─ PRIMITIVE ─ layout ────────────────────────────── */
+    --sidebar-w:            240px;
+    --sidebar-w-collapsed:  48px;
     --header-h: 40px;
     --tabbar-h: 36px;
     --navbar-h: 32px;
 
-    /* ─ PRIMITIVE: motion ─ */
+    /* ─ PRIMITIVE ─ motion ────────────────────────────── */
     --dur-fast: 100ms;
     --dur-med:  180ms;
-    --ease: cubic-bezier(.2,.7,.3,1);
+    --ease:     cubic-bezier(.2,.7,.3,1);
 
-    /* ─ ROLE: surface & text (기본 다크) ─ */
-    --bg-primary:   var(--c-n-90);
-    --bg-secondary: var(--c-n-80);
-    --bg-tertiary:  var(--c-n-95);
-    --bg-hover:     rgba(255,255,255,.05);
-    --bg-active:    rgba(255,255,255,.08);
-    --bg-selected:  rgba(255,255,255,.06);
-    --text-normal:  var(--c-n-05);
-    --text-muted:   var(--c-n-30);
-    --text-faint:   var(--c-n-50);
-    --border:       var(--c-n-70);
+    /* ─ ROLE ─ surface & text ─────────────────────────── */
+    --bg-primary:    var(--c-n-90);
+    --bg-secondary:  var(--c-n-80);
+    --bg-tertiary:   var(--c-n-95);
+    --bg-hover:      rgba(255,255,255,.05);
+    --bg-active:     rgba(255,255,255,.08);
+    --bg-selected:   rgba(255,255,255,.06);
+    --text-normal:   var(--c-n-05);
+    --text-muted:    var(--c-n-30);
+    --text-faint:    var(--c-n-50);
+    --border:        var(--c-n-70);
     --border-strong: var(--c-n-60);
 
-    /* ─ ROLE: primary (상호작용/활성) — 보라 (원래대로 복구 2026-09-10) */
-    --primary:      var(--c-purple-60);
+    /* ─ ROLE ─ primary (인디고 500). 조작에만 사용. ─── */
+    --primary:      var(--c-indigo-60);
     --primary-on:   var(--c-n-0);
-    --primary-tint: rgba(167,139,250,.10);
+    --primary-tint: rgba(99,102,241,.14);
 
-    /* ─ ROLE: rating 4구간 (능력값의 좋고 나쁨) 사용자 결정 2026-09-10
-     *   최상 (elite, 17-20) = 쑥색 (semantic success 초록과 다른 톤)
-     *   좋음 (good, 13-16)  = 주황 (semantic attention 앰버와 다른 톤)
-     *   중간 (average, 9-12)= 흰 (기본)
-     *   나쁨 (poor+terrible)= 회색 muted
-     * 빨강 없음 (semantic danger 축이 별도로 담당).
-     */
-    --rating-elite-text:    #4ade80;                    /* 초록 (semantic success와 같은 톤) */
+    /* ─ ROLE ─ rating 4구간 (능력값) ──────────────────── */
+    --rating-elite-text:    var(--c-green-60);  /* 17-20 */
     --rating-elite-tint:    transparent;
     --rating-elite-border:  transparent;
     --rating-elite-on:      var(--c-n-100);
-    --rating-good-text:     #facc15;                    /* 밝은 노랑 (attention 앰버와 다른 톤) */
+    --rating-good-text:     var(--c-yellow-60); /* 13-16 */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-100);
-    --rating-average-text:  var(--c-n-05);              /* 흰 */
+    --rating-average-text:  var(--c-n-05);      /* 9-12 · 흰 */
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
     --rating-average-on:    var(--c-n-100);
-    --rating-poor-text:     var(--c-n-30);              /* muted 회색 */
+    --rating-poor-text:     var(--c-n-30);      /* 1-8 · muted */
     --rating-poor-tint:     transparent;
     --rating-poor-border:   transparent;
     --rating-poor-on:       var(--c-n-05);
-    --rating-terrible-text: var(--c-n-30);              /* poor와 통일 (4구간) */
+    /* terrible은 poor와 통일 (4구간). 구 5구간 코드 호환용으로만 유지. */
+    --rating-terrible-text: var(--c-n-30);
     --rating-terrible-tint: transparent;
     --rating-terrible-border:transparent;
     --rating-terrible-on:   var(--c-n-05);
 
-    /* ─ ROLE: chart series ─ 곡선이 하나뿐일 때는 primary와 통일 (사용자 결정) */
-    --chart-1: var(--primary);
-    --chart-2: var(--c-amber-60);
-    --chart-3: var(--c-n-30);
-
-    /* ─ ROLE: attention (특이점·이벤트 노티, 앰버) ─ */
+    /* ─ ROLE ─ semantic ──────────────────────────────── */
+    /* success 강점·성공·완료 */
+    --success-text:   var(--c-green-60);
+    --success-tint:   rgba(74,222,128,.20);
+    --success-border: rgba(74,222,128,.42);
+    --success-on:     var(--c-n-100);
+    /* danger 약점·위험·실패 */
+    --danger-text:    var(--c-red-60);
+    --danger-tint:    rgba(248,113,113,.20);
+    --danger-border:  rgba(248,113,113,.42);
+    --danger-on:      var(--c-n-100);
+    /* attention 특이점·재검·주의 */
     --attention-text:   var(--c-amber-60);
     --attention-tint:   rgba(251,191,36,.14);
     --attention-border: rgba(251,191,36,.42);
     --attention-on:     var(--c-n-100);
+    /* info 안내·팁 */
+    --info-text:      var(--c-sky-60);
+    --info-tint:      rgba(125,211,252,.14);
+    --info-border:    rgba(125,211,252,.34);
+    --info-on:        var(--c-n-100);
 
-    /* ─ ROLE: success/danger (강점/약점 semantic — rating과 별개)
-     * rating = 값의 좋고 나쁨 (초록/노랑/흰/회색)
-     * success/danger = 정보성 강조 (강점/약점 배지, 성장 특징의 좋음/나쁨 텍스트)
-     */
-    --success-text:   #4ade80;   --success-tint: rgba(74,222,128,.20);   --success-border: rgba(74,222,128,.42);   --success-on: var(--c-n-100);
-    --danger-text:    #f87171;   --danger-tint:  rgba(248,113,113,.20);  --danger-border:  rgba(248,113,113,.42);  --danger-on:  var(--c-n-100);
-    /* info: 정보 알림/팁 (파랑). semantic 축의 부드러운 안내 */
-    --info-text:      #7dd3fc;   --info-tint:    rgba(125,211,252,.14);  --info-border:    rgba(125,211,252,.34);  --info-on:    var(--c-n-100);
+    /* ─ ROLE ─ chart. 단일 곡선은 primary 재활용, 겹칠 때 2/3 사용. ─ */
+    --chart-1: var(--primary);
+    --chart-2: var(--c-amber-60);
+    --chart-3: var(--c-n-30);
 
-    /* ─ 게임 앱 호환 별칭 (기존 컴포넌트 이름 유지) ─ */
+    /* ─ 게임 앱 v1 호환 별칭 (컴포넌트가 옛 이름 쓰는 곳). 새 코드는 role만. ─ */
     --accent:          var(--primary);
     --text-on-accent:  var(--primary-on);
-    --color-n-0:       var(--c-n-0);
-    --color-n-05:      var(--c-n-05);
-    --color-n-10:      var(--c-n-10);
-    --color-n-20:      var(--c-n-20);
-    --color-n-25:      var(--c-n-25);
-    --color-n-30:      var(--c-n-30);
-    --color-n-50:      var(--c-n-50);
-    --color-n-60:      var(--c-n-60);
-    --color-n-70:      var(--c-n-70);
-    --color-n-80:      var(--c-n-80);
-    --color-n-90:      var(--c-n-90);
-    --color-n-95:      var(--c-n-95);
-    --color-n-100:     var(--c-n-100);
-    --color-accent-hue:265;
-    --color-accent:    var(--c-purple-60);
-    --color-accent-2:  var(--c-purple-40);
+    --color-n-0:  var(--c-n-0);
+    --color-n-05: var(--c-n-05);
+    --color-n-10: var(--c-n-10);
+    --color-n-20: var(--c-n-20);
+    --color-n-25: #d4d4d8;
+    --color-n-30: var(--c-n-30);
+    --color-n-50: var(--c-n-50);
+    --color-n-60: var(--c-n-60);
+    --color-n-70: var(--c-n-70);
+    --color-n-80: var(--c-n-80);
+    --color-n-90: var(--c-n-90);
+    --color-n-95: var(--c-n-95);
+    --color-n-100:var(--c-n-100);
+    --color-accent-hue: 235;
+    --color-accent:     var(--c-indigo-60);
+    --color-accent-2:   var(--c-indigo-40);
     --size-2:  2px;
     --size-4:  var(--space-1);
     --size-6:  6px;
@@ -180,64 +206,67 @@
     --font-interface: var(--font-sans);
   }
 
-  /* ─── 라이트 스위치 (명시적 [data-theme="light"]에만) ─── */
+  /* ──────────────────────────────────────────────────────
+   * 라이트 스위치 — <html data-theme="light"> 에서만.
+   * 시스템 prefers-color-scheme는 무시 (다크 강제 기본).
+   * ────────────────────────────────────────────────────── */
   :root[data-theme="light"] {
-    --bg-primary:   var(--c-n-05);
-    --bg-secondary: var(--c-n-0);
-    --bg-tertiary:  var(--c-n-10);
-    --bg-hover:     rgba(0,0,0,.04);
-    --bg-active:    rgba(0,0,0,.06);
-    --bg-selected:  rgba(0,0,0,.05);
-    --text-normal:  var(--c-n-100);
-    --text-muted:   var(--c-n-50);
-    --text-faint:   var(--c-n-30);
-    --border:       var(--c-n-20);
+    --bg-primary:    var(--c-n-05);
+    --bg-secondary:  var(--c-n-0);
+    --bg-tertiary:   var(--c-n-10);
+    --bg-hover:      rgba(0,0,0,.04);
+    --bg-active:     rgba(0,0,0,.06);
+    --bg-selected:   rgba(0,0,0,.05);
+    --text-normal:   var(--c-n-100);
+    --text-muted:    var(--c-n-50);
+    --text-faint:    var(--c-n-30);
+    --border:        var(--c-n-20);
     --border-strong: var(--c-n-30);
 
-    --primary:      var(--c-purple-40);
-    --primary-on:   var(--c-n-0);
-    --primary-tint: rgba(109,40,217,.08);
+    --primary:       var(--c-indigo-40);
+    --primary-on:    var(--c-n-0);
+    --primary-tint:  rgba(79,70,229,.08);
 
-    --rating-elite-text:    #15803d;                    /* 진한 초록 (라이트) */
-    --rating-elite-tint:    transparent;
-    --rating-elite-border:  transparent;
-    --rating-elite-on:      var(--c-n-0);
-    --rating-good-text:     #a16207;                    /* 진한 노랑 (라이트) */
-    --rating-good-tint:     transparent;
-    --rating-good-border:   transparent;
-    --rating-good-on:       var(--c-n-0);
+    --rating-elite-text:    var(--c-green-40);
+    --rating-good-text:     var(--c-yellow-40);
     --rating-average-text:  var(--c-n-100);
-    --rating-average-tint:  transparent;
-    --rating-average-border:transparent;
-    --rating-average-on:    var(--c-n-100);
     --rating-poor-text:     var(--c-n-50);
-    --rating-poor-tint:     transparent;
-    --rating-poor-border:   transparent;
-    --rating-poor-on:       var(--c-n-0);
-    --rating-terrible-text: var(--c-n-50);              /* poor와 통일 */
-    --rating-terrible-tint: transparent;
-    --rating-terrible-border:transparent;
-    --rating-terrible-on:   var(--c-n-0);
+    --rating-terrible-text: var(--c-n-50);
+    --rating-elite-on: var(--c-n-0);
+    --rating-good-on:  var(--c-n-0);
+    --rating-average-on: var(--c-n-100);
+    --rating-poor-on:  var(--c-n-0);
+    --rating-terrible-on: var(--c-n-0);
+
+    --success-text:   var(--c-green-40);
+    --success-tint:   rgba(21,128,61,.10);
+    --success-border: rgba(21,128,61,.30);
+    --success-on:     var(--c-n-0);
+    --danger-text:    var(--c-red-40);
+    --danger-tint:    rgba(185,28,28,.10);
+    --danger-border:  rgba(185,28,28,.30);
+    --danger-on:      var(--c-n-0);
+    --attention-text:   var(--c-amber-40);
+    --attention-tint:   rgba(161,98,7,.10);
+    --attention-border: rgba(161,98,7,.34);
+    --attention-on:     var(--c-n-0);
+    --info-text:      var(--c-sky-40);
+    --info-tint:      rgba(3,105,161,.10);
+    --info-border:    rgba(3,105,161,.30);
+    --info-on:        var(--c-n-0);
 
     --chart-1: var(--primary);
     --chart-2: var(--c-amber-40);
     --chart-3: var(--c-n-50);
 
-    --attention-text:   var(--c-amber-40);
-    --attention-tint:   rgba(161,98,7,.10);
-    --attention-border: rgba(161,98,7,.34);
-    --attention-on:     var(--c-n-0);
-
-    --success-text:   #15803d;   --success-tint: rgba(21,128,61,.10);   --success-border: rgba(21,128,61,.30);   --success-on: var(--c-n-0);
-    --danger-text:    #b91c1c;   --danger-tint:  rgba(185,28,28,.10);   --danger-border:  rgba(185,28,28,.30);   --danger-on:  var(--c-n-0);
-    --info-text:      #0369a1;   --info-tint:    rgba(3,105,161,.10);   --info-border:    rgba(3,105,161,.30);    --info-on:    var(--c-n-0);
-
     --accent:         var(--primary);
     --text-on-accent: var(--primary-on);
-    --color-accent:   var(--c-purple-40);
+    --color-accent:   var(--c-indigo-40);
   }
 
-  /* ─── RESET · BASE ───────────────────────────────────── */
+  /* ─── Reset · Base ────────────────────────────────────
+   * 세 앱 공통. 세부 셸(overflow, height, .app grid 등)은 각 앱이 unlayered로 얹는다.
+   * ────────────────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box }
   html, body { margin: 0 }
   body {
@@ -256,12 +285,11 @@
 }
 
 /* ============================================================
- * COMPONENT LAYER — 세 앱 공통 컴포넌트 (표·리스트)
- * 각 앱이 opt-in 방식으로 클래스를 붙여 사용한다.
- *   <table class="t-data"> · <div class="l-kv"> 등
+ * COMPONENT LAYER — 세 앱 공통 표준 컴포넌트
+ * opt-in: 각 앱이 <table class="t-data"> · <div class="l-kv">로 사용.
  * ============================================================ */
 @layer components {
-  /* 데이터 표: 숫자 값이 우측 정렬 · 모노 · tabular-nums · header 시각 계층 · 얇은 언더라인 */
+  /* 데이터 표 */
   table.t-data {
     border-collapse: collapse;
     width: 100%;
@@ -284,7 +312,10 @@
   }
   table.t-data thead th:first-child,
   table.t-data tbody th:first-child,
-  table.t-data tbody td:first-child { text-align: left; font-family: var(--font-sans) }
+  table.t-data tbody td:first-child {
+    text-align: left;
+    font-family: var(--font-sans);
+  }
   table.t-data tbody td {
     text-align: right;
     font-family: var(--font-mono);
@@ -292,7 +323,7 @@
   }
   table.t-data tbody tr:hover td { background: var(--bg-hover) }
 
-  /* 라벨/값 리스트: 왼쪽 라벨 muted, 우측 값 mono, 얇은 언더라인 */
+  /* 라벨/값 리스트 */
   .l-kv {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -303,9 +334,13 @@
     border-bottom: 1px solid var(--border);
     padding: var(--space-1) 0;
     line-height: var(--leading-tight);
-    display: flex; align-items: center;
+    display: flex;
+    align-items: center;
   }
-  .l-kv > span:nth-child(odd) { padding-right: var(--space-3); color: var(--text-muted) }
+  .l-kv > span:nth-child(odd) {
+    padding-right: var(--space-3);
+    color: var(--text-muted);
+  }
   .l-kv > span:nth-child(even) {
     justify-content: flex-end;
     font-family: var(--font-mono);
@@ -314,4 +349,3 @@
     color: var(--text-normal);
   }
 }
-
