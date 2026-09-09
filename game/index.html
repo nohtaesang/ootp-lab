@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="../shared/tokens.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.474.0/dist/umd/lucide.min.js"></script>
 <style>
 /* ============================================================
  * 게임 앱 컴포넌트 CSS.
@@ -90,12 +91,12 @@ input:focus, select:focus{
 .app.sidebar-collapsed .topbar-brand .brand-info{display: none}
 .app.sidebar-collapsed .topbar-brand .brand-logo{display: none}
 .brand-logo{
-  width: 28px; height: 28px;
+  width: 22px; height: 22px;
   border-radius: 999px;
   display: inline-flex; align-items: center; justify-content: center;
   color: #fff;
   font-weight: var(--weight-bold);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   flex-shrink: 0;
   letter-spacing: 0;
   background: var(--primary);
@@ -125,19 +126,19 @@ input:focus, select:focus{
   flex-shrink: 0;
 }
 .topbar-toggle{
-  padding: var(--size-4) var(--size-6);
+  width: 22px; height: 22px;
+  padding: 0;
   border: 0;
   background: transparent;
   border-radius: var(--radius-s);
   color: var(--text-muted);
-  font-size: var(--text-md);
   line-height: 1;
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 22px;
   cursor: pointer;
   transition: transform var(--dur-fast) var(--ease);
   flex-shrink: 0;
 }
+.topbar-toggle svg{width: 16px; height: 16px; stroke-width: 1.75}
 .topbar-toggle:hover{background: var(--bg-hover); color: var(--text-normal)}
 .app.sidebar-collapsed .topbar-toggle{transform: rotate(180deg)}
 .topbar-right{
@@ -156,11 +157,12 @@ input:focus, select:focus{
   background: transparent;
   border: 0;
   border-radius: var(--radius-s);
-  font-size: var(--text-md);
   cursor: pointer;
   line-height: 1;
 }
+.topbar-icon-btn svg{width: 16px; height: 16px; stroke-width: 1.75}
 .topbar-icon-btn:hover{background: var(--bg-hover); color: var(--text-normal)}
+.topbar-advance svg{width: 14px; height: 14px; stroke-width: 2}
 .topbar-advance{
   display: inline-flex; align-items: center; gap: var(--size-6);
   padding: var(--size-6) var(--size-12);
@@ -206,6 +208,7 @@ input:focus, select:focus{
 .sidebar-item{
   display: flex; align-items: center; gap: var(--size-10);
   padding: var(--size-6) var(--size-10);
+  min-height: 32px;
   border-radius: var(--radius-s);
   color: var(--text-muted);
   font-size: var(--text-base);
@@ -214,17 +217,14 @@ input:focus, select:focus{
 .sidebar-item:hover{background: var(--bg-hover); color: var(--text-normal)}
 .sidebar-item.active{background: var(--bg-selected); color: var(--text-normal); font-weight: var(--weight-medium)}
 .sidebar-item .item-glyph{
-  width: 14px; height: 14px;
+  width: 18px; height: 18px;
   flex: 0 0 auto;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: var(--text-xxs);
-  font-weight: var(--weight-semibold);
-  color: var(--text-faint);
-  border: 1px solid currentColor;
-  border-radius: var(--radius-s);
+  color: var(--text-muted);
 }
+.sidebar-item .item-glyph svg{width: 100%; height: 100%; stroke-width: 1.75}
 .sidebar-item.active .item-glyph{color: var(--accent)}
-.app.sidebar-collapsed .sidebar-item{justify-content: center; padding: var(--size-8) 0}
+.app.sidebar-collapsed .sidebar-item{justify-content: center; padding: var(--size-6) 0}
 .app.sidebar-collapsed .sidebar-item .item-label{display: none}
 
 /* sidebar-footer 제거됨 — topbar로 이동 */
@@ -297,13 +297,12 @@ input:focus, select:focus{
   height: 2px; background: var(--accent);
 }
 .tab .tab-glyph{
-  font-family: var(--font-mono);
-  font-size: var(--text-xxs);
-  font-weight: var(--weight-semibold);
-  color: var(--text-faint);
-  width: 16px; text-align: center;
+  width: 16px; height: 16px;
+  color: var(--text-muted);
   flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
 }
+.tab .tab-glyph svg{width: 100%; height: 100%; stroke-width: 1.75}
 .tab.active .tab-glyph{color: var(--accent)}
 .tab .tab-name{
   overflow: hidden; text-overflow: ellipsis;
@@ -853,14 +852,14 @@ input:focus, select:focus{
         <span class="brand-team" id="brand-team"></span>
         <span class="brand-season" id="brand-season"></span>
       </div>
-      <button class="topbar-toggle" onclick="toggleSidebar()" title="사이드바 토글" aria-label="사이드바 토글">‹</button>
+      <button class="topbar-toggle" onclick="toggleSidebar()" title="사이드바 토글" aria-label="사이드바 토글"><i data-lucide="chevron-left"></i></button>
     </div>
     <div class="tabbar" id="tabbar"></div>
     <div class="topbar-right">
-      <button class="topbar-icon-btn" onclick="openOptions()" title="옵션" aria-label="옵션">⚙</button>
+      <button class="topbar-icon-btn" onclick="openOptions()" title="옵션" aria-label="옵션"><i data-lucide="settings"></i></button>
       <button class="topbar-advance" onclick="advanceYear()">
         진행하기
-        <span>›</span>
+        <i data-lucide="chevron-right"></i>
       </button>
     </div>
   </header>
@@ -914,11 +913,11 @@ input:focus, select:focus{
   }
 
   const CATEGORIES = [
-    { key:'home',      glyph:'HM', label:'홈',     home:'/' },
-    { key:'players',   glyph:'PL', label:'선수단', home:'/players/overview' },
-    { key:'selection', glyph:'SE', label:'편성',   home:'/selection/lineup' },
-    { key:'staff',     glyph:'ST', label:'스태프', home:'/staff' },
-    { key:'training',  glyph:'TR', label:'훈련',   home:'/training' },
+    { key:'home',      icon:'home',           label:'홈',     home:'/' },
+    { key:'players',   icon:'users',          label:'선수단', home:'/players/overview' },
+    { key:'selection', icon:'clipboard-list', label:'편성',   home:'/selection/lineup' },
+    { key:'staff',     icon:'briefcase',      label:'스태프', home:'/staff' },
+    { key:'training',  icon:'dumbbell',       label:'훈련',   home:'/training' },
   ];
 
   function routeContext(route){
@@ -1007,27 +1006,26 @@ input:focus, select:focus{
 
   function tabLabel(route){
     const parts = parseRoute(route);
-    if (route === '/' || parts.length === 0) return { glyph:'HM', name:'홈' };
-    if (parts[0] === 'players')  return { glyph:'PL', name:'선수단' };
-    if (parts[0] === 'staff' && !parts[1]) return { glyph:'ST', name:'스태프' };
-    if (parts[0] === 'training') return { glyph:'TR', name:'훈련' };
+    if (route === '/' || parts.length === 0) return { icon:'home', name:'홈' };
+    if (parts[0] === 'staff' && !parts[1]) return { icon:'briefcase', name:'스태프' };
+    if (parts[0] === 'training') return { icon:'dumbbell', name:'훈련' };
     if (parts[0] === 'selection') {
       const names = { lineup:'라인업', rotation:'로테이션', bullpen:'불펜', depth:'뎁스' };
-      return { glyph:'SE', name: names[parts[1]] || '편성' };
+      return { icon:'clipboard-list', name: names[parts[1]] || '편성' };
     }
-    if (parts[0] === 'players' && parts[1]) {
+    if (parts[0] === 'players') {
       const names = { overview:'선수단 개요', list:'선수단 리스트', roster:'선수단 로스터' };
-      return { glyph:'PL', name: names[parts[1]] || '선수단' };
+      return { icon:'users', name: parts[1] ? (names[parts[1]] || '선수단') : '선수단' };
     }
     if (parts[0] === 'player' && parts[1]){
       const p = POOL.players.find(x => String(x.id) === parts[1]);
-      return { glyph:'PL', name: p ? p.name : `선수 ${parts[1]}` };
+      return { icon:'user', name: p ? p.name : `선수 ${parts[1]}` };
     }
     if (parts[0] === 'staff' && parts[1]){
       const s = POOL.staff.find(x => String(x.id) === parts[1]);
-      return { glyph:'ST', name: s ? s.name : `스태프 ${parts[1]}` };
+      return { icon:'user', name: s ? s.name : `스태프 ${parts[1]}` };
     }
-    return { glyph:'·', name:'페이지' };
+    return { icon:'circle', name:'페이지' };
   }
 
   function render(){
@@ -1038,14 +1036,14 @@ input:focus, select:focus{
     document.getElementById('sidebar-items').innerHTML =
       CATEGORIES.map(c =>
         `<a class="sidebar-item ${c.key === ctx ? 'active' : ''}" data-route="${c.home}">
-          <span class="item-glyph">${c.glyph}</span>
+          <span class="item-glyph"><i data-lucide="${c.icon}"></i></span>
           <span class="item-label">${c.label}</span>
         </a>`
       ).join('') +
       `<div class="nav-divider"></div>
        <div class="nav-group-label">Lab</div>
        <a class="sidebar-item" style="opacity:.4;pointer-events:none">
-         <span class="item-glyph">·</span>
+         <span class="item-glyph"><i data-lucide="flask-conical"></i></span>
          <span class="item-label">(자리 예약)</span>
        </a>`;
     document.querySelectorAll('.sidebar-item').forEach(el => {
@@ -1060,7 +1058,7 @@ input:focus, select:focus{
     tabbar.innerHTML = tabs.map(tab => {
       const lb = tabLabel(tab.route);
       return `<div class="tab ${tab.id===activeTabId?'active':''}" data-id="${tab.id}">
-        <span class="tab-glyph">${lb.glyph}</span>
+        <span class="tab-glyph"><i data-lucide="${lb.icon}"></i></span>
         <span class="tab-name">${lb.name}</span>
         <button class="tab-close" data-close="${tab.id}" title="닫기">×</button>
       </div>`;
@@ -1097,6 +1095,9 @@ input:focus, select:focus{
     // Content
     if (t) renderContent(t.route);
     else renderEmpty();
+
+    // Lucide 아이콘: <i data-lucide="..."> → <svg> 치환
+    if (window.lucide) lucide.createIcons();
   }
 
   function renderEmpty(){
