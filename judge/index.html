@@ -55,21 +55,21 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .app > .checklist{flex:0 0 auto}
 .app > .cols{flex:1 1 auto;min-height:0}
 header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-h1{font-size:18px;margin:0;font-weight:600}
+h1{font-size:15px;margin:0;font-weight:600}
 .sub{font-size:12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
 kbd{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--rule);border-radius:3px;padding:0 4px;color:var(--muted)}
 .batch{display:flex;gap:12px;align-items:center}
-.batch b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px}
+.batch b{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-weight:600;font-size:13px}
 .prog{display:flex;align-items:center;gap:8px}
 .prog .seg{display:flex;gap:3px}
 .prog .seg i{display:block;width:22px;height:14px;border-radius:3px;background:var(--soft);border:1px solid var(--rule)}
 .prog .seg i.on{background:var(--accent);border-color:var(--accent)}
 .prog .seg i.on.p{background:#3C79C9;border-color:#3C79C9}
 .prog small{font-size:13px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
-.prog .n{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;min-width:44px}
+.prog .n{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:12px;font-weight:600;min-width:40px}
 .prog .n.done{color:var(--accent)}
 button.small{padding:4px 10px;font-size:13px}
-.checklist{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:12px 18px;font-size:14px;max-height:46vh;overflow:auto}
+.checklist{background:var(--card);border:1px solid var(--accent);border-radius:8px;padding:10px 16px;font-size:12px;max-height:46vh;overflow:auto}
 .checklist .chead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .checklist ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
 .checklist li{margin:0 0 6px;break-inside:avoid}
@@ -168,7 +168,7 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .toggle .tip .pop b{color:var(--accent)}
 .toggle.small{margin:0 0 4px}
 .toggle.small button{padding:3px 10px;font-size:13px;flex:0 0 auto}
-.recheck{background:var(--soft);border-left:4px solid var(--warn);border-radius:6px;padding:8px 12px;font-size:14px;margin:0 0 8px}
+.recheck{background:var(--soft);border-left:3px solid var(--warn);border-radius:6px;padding:6px 10px;font-size:12px;margin:0 0 8px}
 .recheck b{font-weight:600}
 .chart{width:100%;height:auto;aspect-ratio:860/240;display:block;cursor:ew-resize;touch-action:none;user-select:none}
 .chart text{font:12px "IBM Plex Mono",monospace;fill:var(--muted)}
@@ -184,7 +184,7 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .big3 b{display:block;font-family:"IBM Plex Mono",monospace;font-size:38px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
 .big3 b.accent{color:var(--accent)}
 .big3 b.sm{font-size:30px;white-space:nowrap}
-.big3 b em{font-style:normal;font-size:16px;color:var(--muted);font-weight:500}
+.big3 b em{font-style:normal;font-size:13px;color:var(--muted);font-weight:500}
 .hint{font-size:12px;color:var(--muted);margin:10px 0 0}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
 .legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--accent);vertical-align:middle;margin-right:5px}
@@ -207,22 +207,22 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .gsum div{text-align:center;background:var(--soft);border-radius:8px;padding:8px 4px}
 .gsum div.dim{opacity:.45}
 .gsum small{display:block;font-size:12px;color:var(--muted)}
-.gsum b{display:block;font-family:"IBM Plex Mono",monospace;font-size:28px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.gsum b{display:block;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:20px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
 .groups{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px}
 .group.dim{opacity:.45}
 .posapt{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin-top:8px}
 .posapt span{text-align:center;border-radius:4px;padding:3px 0;background:var(--soft)}
 .posapt span.main{outline:2px solid var(--accent)}
 .posapt small{display:block;font-size:11px;color:var(--muted)}
-.posapt b{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600}
+.posapt b{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px;font-weight:600}
 .posapt b.hi{color:var(--hi)}.posapt b.lo{color:var(--lo)}
-table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums;margin-top:12px}
-th,td{text-align:right;padding:5px 6px;border-bottom:1px solid var(--rule);white-space:nowrap}
-th{font-weight:500;color:var(--muted);font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums;margin-top:10px}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font-weight:500;color:var(--muted);font-size:11px}
 th small{font-weight:400;font-size:10px}
 tr.fmax td{color:var(--muted)}tr.fmax td.hi{color:var(--hi)}tr.fmax td.lo{color:var(--lo)}
-tr.fmax small{font-family:"IBM Plex Sans KR",sans-serif;font-size:11px}
-td{font-family:"IBM Plex Mono",monospace;font-size:15px}
+tr.fmax small{font-family:"Pretendard","Inter",sans-serif;font-size:10px}
+td{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px}
 td.hi{color:var(--hi);font-weight:600}td.lo{color:var(--lo);font-weight:600}
 th:first-child,td:first-child{text-align:left;font-family:inherit}
 .tablewrap{overflow-x:auto}
@@ -231,7 +231,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
 .judge > div{display:flex;align-items:center;gap:6px;min-width:0;line-height:1}
 .judge > div:has(#odd){flex:1 1 220px}
 .judge label.lbl{flex:0 0 auto;font-size:12px;color:var(--bar-muted);margin:0;white-space:nowrap}
-.judge input[type=text]{flex:1 1 auto;width:100%;font-size:14px;height:36px;padding:0 10px;background:var(--bar-field);color:var(--bar-ink);border-color:var(--bar-rule)}
+.judge input[type=text]{flex:1 1 auto;width:100%;font-size:13px;height:32px;padding:0 10px;background:var(--bar-field);color:var(--bar-ink);border-color:var(--bar-rule)}
 .judge input::placeholder{color:var(--bar-muted)}
 .judge button{background:var(--bar-field);color:var(--bar-ink);border-color:var(--bar-rule)}
 .judge button.primary{background:var(--bar-accent);color:var(--bar-accent-ink);border-color:var(--bar-accent)}
@@ -359,7 +359,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'cece525 2026-09-09';
+  const BUILD = '76e56a8 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
