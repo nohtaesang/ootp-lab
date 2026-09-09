@@ -34,20 +34,20 @@
   --color-accent:     hsl(var(--color-accent-hue), 55%, 60%);
   --color-accent-2:   hsl(var(--color-accent-hue), 55%, 50%);
 
-  /* ── Semantic (light default) ── */
-  --bg-primary:      var(--color-n-05);
-  --bg-secondary:    var(--color-n-0);
-  --bg-tertiary:     var(--color-n-10);
-  --bg-hover:        rgba(0,0,0,.04);
-  --bg-active:       rgba(0,0,0,.06);
-  --bg-selected:     rgba(0,0,0,.05);
-  --text-normal:     var(--color-n-100);
-  --text-muted:      var(--color-n-50);
-  --text-faint:      var(--color-n-30);
+  /* ── Semantic (dark default) ── */
+  --bg-primary:      var(--color-n-90);
+  --bg-secondary:    var(--color-n-80);
+  --bg-tertiary:     var(--color-n-95);
+  --bg-hover:        rgba(255,255,255,.05);
+  --bg-active:       rgba(255,255,255,.08);
+  --bg-selected:     rgba(255,255,255,.06);
+  --text-normal:     var(--color-n-05);
+  --text-muted:      var(--color-n-30);
+  --text-faint:      var(--color-n-50);
   --text-on-accent:  var(--color-n-0);
-  --border:          var(--color-n-20);
-  --border-strong:   var(--color-n-25);
-  --accent:          var(--color-accent-2);
+  --border:          var(--color-n-70);
+  --border-strong:   var(--color-n-60);
+  --accent:          var(--color-accent);
 
   /* ── Spacing scale (4px 기준) ── */
   --size-2:  2px;
@@ -101,22 +101,21 @@
   --dur-med:  180ms;
   --ease:     cubic-bezier(.2,.7,.3,1);
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg-primary:      var(--color-n-90);
-    --bg-secondary:    var(--color-n-80);
-    --bg-tertiary:     var(--color-n-95);
-    --bg-hover:        rgba(255,255,255,.05);
-    --bg-active:       rgba(255,255,255,.08);
-    --bg-selected:     rgba(255,255,255,.06);
-    --text-normal:     var(--color-n-05);
-    --text-muted:      var(--color-n-30);
-    --text-faint:      var(--color-n-50);
-    --text-on-accent:  var(--color-n-0);
-    --border:          var(--color-n-70);
-    --border-strong:   var(--color-n-60);
-    --accent:          var(--color-accent);
-  }
+/* 명시적으로 라이트 스위치했을 때만 라이트 팔레트 (기본은 다크) */
+:root[data-theme="light"]{
+  --bg-primary:      var(--color-n-05);
+  --bg-secondary:    var(--color-n-0);
+  --bg-tertiary:     var(--color-n-10);
+  --bg-hover:        rgba(0,0,0,.04);
+  --bg-active:       rgba(0,0,0,.06);
+  --bg-selected:     rgba(0,0,0,.05);
+  --text-normal:     var(--color-n-100);
+  --text-muted:      var(--color-n-50);
+  --text-faint:      var(--color-n-30);
+  --text-on-accent:  var(--color-n-0);
+  --border:          var(--color-n-20);
+  --border-strong:   var(--color-n-25);
+  --accent:          var(--color-accent-2);
 }
 
 /* ============================================================

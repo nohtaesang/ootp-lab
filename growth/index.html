@@ -2,17 +2,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <meta name="robots" content="noindex, nofollow">
 <style>
+/* 팔레트는 게임 앱과 톤 통일. 기본 다크. */
 :root{
-  --bg:#F3F6F4;--card:#FFFFFF;--ink:#1B2A24;--muted:#66766E;--rule:#D5DCD7;--soft:#E9EFEB;
-  --accent:#1F6F4A;--accent-ink:#FFFFFF;--accent-soft:#DDEFE4;
-  --pos:#1F6F4A;--neg:#B4463C;
+  --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
+  --accent:hsl(265,55%,60%);--accent-ink:#0a0a0d;--accent-soft:rgba(167,139,250,.16);
+  --pos:#7ED89A;--neg:#E28A80;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
-    --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;
-    --pos:#7ED89A;--neg:#E28A80;
-  }
+:root[data-theme="light"]{
+  --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
+  --accent:hsl(265,55%,50%);--accent-ink:#ffffff;--accent-soft:rgba(139,92,246,.10);
+  --pos:#1F6F4A;--neg:#B4463C;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px}

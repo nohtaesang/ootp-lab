@@ -2,22 +2,18 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+/* 팔레트는 게임 앱과 톤 통일(zinc + 보라 액센트). 기본 다크. */
 :root{
-  --bg:#F3F6F4;--card:#FFFFFF;--ink:#1B2A24;--muted:#66766E;--rule:#D5DCD7;--soft:#E9EFEB;
-  --accent:#1F6F4A;--accent-ink:#FFFFFF;--accent-soft:#DDEFE4;--lo:#C0392B;--hi:#1E8E4A;--warn:#B8860B;--now:#2F6FD6;--now-soft:rgba(47,111,214,.16);
-  --bar-bg:#E4EFE7;--bar-ink:#14352A;--bar-muted:#5B7A6A;--bar-rule:#C0D2C6;--bar-field:#F5FAF6;--bar-accent:#1F6F4A;--bar-accent-ink:#FFFFFF;
+  --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
+  --accent:hsl(265,55%,60%);--accent-ink:#0a0a0d;--accent-soft:rgba(167,139,250,.16);
+  --lo:#F08A8A;--hi:#6FE09A;--warn:#E8C36A;--now:#7FB3FF;--now-soft:rgba(127,179,255,.18);
+  --bar-bg:#27272a;--bar-ink:#fafafa;--bar-muted:#a1a1aa;--bar-rule:#3f3f46;--bar-field:#1c1c20;--bar-accent:hsl(265,55%,60%);--bar-accent-ink:#0a0a0d;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
-    --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;--lo:#F08A8A;--hi:#6FE09A;--warn:#E8C36A;--now:#7FB3FF;--now-soft:rgba(127,179,255,.18);
-    --bar-bg:#182B23;--bar-ink:#E4ECE7;--bar-muted:#8FA69A;--bar-rule:#2C3E36;--bar-field:#213730;--bar-accent:#A6EDB6;--bar-accent-ink:#0F2418;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
-  --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;--lo:#F08A8A;--hi:#6FE09A;--warn:#E8C36A;--now:#7FB3FF;--now-soft:rgba(127,179,255,.18);
-  --bar-bg:#182B23;--bar-ink:#E4ECE7;--bar-muted:#8FA69A;--bar-rule:#2C3E36;--bar-field:#213730;--bar-accent:#A6EDB6;--bar-accent-ink:#0F2418;
+:root[data-theme="light"]{
+  --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
+  --accent:hsl(265,55%,50%);--accent-ink:#ffffff;--accent-soft:rgba(139,92,246,.10);
+  --lo:#C0392B;--hi:#1E8E4A;--warn:#B8860B;--now:#2F6FD6;--now-soft:rgba(47,111,214,.16);
+  --bar-bg:#f4f4f5;--bar-ink:#0a0a0d;--bar-muted:#71717a;--bar-rule:#e4e4e7;--bar-field:#ffffff;--bar-accent:hsl(265,55%,50%);--bar-accent-ink:#ffffff;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -329,7 +325,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'cc2a56e 2026-09-09';
+  const BUILD = 'c2b23eb 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
