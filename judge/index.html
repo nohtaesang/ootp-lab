@@ -87,11 +87,11 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .labels .lab.odd{background:var(--attention-tint);color:var(--attention-text);border:1px solid var(--attention-border)}
 .labels span.v{margin-right:6px}
 .talcols h4,.group h4{font-size:12px;color:var(--text-muted);margin:0 0 2px;font-weight:600;letter-spacing:.04em}
-.list{display:grid;grid-template-columns:1fr auto;column-gap:0}
-.list span{border-bottom:1px solid var(--border);padding:2px 0;font-size:12px;line-height:1.3;display:flex;align-items:center}
-.list span:nth-child(odd){padding-right:10px}
-.list span.n{justify-content:flex-end;font-family:var(--font-mono);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;min-width:34px}
-.list span.n.hi{color:var(--rating-elite-text)}.list span.n.lo{color:var(--rating-terrible-text)}
+/* 판정 앱 재능·능력 리스트 특화 (tokens.css .l-kv 위에 얹음) */
+.l-kv span:nth-child(odd) { padding-right: 10px }
+.l-kv span.n { min-width: 34px; font-size: var(--text-md); font-weight: 600 }
+.l-kv span.n.hi { color: var(--rating-elite-text) }
+.l-kv span.n.lo { color: var(--rating-terrible-text) }
 .hidden{margin-top:var(--space-3);border-top:1px solid var(--border);padding-top:10px}
 .hidden h4{font-size:12px;color:var(--text-muted);margin:0 0 6px;font-weight:600;letter-spacing:.04em}
 .hgrid{display:grid;grid-template-columns:1fr;gap:0;font-size:12px}
@@ -265,9 +265,9 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
   <div class="summary" id="summary"></div>
   <p class="covers" id="covers" hidden></p>
   <div class="talcols three">
-    <div class="tgroup" id="tg-bat"><h4>타자</h4><div class="list" id="tal-bat"></div></div>
-    <div class="tgroup" id="tg-pit"><h4>투수</h4><div class="list" id="tal-pit"></div></div>
-    <div class="tgroup"><h4>공통</h4><div class="list" id="tal-common"></div></div>
+    <div class="tgroup" id="tg-bat"><h4>타자</h4><div class="l-kv" id="tal-bat"></div></div>
+    <div class="tgroup" id="tg-pit"><h4>투수</h4><div class="l-kv" id="tal-pit"></div></div>
+    <div class="tgroup"><h4>공통</h4><div class="l-kv" id="tal-common"></div></div>
   </div>
   <details class="apts"><summary>소질 보기 — 재능은 여기서 나와요</summary><div class="aptgrid" id="apts"></div></details>
   <div class="labels" id="notes"></div>
@@ -331,7 +331,7 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'a02ae6d 2026-09-09';
+  const BUILD = 'c44a2cf 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
@@ -609,7 +609,7 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
     const posLine = P ? `<div class="posapt">${['C','1B','2B','3B','SS','LF','CF','RF'].map(id => { const v = P.apt[id]; const main = id === P.main; return `<span class="${main ? 'main' : ''}"><small>${(P.labels && P.labels[id] || id).replace('수', '')}</small><b class="${v >= 16 ? 'hi' : v <= 7 ? 'lo' : ''}">${v}</b></span>`; }).join('')}</div>` : '';
     $('groups').innerHTML = groupOrder.map(([set, name]) => {
       const items = pool.ability_labels.filter(x => x[2] === set).map(([id, label]) => { const v = r.display[id]; return `<span>${label}</span><span class="n ${abCls(v)}">${v}</span>`; }).join('');
-      return `<div class="group ${dimSet.has(set) ? 'dim' : ''}"><h4>${name}${dimSet.has(set) ? ' (안 키워요)' : ''}</h4><div class="list">${items}</div></div>`;
+      return `<div class="group ${dimSet.has(set) ? 'dim' : ''}"><h4>${name}${dimSet.has(set) ? ' (안 키워요)' : ''}</h4><div class="l-kv">${items}</div></div>`;
     }).join('');
     if (role === 'batter') { $('pitchwrap').hidden = true; } else {
       $('pitchwrap').hidden = false;
