@@ -43,8 +43,8 @@
 .app > .cols{flex:1 1 auto;min-height:0}
 header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 h1{font-size:15px;margin:0;font-weight:600}
-.sub{font-size:12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
-kbd{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--rule);border-radius:3px;padding:0 4px;color:var(--muted)}
+.sub{font-size:12px;color:var(--muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace}
+kbd{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--rule);border-radius:3px;padding:0 4px;color:var(--muted)}
 .batch{display:flex;gap:12px;align-items:center}
 .batch b{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-weight:600;font-size:13px}
 .prog{display:flex;align-items:center;gap:8px}
@@ -52,7 +52,7 @@ kbd{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--
 .prog .seg i{display:block;width:22px;height:14px;border-radius:3px;background:var(--soft);border:1px solid var(--rule)}
 .prog .seg i.on{background:var(--accent);border-color:var(--accent)}
 .prog .seg i.on.p{background:#3C79C9;border-color:#3C79C9}
-.prog small{font-size:13px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.prog small{font-size:13px;color:var(--muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace}
 .prog .n{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:12px;font-weight:600;min-width:40px}
 .prog .n.done{color:var(--accent)}
 button.small{padding:4px 10px;font-size:13px}
@@ -122,9 +122,9 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .hgrid b.n{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px}
 .hgrid b.gv{font-weight:500}
 .hgrid b.gv.hi{color:var(--hi)}.hgrid b.gv.lo{color:var(--lo)}
-.hgrid b.gv small{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin:0 8px 0 0}
+.hgrid b.gv small{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin:0 8px 0 0}
 .hgrid b.hi{color:var(--hi)}.hgrid b.lo{color:var(--lo)}
-.hgrid small{color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:11px;margin-left:6px;font-weight:400}
+.hgrid small{color:var(--muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;margin-left:6px;font-weight:400}
 .apts{margin:6px 0 0;border-top:0;padding-top:0}
 .apts summary{font-size:12px}
 .aptgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;margin-top:6px}
@@ -141,9 +141,9 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .bar i::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--rule)}
 .bar i b{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:4px}
 .bar i b.neg{background:var(--lo)}
-.bar span:last-child{font-family:"IBM Plex Mono",monospace;text-align:right;font-size:12px;color:var(--muted)}
+.bar span:last-child{font-family:"JetBrains Mono","IBM Plex Mono",monospace;text-align:right;font-size:12px;color:var(--muted)}
 .kv{font-size:13px;color:var(--muted);margin:8px 0}
-.kv b{color:var(--ink);font-weight:500;font-family:"IBM Plex Mono",monospace}
+.kv b{color:var(--ink);font-weight:500;font-family:"JetBrains Mono","IBM Plex Mono",monospace}
 .kv h4{font-size:12px;margin:10px 0 4px;color:var(--muted)}
 /* 2. 커리어 */
 .toggle{display:flex;gap:6px;margin-bottom:8px;align-items:center}
@@ -159,17 +159,17 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .recheck{background:var(--soft);border-left:3px solid var(--warn);border-radius:6px;padding:6px 10px;font-size:12px;margin:0 0 8px}
 .recheck b{font-weight:600}
 .chart{width:100%;height:auto;aspect-ratio:860/240;display:block;cursor:ew-resize;touch-action:none;user-select:none}
-.chart text{font:12px "IBM Plex Mono",monospace;fill:var(--muted)}
-.chart .agebig{font:600 22px "IBM Plex Mono",monospace;fill:var(--now)}
+.chart text{font:12px "JetBrains Mono","IBM Plex Mono",monospace;fill:var(--muted)}
+.chart .agebig{font:600 22px "JetBrains Mono","IBM Plex Mono",monospace;fill:var(--now)}
 .sliderrow{position:relative;margin:2px 0 0;padding:0 calc(30 / 860 * 100%) 0 calc(157 / 860 * 100%)}
 .sliderrow input[type=range]{display:block;width:calc(100% + 18px);margin:0 0 0 -9px;accent-color:var(--now);cursor:ew-resize}
 .jumps{display:flex;gap:4px;justify-content:center;margin-top:6px}
-.jumps button{padding:3px 0;width:44px;font-family:"IBM Plex Mono",monospace;font-size:13px}
+.jumps button{padding:3px 0;width:44px;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px}
 .jumps button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .big3{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;border-top:1px solid var(--rule);padding-top:12px}
 .big3 div{text-align:center}
 .big3 small{display:block;font-size:12px;color:var(--muted);letter-spacing:.04em}
-.big3 b{display:block;font-family:"IBM Plex Mono",monospace;font-size:38px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.big3 b{display:block;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:38px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
 .big3 b.accent{color:var(--accent)}
 .big3 b.sm{font-size:30px;white-space:nowrap}
 .big3 b em{font-style:normal;font-size:13px;color:var(--muted);font-weight:500}
@@ -183,8 +183,13 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .heat col.lab{width:14.99%}.heat col.age{width:6.52%}
 .heat th,.heat td{padding:2px 4px;text-align:center;border-bottom:1px solid var(--rule)}
 .heat th:first-child,.heat td:first-child{text-align:left;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:0}
-.heat td{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:500}
-.heat td.hi{color:var(--hi);background:rgba(30,142,74,.12);font-weight:600}.heat td.lo{color:var(--lo);background:rgba(192,57,43,.12);font-weight:600}
+.heat td{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px;font-weight:500}
+.heat td.hi{color:var(--hi);background:var(--rating-elite-tint);font-weight:600}.heat td.lo{color:var(--lo);background:var(--rating-terrible-tint);font-weight:600}
+/* rating 5구간 열지도 */
+.heat td.rating-elite{color:var(--rating-elite-text);background:var(--rating-elite-tint);font-weight:600}
+.heat td.rating-good{color:var(--rating-good-text);background:var(--rating-good-tint)}
+.heat td.rating-poor{color:var(--rating-poor-text);background:var(--rating-poor-tint)}
+.heat td.rating-terrible{color:var(--rating-terrible-text);background:var(--rating-terrible-tint);font-weight:600}
 .heat tr.g th{font-size:11px;color:var(--muted);letter-spacing:.04em;text-align:left;padding-top:8px;border-bottom:0}
 .heat tr.dim td,.heat tr.dim th{opacity:.4}
 .heat td.now,.heat th.now{background:var(--now-soft)}
@@ -236,9 +241,9 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
 .status{flex:0 0 auto;font-size:11px;color:var(--muted);line-height:1.2;display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:4px 14px 6px;background:var(--bg)}
 .status .ok{color:var(--bar-accent)}.status .err{color:var(--lo)}
 .judge button.link{background:none;border:0;padding:0;color:var(--bar-muted);text-decoration:underline;font-size:12px;cursor:pointer}
-.judge .build{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--bar-muted)}
+.judge .build{margin-left:auto;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;color:var(--bar-muted)}
 .status button.link{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:11px;cursor:pointer}
-.status .build{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.status .build{margin-left:auto;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
 </style>
 
 <div class="app">
@@ -347,11 +352,18 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '80899fa 2026-09-09';
+  const BUILD = 'd945c90 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
   const talCls = v => v >= DR.talent_hi ? 'hi' : v <= DR.talent_lo ? 'lo' : '';
+  // rating 5구간 (#90): 열지도·값 강조의 표준. 임계는 표시값 1~20 기준
+  const rateCls = v => v == null ? '' :
+    v >= 17 ? 'rating-elite' :
+    v >= 13 ? 'rating-good'  :
+    v >= 9  ? '' /* average = 기본 */ :
+    v >= 5  ? 'rating-poor'  :
+             'rating-terrible';
   const z20 = z => Math.max(1, Math.min(20, Math.round(DR.z_center + z * DR.z_per_sd)));
   const BATCH = (entries.find(e => !e.preset && !e.recheck && !e.contrast) || entries[0]).key.replace(/^[dc](\d+)-.*$/, 'b$1');
   const BATCH_SIZE = 10, PER_ROLE = 5;
@@ -637,7 +649,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     for (const [set, name] of groupOrder) {
       h += `<tr class="g ${dimSet.has(set) ? 'dim' : ''}"><th colspan="${HEAT_AGES.length + 1}">${name}${dimSet.has(set) ? ' (안 키워요)' : ''}</th></tr>`;
       for (const [id, label] of pool.ability_labels.filter(x => x[2] === set)) {
-        h += `<tr class="${dimSet.has(set) ? 'dim' : ''}"><th>${label}</th>` + HEAT_AGES.map(a => { const val = byAge[a] ? byAge[a].display[id] : null; const c = val == null ? '' : abCls(val); return `<td class="${c} ${a === nearest ? 'now' : ''}">${val == null ? '' : val}</td>`; }).join('') + '</tr>';
+        h += `<tr class="${dimSet.has(set) ? 'dim' : ''}"><th>${label}</th>` + HEAT_AGES.map(a => { const val = byAge[a] ? byAge[a].display[id] : null; const c = rateCls(val); return `<td class="${c} ${a === nearest ? 'now' : ''}">${val == null ? '' : val}</td>`; }).join('') + '</tr>';
       }
     }
     $('heat').innerHTML = h + '</tbody>';
