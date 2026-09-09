@@ -2,190 +2,20 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <meta name="robots" content="noindex, nofollow">
 <style>
-/* ============================================================
- * DESIGN TOKENS — OOTP Lab 공통. Obsidian 감각의 얇은 시스템.
- * 이 파일이 유일한 원시 값 자리. 각 앱은 var(--...)만 참조한다.
- * build 시점에 각 앱 HTML로 인라인된다 (web/*/build.js).
- * ============================================================ */
 :root{
-  /* ── Color scale (neutral) ── */
-  --color-n-0:   #ffffff;
-  --color-n-05:  #fafafa;
-  --color-n-10:  #f4f4f5;
-  --color-n-20:  #e4e4e7;
-  --color-n-25:  #d4d4d8;
-  --color-n-30:  #a1a1aa;
-  --color-n-50:  #71717a;
-  --color-n-60:  #52525b;
-  --color-n-70:  #3f3f46;
-  --color-n-80:  #27272a;
-  --color-n-90:  #1c1c20;
-  --color-n-95:  #141418;
-  --color-n-100: #0a0a0d;
-
-  /* ── Color scale (accent · 판정 hi/lo) ── */
-  --color-accent-hue: 265;
-  --color-accent:     hsl(var(--color-accent-hue), 55%, 60%);
-  --color-accent-2:   hsl(var(--color-accent-hue), 55%, 50%);
-  --color-hi:         #1E8E4A;
-  --color-hi-dark:    #6FE09A;
-  --color-lo:         #C0392B;
-  --color-lo-dark:    #F08A8A;
-  --color-warn:       #B8860B;
-  --color-warn-dark:  #E8C36A;
-  --color-now:        #2F6FD6;
-  --color-now-dark:   #7FB3FF;
-
-  /* ── Semantic (light default) ── */
-  --bg-primary:      var(--color-n-05);
-  --bg-secondary:    var(--color-n-0);
-  --bg-tertiary:     var(--color-n-10);
-  --bg-hover:        rgba(0,0,0,.04);
-  --bg-active:       rgba(0,0,0,.06);
-  --bg-selected:     rgba(0,0,0,.05);
-  --text-normal:     var(--color-n-100);
-  --text-muted:      var(--color-n-50);
-  --text-faint:      var(--color-n-30);
-  --text-on-accent:  var(--color-n-0);
-  --border:          var(--color-n-20);
-  --border-strong:   var(--color-n-25);
-  --accent:          var(--color-accent-2);
-  --hi:              var(--color-hi);
-  --lo:              var(--color-lo);
-  --warn:            var(--color-warn);
-  --now:             var(--color-now);
-  --now-soft:        rgba(47,111,214,.16);
-
-  /* ── Spacing (4px 기준) ── */
-  --size-2:  2px;
-  --size-4:  4px;
-  --size-6:  6px;
-  --size-8:  8px;
-  --size-10: 10px;
-  --size-12: 12px;
-  --size-16: 16px;
-  --size-20: 20px;
-  --size-24: 24px;
-  --size-32: 32px;
-  --size-40: 40px;
-  --size-48: 48px;
-
-  /* ── Typography ── */
-  --font-interface: "Pretendard", "Inter", "IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", sans-serif;
-  --font-mono:      "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --text-xxs: 10px;
-  --text-xs:  11px;
-  --text-sm:  12px;
-  --text-base:13px;
-  --text-md:  14px;
-  --text-lg:  16px;
-  --text-xl:  19px;
-  --text-2xl: 24px;
-  --leading-tight:  1.25;
-  --leading-normal: 1.45;
-  --leading-loose:  1.6;
-  --weight-regular:  400;
-  --weight-medium:   500;
-  --weight-semibold: 600;
-  --weight-bold:     700;
-  --tracking-tight:  -0.01em;
-  --tracking-wide:    0.02em;
-
-  /* ── Radius ── */
-  --radius-s: 4px;
-  --radius-m: 6px;
-  --radius-l: 10px;
-
-  /* ── Layout ── */
-  --sidebar-w:            240px;
-  --sidebar-w-collapsed:  48px;
-  --header-h:             40px;
-  --tabbar-h:             36px;
-  --navbar-h:             32px;
-
-  /* ── Motion ── */
-  --dur-fast: 100ms;
-  --dur-med:  180ms;
-  --ease:     cubic-bezier(.2,.7,.3,1);
+  --bg:#F3F6F4;--card:#FFFFFF;--ink:#1B2A24;--muted:#66766E;--rule:#D5DCD7;--soft:#E9EFEB;
+  --accent:#1F6F4A;--accent-ink:#FFFFFF;--accent-soft:#DDEFE4;
+  --pos:#1F6F4A;--neg:#B4463C;
 }
-
-/* Dark: prefers-color-scheme + explicit override */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg-primary:      var(--color-n-90);
-    --bg-secondary:    var(--color-n-80);
-    --bg-tertiary:     var(--color-n-95);
-    --bg-hover:        rgba(255,255,255,.05);
-    --bg-active:       rgba(255,255,255,.08);
-    --bg-selected:     rgba(255,255,255,.06);
-    --text-normal:     var(--color-n-05);
-    --text-muted:      var(--color-n-30);
-    --text-faint:      var(--color-n-50);
-    --text-on-accent:  var(--color-n-0);
-    --border:          var(--color-n-70);
-    --border-strong:   var(--color-n-60);
-    --accent:          var(--color-accent);
-    --hi:              var(--color-hi-dark);
-    --lo:              var(--color-lo-dark);
-    --warn:            var(--color-warn-dark);
-    --now:             var(--color-now-dark);
-    --now-soft:        rgba(127,179,255,.18);
+    --bg:#101B24;--card:#16232E;--ink:#E4ECE7;--muted:#90A6B9;--rule:#304453;--soft:#1C2A36;
+    --accent:#A6EDB6;--accent-ink:#0F2418;--accent-soft:#1E3A2C;
+    --pos:#7ED89A;--neg:#E28A80;
   }
 }
-:root[data-theme="dark"]{
-  --bg-primary:      var(--color-n-90);
-  --bg-secondary:    var(--color-n-80);
-  --bg-tertiary:     var(--color-n-95);
-  --bg-hover:        rgba(255,255,255,.05);
-  --bg-active:       rgba(255,255,255,.08);
-  --bg-selected:     rgba(255,255,255,.06);
-  --text-normal:     var(--color-n-05);
-  --text-muted:      var(--color-n-30);
-  --text-faint:      var(--color-n-50);
-  --text-on-accent:  var(--color-n-0);
-  --border:          var(--color-n-70);
-  --border-strong:   var(--color-n-60);
-  --accent:          var(--color-accent);
-  --hi:              var(--color-hi-dark);
-  --lo:              var(--color-lo-dark);
-  --warn:            var(--color-warn-dark);
-  --now:             var(--color-now-dark);
-  --now-soft:        rgba(127,179,255,.18);
-}
-
-/* ============================================================
- * RESET · BASE
- * ============================================================ */
-*, *::before, *::after{box-sizing:border-box}
-html,body{margin:0}
-body{
-  background: var(--bg-primary);
-  color: var(--text-normal);
-  font-family: var(--font-interface);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-button{font: inherit; color: inherit; cursor: pointer}
-a{color: inherit; text-decoration: none}
-::selection{background: var(--accent); color: var(--text-on-accent)}
-
-
-/* 성장 시연 로컬 별칭 */
-:root{
-  --bg: var(--bg-primary);
-  --card: var(--bg-secondary);
-  --ink: var(--text-normal);
-  --muted: var(--text-muted);
-  --rule: var(--border);
-  --soft: var(--bg-tertiary);
-  --accent-ink: var(--text-on-accent);
-  --accent-soft: var(--bg-selected);
-  --pos: var(--hi);
-  --neg: var(--lo);
-}
-body{font-family:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px}
 .wrap{max-width:1400px;margin:0 auto}
 h1{font-size:22px;margin:0 0 4px;font-weight:700}
 .sub{color:var(--muted);font-size:14px;margin:0 0 20px}

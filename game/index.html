@@ -9,9 +9,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <style>
 /* ============================================================
- * DESIGN TOKENS — OOTP Lab 공통. Obsidian 감각의 얇은 시스템.
- * 이 파일이 유일한 원시 값 자리. 각 앱은 var(--...)만 참조한다.
- * build 시점에 각 앱 HTML로 인라인된다 (web/*/build.js).
+ * DESIGN TOKENS — Obsidian 감각의 얇은 시스템.
+ * 모든 원시 값은 여기 한 곳. 컴포넌트는 var(--...)만 참조.
+ * 나중에 스타일 통째로 바꾸려면 이 블록만 갈아끼운다.
  * ============================================================ */
 :root{
   /* ── Color scale (neutral) ── */
@@ -29,18 +29,10 @@
   --color-n-95:  #141418;
   --color-n-100: #0a0a0d;
 
-  /* ── Color scale (accent · 판정 hi/lo) ── */
+  /* ── Color scale (accent) ── */
   --color-accent-hue: 265;
   --color-accent:     hsl(var(--color-accent-hue), 55%, 60%);
   --color-accent-2:   hsl(var(--color-accent-hue), 55%, 50%);
-  --color-hi:         #1E8E4A;
-  --color-hi-dark:    #6FE09A;
-  --color-lo:         #C0392B;
-  --color-lo-dark:    #F08A8A;
-  --color-warn:       #B8860B;
-  --color-warn-dark:  #E8C36A;
-  --color-now:        #2F6FD6;
-  --color-now-dark:   #7FB3FF;
 
   /* ── Semantic (light default) ── */
   --bg-primary:      var(--color-n-05);
@@ -56,13 +48,8 @@
   --border:          var(--color-n-20);
   --border-strong:   var(--color-n-25);
   --accent:          var(--color-accent-2);
-  --hi:              var(--color-hi);
-  --lo:              var(--color-lo);
-  --warn:            var(--color-warn);
-  --now:             var(--color-now);
-  --now-soft:        rgba(47,111,214,.16);
 
-  /* ── Spacing (4px 기준) ── */
+  /* ── Spacing scale (4px 기준) ── */
   --size-2:  2px;
   --size-4:  4px;
   --size-6:  6px;
@@ -77,8 +64,8 @@
   --size-48: 48px;
 
   /* ── Typography ── */
-  --font-interface: "Pretendard", "Inter", "IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", sans-serif;
-  --font-mono:      "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-interface: "Pretendard", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", sans-serif;
+  --font-mono:      "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --text-xxs: 10px;
   --text-xs:  11px;
   --text-sm:  12px;
@@ -114,8 +101,6 @@
   --dur-med:  180ms;
   --ease:     cubic-bezier(.2,.7,.3,1);
 }
-
-/* Dark: prefers-color-scheme + explicit override */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg-primary:      var(--color-n-90);
@@ -131,39 +116,14 @@
     --border:          var(--color-n-70);
     --border-strong:   var(--color-n-60);
     --accent:          var(--color-accent);
-    --hi:              var(--color-hi-dark);
-    --lo:              var(--color-lo-dark);
-    --warn:            var(--color-warn-dark);
-    --now:             var(--color-now-dark);
-    --now-soft:        rgba(127,179,255,.18);
   }
-}
-:root[data-theme="dark"]{
-  --bg-primary:      var(--color-n-90);
-  --bg-secondary:    var(--color-n-80);
-  --bg-tertiary:     var(--color-n-95);
-  --bg-hover:        rgba(255,255,255,.05);
-  --bg-active:       rgba(255,255,255,.08);
-  --bg-selected:     rgba(255,255,255,.06);
-  --text-normal:     var(--color-n-05);
-  --text-muted:      var(--color-n-30);
-  --text-faint:      var(--color-n-50);
-  --text-on-accent:  var(--color-n-0);
-  --border:          var(--color-n-70);
-  --border-strong:   var(--color-n-60);
-  --accent:          var(--color-accent);
-  --hi:              var(--color-hi-dark);
-  --lo:              var(--color-lo-dark);
-  --warn:            var(--color-warn-dark);
-  --now:             var(--color-now-dark);
-  --now-soft:        rgba(127,179,255,.18);
 }
 
 /* ============================================================
  * RESET · BASE
  * ============================================================ */
 *, *::before, *::after{box-sizing:border-box}
-html,body{margin:0}
+html,body{height:100%;margin:0}
 body{
   background: var(--bg-primary);
   color: var(--text-normal);
@@ -172,23 +132,25 @@ body{
   line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
-button{font: inherit; color: inherit; cursor: pointer}
+button{
+  font: inherit; color: inherit; cursor: pointer;
+  border: 0; background: transparent; padding: 0; margin: 0;
+}
 a{color: inherit; text-decoration: none}
-::selection{background: var(--accent); color: var(--text-on-accent)}
-
-
-/* 게임 앱 국지 오버라이드: full-viewport 셸 */
-html,body{height:100%}
-body{overflow:hidden}
-button{border:0; background:transparent; padding:0; margin:0}
 input, select, textarea{
+  font: inherit; color: inherit;
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   border-radius: var(--radius-s);
   padding: var(--size-6) var(--size-8);
 }
-input:focus, select:focus{outline:none; border-color: var(--accent)}
+input:focus, select:focus{
+  outline: none;
+  border-color: var(--accent);
+}
+::selection{background: var(--accent); color: var(--text-on-accent)}
 
 /* ============================================================
  * APP SHELL — grid areas
