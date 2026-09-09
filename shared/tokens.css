@@ -43,6 +43,8 @@
     --c-cyan-40:   #0e7490;   --c-cyan-60:   hsl(190,75%,55%);
     --c-pink-40:   #be185d;   --c-pink-60:   #f472b6;
     --c-pink-light:#fbcfe8;
+    --c-indigo-40: #4f46e5;   --c-indigo-60: hsl(235,60%,60%);
+    --c-sage-40:   #556b2f;   --c-sage-60:   hsl(95,25%,55%);
 
     /* ─ PRIMITIVE: spacing (4px grid) ─ */
     --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
@@ -91,24 +93,23 @@
     --border:       var(--c-n-70);
     --border-strong: var(--c-n-60);
 
-    /* ─ ROLE: primary (상호작용/활성) — 시안 계열 (사용자 결정 2026-09-10)
-     * 다크에서 밝은 시안 위 검정 텍스트 (흰은 대비 부족) */
-    --primary:      var(--c-cyan-60);
-    --primary-on:   var(--c-n-100);           /* 검정: 밝은 시안 위 대비 확보 */
-    --primary-tint: rgba(34,211,238,.14);
+    /* ─ ROLE: primary (상호작용/활성) — 인디고 (블루-보라, 사용자 결정 2026-09-10) */
+    --primary:      var(--c-indigo-60);
+    --primary-on:   var(--c-n-0);
+    --primary-tint: rgba(99,102,241,.14);
 
     /* ─ ROLE: rating 4구간 (능력값의 좋고 나쁨) 사용자 결정 2026-09-10
-     *   최상 (elite, 17-20) = 네온 핑크 (진한 강조 + 굵음)
-     *   좋음 (good, 13-16)  = 연한 핑크 (어울리는 색)
+     *   최상 (elite, 17-20) = 쑥색 (semantic success 초록과 다른 톤)
+     *   좋음 (good, 13-16)  = 주황 (semantic attention 앰버와 다른 톤)
      *   중간 (average, 9-12)= 흰 (기본)
-     *   나쁨 (poor+terrible)= 회색 muted (튀지 않음)
+     *   나쁨 (poor+terrible)= 회색 muted
      * 빨강 없음 (semantic danger 축이 별도로 담당).
      */
-    --rating-elite-text:    var(--c-pink-60);           /* 네온 핑크 (bg-secondary 대비 5.7:1) */
-    --rating-elite-tint:    rgba(244,114,182,.20);
-    --rating-elite-border:  rgba(244,114,182,.42);
+    --rating-elite-text:    var(--c-sage-60);           /* 쑥색 */
+    --rating-elite-tint:    rgba(140,168,120,.18);
+    --rating-elite-border:  rgba(140,168,120,.38);
     --rating-elite-on:      var(--c-n-100);
-    --rating-good-text:     var(--c-pink-light);        /* 연한 핑크 */
+    --rating-good-text:     var(--c-orange-60);         /* 주황 */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-100);
@@ -125,8 +126,8 @@
     --rating-terrible-border:transparent;
     --rating-terrible-on:   var(--c-n-05);
 
-    /* ─ ROLE: chart series ─ */
-    --chart-1: var(--c-teal-60);
+    /* ─ ROLE: chart series ─ 곡선이 하나뿐일 때는 primary와 통일 (사용자 결정) */
+    --chart-1: var(--primary);
     --chart-2: var(--c-amber-60);
     --chart-3: var(--c-n-30);
 
@@ -191,15 +192,15 @@
     --border:       var(--c-n-20);
     --border-strong: var(--c-n-30);
 
-    --primary:      var(--c-cyan-40);
+    --primary:      var(--c-indigo-40);
     --primary-on:   var(--c-n-0);
-    --primary-tint: rgba(8,145,178,.10);
+    --primary-tint: rgba(79,70,229,.10);
 
-    --rating-elite-text:    var(--c-pink-40);
-    --rating-elite-tint:    rgba(190,24,93,.10);
-    --rating-elite-border:  rgba(190,24,93,.30);
+    --rating-elite-text:    var(--c-sage-40);           /* 진한 쑥색 (라이트) */
+    --rating-elite-tint:    rgba(85,107,47,.10);
+    --rating-elite-border:  rgba(85,107,47,.30);
     --rating-elite-on:      var(--c-n-0);
-    --rating-good-text:     #db2777;                    /* 진한 핑크 (라이트) */
+    --rating-good-text:     var(--c-orange-40);         /* 진한 주황 (라이트) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-0);
@@ -216,7 +217,7 @@
     --rating-terrible-border:transparent;
     --rating-terrible-on:   var(--c-n-0);
 
-    --chart-1: var(--c-teal-40);
+    --chart-1: var(--primary);
     --chart-2: var(--c-amber-40);
     --chart-3: var(--c-n-50);
 
