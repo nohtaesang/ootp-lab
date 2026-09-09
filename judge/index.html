@@ -5,30 +5,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="../shared/tokens.css">
 <style>
-/* 판정 앱 로컬 별칭 — tokens.css의 role에 매핑. 원시값 없음.
- * @layer app: tokens < app 우선순위를 CSS Cascade Layers로 명시. */
+/* 판정 앱 컴포넌트 CSS. 색·간격·타이포는 tokens.css의 role 토큰을 직접 참조.
+ * 로컬 별칭 없음 (Phase 3, 2026-09-10). @layer app: tokens < app 우선순위. */
 @layer app {
-  :root {
-    --bg: var(--bg-primary);
-    --card: var(--bg-secondary);
-    --ink: var(--text-normal);
-    --muted: var(--text-muted);
-    --rule: var(--border);
-    --soft: var(--bg-tertiary);
-    --hi:  var(--rating-elite-text);
-    --lo:  var(--rating-terrible-text);
-    --warn:var(--attention-text);
-    --now: var(--chart-1);
-    --now-soft: var(--primary-tint);
-    --accent-soft: var(--primary-tint);
-    --bar-bg: var(--bg-secondary);
-    --bar-ink: var(--text-normal);
-    --bar-muted: var(--text-muted);
-    --bar-rule: var(--border);
-    --bar-field: var(--bg-primary);
-    --bar-accent: var(--primary);
-    --bar-accent-ink: var(--primary-on);
-  }
   html, body { height: 100% }
   body {
     font-family: "Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
@@ -42,61 +21,61 @@
 .app > .cols{flex:1 1 auto;min-height:0}
 header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 h1{font-size:15px;margin:0;font-weight:600}
-.sub{font-size:12px;color:var(--muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace}
-kbd{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--rule);border-radius:3px;padding:0 4px;color:var(--muted)}
+.sub{font-size:12px;color:var(--text-muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace}
+kbd{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--border);border-radius:3px;padding:0 4px;color:var(--text-muted)}
 .batch{display:flex;gap:12px;align-items:center}
 .batch b{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-weight:600;font-size:13px}
 .prog{display:flex;align-items:center;gap:8px}
 .prog .seg{display:flex;gap:3px}
-.prog .seg i{display:block;width:22px;height:14px;border-radius:3px;background:var(--soft);border:1px solid var(--rule)}
-.prog .seg i.on{background:var(--accent);border-color:var(--accent)}
+.prog .seg i{display:block;width:22px;height:14px;border-radius:3px;background:var(--bg-tertiary);border:1px solid var(--border)}
+.prog .seg i.on{background:var(--primary);border-color:var(--primary)}
 .prog .seg i.on.p{background:#3C79C9;border-color:#3C79C9}
-.prog small{font-size:13px;color:var(--muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace}
+.prog small{font-size:13px;color:var(--text-muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace}
 .prog .n{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:12px;font-weight:600;min-width:40px}
-.prog .n.done{color:var(--accent)}
+.prog .n.done{color:var(--primary)}
 button.small{padding:4px 10px;font-size:13px}
-.checklist{background:var(--card);border:1px solid var(--accent);border-radius:8px;padding:10px 16px;font-size:12px;max-height:46vh;overflow:auto}
+.checklist{background:var(--bg-secondary);border:1px solid var(--primary);border-radius:8px;padding:10px 16px;font-size:12px;max-height:46vh;overflow:auto}
 .checklist .chead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .checklist ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
 .checklist li{margin:0 0 6px;break-inside:avoid}
 .checklist li b{font-weight:700;margin-right:4px}
-.checklist li i{color:var(--muted);font-style:normal;font-size:12px;margin-left:4px}
+.checklist li i{color:var(--text-muted);font-style:normal;font-size:12px;margin-left:4px}
 .cols{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(440px,1.35fr) minmax(320px,1fr);gap:12px;min-height:0}
 @media (max-width:1100px){.app{height:auto}.cols{grid-template-columns:1fr}.card{overflow:visible}}
-.card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;min-height:0;overflow:auto}
-.card h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-height:0;overflow:auto}
+.card h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin:0 0 10px;font-weight:600;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
 .card h2 span{text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;text-align:right}
-.nowline{margin:0 0 10px;font-size:13px;color:var(--muted)}
-button,input[type=text]{font:inherit;font-size:13px;border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:5px;padding:6px 10px}
+.nowline{margin:0 0 10px;font-size:13px;color:var(--text-muted)}
+button,input[type=text]{font:inherit;font-size:13px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-normal);border-radius:5px;padding:6px 10px}
 button{cursor:pointer}
-button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button.primary{background:var(--primary);color:var(--primary-on);border-color:var(--primary);font-weight:600}
 button:disabled{opacity:.5;cursor:default}
-button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
 /* 1. 이 선수 — 이름/포지션이 위, 스켈레톤이 아래. 모던 톤 */
 .profile{display:flex;flex-direction:column;gap:12px;margin:0 0 14px}
 .who{font-size:18px;font-weight:700;margin:0;line-height:1.25;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;letter-spacing:-0.01em}
-.who .sep{color:var(--muted);font-weight:400}
-.who .pos{display:inline-flex;align-items:center;background:var(--accent);color:var(--accent-ink);border-radius:5px;padding:2px 9px;font-size:12px;font-weight:600;letter-spacing:0}
-.who small{font-size:12px;font-weight:500;color:var(--muted)}
-.basics{color:var(--muted);font-size:12px;margin:0}
-.roleline{margin:2px 0 0;font-size:12px;color:var(--muted)}
-.roleline b{font-weight:700;font-size:14px;color:var(--ink)}
-.roleline .pos{display:inline-flex;align-items:center;background:var(--accent);color:var(--accent-ink);border-radius:5px;padding:2px 9px;font-weight:600;margin-left:6px;font-size:12px}
-.roleline small{color:var(--muted);font-size:11px;margin-left:6px}
+.who .sep{color:var(--text-muted);font-weight:400}
+.who .pos{display:inline-flex;align-items:center;background:var(--primary);color:var(--primary-on);border-radius:5px;padding:2px 9px;font-size:12px;font-weight:600;letter-spacing:0}
+.who small{font-size:12px;font-weight:500;color:var(--text-muted)}
+.basics{color:var(--text-muted);font-size:12px;margin:0}
+.roleline{margin:2px 0 0;font-size:12px;color:var(--text-muted)}
+.roleline b{font-weight:700;font-size:14px;color:var(--text-normal)}
+.roleline .pos{display:inline-flex;align-items:center;background:var(--primary);color:var(--primary-on);border-radius:5px;padding:2px 9px;font-weight:600;margin-left:6px;font-size:12px}
+.roleline small{color:var(--text-muted);font-size:11px;margin-left:6px}
 .face{width:100%;max-width:240px;aspect-ratio:200/172;border-radius:8px;background:transparent;overflow:visible;border:0;margin:0}
-.facehint{font-size:10px;color:var(--muted);margin:4px 0 0;text-align:left;letter-spacing:.02em}
+.facehint{font-size:10px;color:var(--text-muted);margin:4px 0 0;text-align:left;letter-spacing:.02em}
 .face svg{display:block;width:100%;height:100%;overflow:visible}
 .face text{font-family:"Pretendard","Inter",system-ui,sans-serif}
-.summary{display:flex;align-items:center;gap:10px;background:var(--accent-soft);border-radius:6px;padding:6px 10px;margin:0 0 10px;font-size:13px}
+.summary{display:flex;align-items:center;gap:10px;background:var(--primary-tint);border-radius:6px;padding:6px 10px;margin:0 0 10px;font-size:13px}
 .summary b{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-weight:600;font-size:14px}
 .summary .lvl{margin-left:auto;font-weight:600}
 .hgroup{margin-top:6px}
 .hcols{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
-.hgroup h5{font-size:11px;color:var(--muted);margin:6px 0 2px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.hgroup h5{font-size:11px;color:var(--text-muted);margin:6px 0 2px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .hgrid.one{grid-template-columns:1fr}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
-.tag{background:var(--soft);border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500}
-.covers{font-size:12px;color:var(--accent);margin:0 0 10px;font-weight:500}
+.tag{background:var(--bg-tertiary);border-radius:4px;padding:2px 8px;font-size:12px;font-weight:500}
+.covers{font-size:12px;color:var(--primary);margin:0 0 10px;font-weight:500}
 .talcols{display:grid;grid-template-columns:1fr 1fr;gap:6px 22px}
 .talcols.three{grid-template-columns:1fr 1fr 1.1fr;gap:6px 16px}
 .tgroup.dim{opacity:.4}
@@ -107,142 +86,142 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .labels .lab.lo{background:var(--rating-terrible-tint);color:var(--rating-terrible-text);border:1px solid var(--rating-terrible-border)}
 .labels .lab.odd{background:var(--attention-tint);color:var(--attention-text);border:1px solid var(--attention-border)}
 .labels span.v{margin-right:6px}
-.talcols h4,.group h4{font-size:12px;color:var(--muted);margin:0 0 2px;font-weight:600;letter-spacing:.04em}
+.talcols h4,.group h4{font-size:12px;color:var(--text-muted);margin:0 0 2px;font-weight:600;letter-spacing:.04em}
 .list{display:grid;grid-template-columns:1fr auto;column-gap:0}
-.list span{border-bottom:1px solid var(--rule);padding:2px 0;font-size:12px;line-height:1.3;display:flex;align-items:center}
+.list span{border-bottom:1px solid var(--border);padding:2px 0;font-size:12px;line-height:1.3;display:flex;align-items:center}
 .list span:nth-child(odd){padding-right:10px}
 .list span.n{justify-content:flex-end;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;min-width:34px}
-.list span.n.hi{color:var(--hi)}.list span.n.lo{color:var(--lo)}
-.hidden{margin-top:12px;border-top:1px solid var(--rule);padding-top:10px}
-.hidden h4{font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:600;letter-spacing:.04em}
+.list span.n.hi{color:var(--rating-elite-text)}.list span.n.lo{color:var(--rating-terrible-text)}
+.hidden{margin-top:12px;border-top:1px solid var(--border);padding-top:10px}
+.hidden h4{font-size:12px;color:var(--text-muted);margin:0 0 6px;font-weight:600;letter-spacing:.04em}
 .hgrid{display:grid;grid-template-columns:1fr;gap:0;font-size:12px}
-.hgrid div{display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding:2px 0}
+.hgrid div{display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:2px 0}
 .hgrid b{font-weight:600}
 .hgrid b.n{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px}
 .hgrid b.gv{font-weight:500}
-.hgrid b.gv.hi{color:var(--hi)}.hgrid b.gv.lo{color:var(--lo)}
-.hgrid b.gv small{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:12px;color:var(--muted);margin:0 8px 0 0}
-.hgrid b.hi{color:var(--hi)}.hgrid b.lo{color:var(--lo)}
-.hgrid small{color:var(--muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;margin-left:6px;font-weight:400}
+.hgrid b.gv.hi{color:var(--rating-elite-text)}.hgrid b.gv.lo{color:var(--rating-terrible-text)}
+.hgrid b.gv small{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:12px;color:var(--text-muted);margin:0 8px 0 0}
+.hgrid b.hi{color:var(--rating-elite-text)}.hgrid b.lo{color:var(--rating-terrible-text)}
+.hgrid small{color:var(--text-muted);font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;margin-left:6px;font-weight:400}
 .apts{margin:6px 0 0;border-top:0;padding-top:0}
 .apts summary{font-size:12px}
 .aptgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;margin-top:6px}
-.aptgrid div{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--rule);padding:2px 0;font-size:11px}
+.aptgrid div{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding:2px 0;font-size:11px}
 .aptgrid b{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px;font-weight:600}
-.aptgrid b.hi{color:var(--hi)}.aptgrid b.lo{color:var(--lo)}
+.aptgrid b.hi{color:var(--rating-elite-text)}.aptgrid b.lo{color:var(--rating-terrible-text)}
 .sect{margin-top:10px;font-size:12px}
 .sect p{margin:2px 0}
 .sect b{font-weight:600}
-details{margin-top:12px;border-top:1px solid var(--rule);padding-top:8px}
-summary{cursor:pointer;font-size:13px;color:var(--muted)}
+details{margin-top:12px;border-top:1px solid var(--border);padding-top:8px}
+summary{cursor:pointer;font-size:13px;color:var(--text-muted)}
 .bar{display:grid;grid-template-columns:96px 1fr 56px;gap:8px;align-items:center;font-size:13px;padding:2px 0}
-.bar i{display:block;height:8px;background:var(--soft);border-radius:4px;position:relative;overflow:hidden}
-.bar i::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--rule)}
-.bar i b{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:4px}
-.bar i b.neg{background:var(--lo)}
-.bar span:last-child{font-family:"JetBrains Mono","IBM Plex Mono",monospace;text-align:right;font-size:12px;color:var(--muted)}
-.kv{font-size:13px;color:var(--muted);margin:8px 0}
-.kv b{color:var(--ink);font-weight:500;font-family:"JetBrains Mono","IBM Plex Mono",monospace}
-.kv h4{font-size:12px;margin:10px 0 4px;color:var(--muted)}
+.bar i{display:block;height:8px;background:var(--bg-tertiary);border-radius:4px;position:relative;overflow:hidden}
+.bar i::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--border)}
+.bar i b{position:absolute;top:0;bottom:0;background:var(--primary);border-radius:4px}
+.bar i b.neg{background:var(--rating-terrible-text)}
+.bar span:last-child{font-family:"JetBrains Mono","IBM Plex Mono",monospace;text-align:right;font-size:12px;color:var(--text-muted)}
+.kv{font-size:13px;color:var(--text-muted);margin:8px 0}
+.kv b{color:var(--text-normal);font-weight:500;font-family:"JetBrains Mono","IBM Plex Mono",monospace}
+.kv h4{font-size:12px;margin:10px 0 4px;color:var(--text-muted)}
 /* 2. 커리어 */
 .toggle{display:flex;gap:6px;margin-bottom:8px;align-items:center}
 .toggle button{flex:1;font-weight:500}
-.toggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.toggle .tip{position:relative;flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);background:transparent;color:var(--muted);font-size:12px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;user-select:none}
-.toggle .tip:hover,.toggle .tip:focus,.toggle .tip.on{border-color:var(--accent);color:var(--ink);outline:none}
-.toggle .tip .pop{display:none;position:absolute;right:0;top:calc(100% + 6px);width:min(320px,80vw);background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:400;line-height:1.5;color:var(--ink);text-align:left;box-shadow:0 6px 20px rgba(0,0,0,0.15);z-index:20;white-space:normal;cursor:auto}
+.toggle button[aria-pressed="true"]{background:var(--primary);color:var(--primary-on);border-color:var(--primary)}
+.toggle .tip{position:relative;flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:12px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;user-select:none}
+.toggle .tip:hover,.toggle .tip:focus,.toggle .tip.on{border-color:var(--primary);color:var(--text-normal);outline:none}
+.toggle .tip .pop{display:none;position:absolute;right:0;top:calc(100% + 6px);width:min(320px,80vw);background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:400;line-height:1.5;color:var(--text-normal);text-align:left;box-shadow:0 6px 20px rgba(0,0,0,0.15);z-index:20;white-space:normal;cursor:auto}
 .toggle .tip.on .pop{display:block}
-.toggle .tip .pop b{color:var(--accent)}
+.toggle .tip .pop b{color:var(--primary)}
 .toggle.small{margin:0 0 4px}
 .toggle.small button{padding:3px 10px;font-size:13px;flex:0 0 auto}
-.recheck{background:var(--soft);border-left:3px solid var(--warn);border-radius:6px;padding:6px 10px;font-size:12px;margin:0 0 8px}
+.recheck{background:var(--bg-tertiary);border-left:3px solid var(--attention-text);border-radius:6px;padding:6px 10px;font-size:12px;margin:0 0 8px}
 .recheck b{font-weight:600}
 .chart{width:100%;height:auto;aspect-ratio:860/240;display:block;cursor:ew-resize;touch-action:none;user-select:none}
-.chart text{font:12px "JetBrains Mono","IBM Plex Mono",monospace;fill:var(--muted)}
-.chart .agebig{font:600 22px "JetBrains Mono","IBM Plex Mono",monospace;fill:var(--now)}
+.chart text{font:12px "JetBrains Mono","IBM Plex Mono",monospace;fill:var(--text-muted)}
+.chart .agebig{font:600 22px "JetBrains Mono","IBM Plex Mono",monospace;fill:var(--chart-1)}
 .sliderrow{position:relative;margin:2px 0 0;padding:0 calc(30 / 860 * 100%) 0 calc(157 / 860 * 100%)}
-.sliderrow input[type=range]{display:block;width:calc(100% + 18px);margin:0 0 0 -9px;accent-color:var(--now);cursor:ew-resize}
+.sliderrow input[type=range]{display:block;width:calc(100% + 18px);margin:0 0 0 -9px;accent-color:var(--chart-1);cursor:ew-resize}
 .jumps{display:flex;gap:4px;justify-content:center;margin-top:6px}
 .jumps button{padding:3px 0;width:44px;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px}
-.jumps button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.big3{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;border-top:1px solid var(--rule);padding-top:12px}
+.jumps button[aria-pressed="true"]{background:var(--primary);color:var(--primary-on);border-color:var(--primary)}
+.big3{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
 .big3 div{text-align:center}
-.big3 small{display:block;font-size:12px;color:var(--muted);letter-spacing:.04em}
+.big3 small{display:block;font-size:12px;color:var(--text-muted);letter-spacing:.04em}
 .big3 b{display:block;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:38px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
-.big3 b.accent{color:var(--accent)}
+.big3 b.accent{color:var(--primary)}
 .big3 b.sm{font-size:30px;white-space:nowrap}
-.big3 b em{font-style:normal;font-size:13px;color:var(--muted);font-weight:500}
-.hint{font-size:12px;color:var(--muted);margin:10px 0 0}
-.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.big3 b em{font-style:normal;font-size:13px;color:var(--text-muted);font-weight:500}
+.hint{font-size:12px;color:var(--text-muted);margin:10px 0 0}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--text-muted);margin-top:6px}
 .legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--chart-1);vertical-align:middle;margin-right:5px}
-.legend i.prev{border-top:2px dashed var(--muted)}
+.legend i.prev{border-top:2px dashed var(--text-muted)}
 .legend i.band{border-top:0;height:10px;background:var(--chart-1);opacity:.25;border-radius:2px}
 .heat{margin-top:12px}
 .heat table{font-size:13px;margin:0;table-layout:fixed;width:100%}
 .heat col.lab{width:14.99%}.heat col.age{width:6.52%}
-.heat th,.heat td{padding:2px 4px;text-align:center;border-bottom:1px solid var(--rule)}
+.heat th,.heat td{padding:2px 4px;text-align:center;border-bottom:1px solid var(--border)}
 .heat th:first-child,.heat td:first-child{text-align:left;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:0}
 .heat td{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px;font-weight:500}
-.heat td.hi{color:var(--hi);background:var(--rating-elite-tint);font-weight:600}.heat td.lo{color:var(--lo);background:var(--rating-terrible-tint);font-weight:600}
+.heat td.hi{color:var(--rating-elite-text);background:var(--rating-elite-tint);font-weight:600}.heat td.lo{color:var(--rating-terrible-text);background:var(--rating-terrible-tint);font-weight:600}
 /* rating 5구간 열지도: elite/terrible은 굵은 강조, good/poor는 약한 tint, average는 배경 없음 */
 .heat td.rating-elite{color:var(--rating-elite-text);background:var(--rating-elite-tint);font-weight:700}
 .heat td.rating-good{color:var(--rating-good-text);background:var(--rating-good-tint);font-weight:500}
 .heat td.rating-poor{color:var(--rating-poor-text);background:var(--rating-poor-tint);font-weight:500}
 .heat td.rating-terrible{color:var(--rating-terrible-text);background:var(--rating-terrible-tint);font-weight:700}
-.heat tr.g th{font-size:11px;color:var(--muted);letter-spacing:.04em;text-align:left;padding-top:8px;border-bottom:0}
+.heat tr.g th{font-size:11px;color:var(--text-muted);letter-spacing:.04em;text-align:left;padding-top:8px;border-bottom:0}
 .heat tr.dim td,.heat tr.dim th{opacity:.4}
-.heat td.now,.heat th.now{background:var(--now-soft)}
-.heat th.now{color:var(--now);font-weight:700}
-.heat td.now.hi{color:var(--hi)}.heat td.now.lo{color:var(--lo)}
+.heat td.now,.heat th.now{background:var(--primary-tint)}
+.heat th.now{color:var(--chart-1);font-weight:700}
+.heat td.now.hi{color:var(--rating-elite-text)}.heat td.now.lo{color:var(--rating-terrible-text)}
 /* 3. 지금 능력 */
 .gsum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 12px}
-.gsum div{text-align:center;background:var(--soft);border-radius:8px;padding:8px 4px}
+.gsum div{text-align:center;background:var(--bg-tertiary);border-radius:8px;padding:8px 4px}
 .gsum div.dim{opacity:.45}
-.gsum small{display:block;font-size:12px;color:var(--muted)}
+.gsum small{display:block;font-size:12px;color:var(--text-muted)}
 .gsum b{display:block;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:20px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
 .groups{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px}
 .group.dim{opacity:.45}
 .posapt{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin-top:8px}
-.posapt span{text-align:center;border-radius:4px;padding:3px 0;background:var(--soft)}
-.posapt span.main{outline:2px solid var(--accent)}
-.posapt small{display:block;font-size:11px;color:var(--muted)}
+.posapt span{text-align:center;border-radius:4px;padding:3px 0;background:var(--bg-tertiary)}
+.posapt span.main{outline:2px solid var(--primary)}
+.posapt small{display:block;font-size:11px;color:var(--text-muted)}
 .posapt b{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px;font-weight:600}
-.posapt b.hi{color:var(--hi)}.posapt b.lo{color:var(--lo)}
+.posapt b.hi{color:var(--rating-elite-text)}.posapt b.lo{color:var(--rating-terrible-text)}
 table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums;margin-top:10px}
-th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--rule);white-space:nowrap}
-th{font-weight:500;color:var(--muted);font-size:11px}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--border);white-space:nowrap}
+th{font-weight:500;color:var(--text-muted);font-size:11px}
 th small{font-weight:400;font-size:10px}
-tr.fmax td{color:var(--muted)}tr.fmax td.hi{color:var(--hi)}tr.fmax td.lo{color:var(--lo)}
+tr.fmax td{color:var(--text-muted)}tr.fmax td.hi{color:var(--rating-elite-text)}tr.fmax td.lo{color:var(--rating-terrible-text)}
 tr.fmax small{font-family:"Pretendard","Inter",sans-serif;font-size:10px}
 td{font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:13px}
-td.hi{color:var(--hi);font-weight:600}td.lo{color:var(--lo);font-weight:600}
+td.hi{color:var(--rating-elite-text);font-weight:600}td.lo{color:var(--rating-terrible-text);font-weight:600}
 th:first-child,td:first-child{text-align:left;font-family:inherit}
 .tablewrap{overflow-x:auto}
 /* 판정 바 — 한 줄 flex, 컴팩트, body 직접 자식 */
-.judge{flex:0 0 auto;background:var(--bar-bg);color:var(--bar-ink);border-top:1px solid var(--bar-rule);padding:6px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;box-shadow:0 -4px 12px rgba(0,0,0,.06);line-height:1}
+.judge{flex:0 0 auto;background:var(--bg-secondary);color:var(--text-normal);border-top:1px solid var(--border);padding:6px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;box-shadow:0 -4px 12px rgba(0,0,0,.06);line-height:1}
 .judge > div{display:flex;align-items:center;gap:6px;min-width:0;line-height:1}
 .judge > div:has(#odd){flex:1 1 220px}
-.judge label.lbl{flex:0 0 auto;font-size:12px;color:var(--bar-muted);margin:0;white-space:nowrap}
-.judge input[type=text]{flex:1 1 auto;width:100%;font-size:13px;height:32px;padding:0 10px;background:var(--bar-field);color:var(--bar-ink);border-color:var(--bar-rule)}
-.judge input::placeholder{color:var(--bar-muted)}
-.judge button{background:var(--bar-field);color:var(--bar-ink);border-color:var(--bar-rule)}
-.judge button.primary{background:var(--bar-accent);color:var(--bar-accent-ink);border-color:var(--bar-accent)}
+.judge label.lbl{flex:0 0 auto;font-size:12px;color:var(--text-muted);margin:0;white-space:nowrap}
+.judge input[type=text]{flex:1 1 auto;width:100%;font-size:13px;height:32px;padding:0 10px;background:var(--bg-primary);color:var(--text-normal);border-color:var(--border)}
+.judge input::placeholder{color:var(--text-muted)}
+.judge button{background:var(--bg-primary);color:var(--text-normal);border-color:var(--border)}
+.judge button.primary{background:var(--primary);color:var(--primary-on);border-color:var(--primary)}
 .verdict{display:flex;gap:6px}
 .verdict button{height:36px;padding:0 12px;font-weight:600;font-size:14px}
-.verdict button[aria-pressed="true"]{background:var(--bar-accent);color:var(--bar-accent-ink);border-color:var(--bar-accent)}
-.verdict button[data-v="odd"][aria-pressed="true"],.verdict button[data-v="odd_other"][aria-pressed="true"]{background:var(--lo);border-color:var(--lo);color:#fff}
+.verdict button[aria-pressed="true"]{background:var(--primary);color:var(--primary-on);border-color:var(--primary)}
+.verdict button[data-v="odd"][aria-pressed="true"],.verdict button[data-v="odd_other"][aria-pressed="true"]{background:var(--rating-terrible-text);border-color:var(--rating-terrible-text);color:#fff}
 .chips{display:flex;gap:4px;flex-wrap:wrap}
 .chips button{height:28px;padding:0 10px;font-size:12px;border-radius:999px}
-.chips button[aria-pressed="true"]{background:var(--bar-accent);color:var(--bar-accent-ink);border-color:var(--bar-accent)}
+.chips button[aria-pressed="true"]{background:var(--primary);color:var(--primary-on);border-color:var(--primary)}
 .actions{display:flex;gap:6px}
 .actions button{height:36px;padding:0 14px;font-size:14px}
 .actions button.done{font-size:14px;padding:0 18px}
-.status{flex:0 0 auto;font-size:11px;color:var(--muted);line-height:1.2;display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:4px 14px 6px;background:var(--bg)}
-.status .ok{color:var(--bar-accent)}.status .err{color:var(--lo)}
-.judge button.link{background:none;border:0;padding:0;color:var(--bar-muted);text-decoration:underline;font-size:12px;cursor:pointer}
-.judge .build{margin-left:auto;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;color:var(--bar-muted)}
-.status button.link{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:11px;cursor:pointer}
-.status .build{margin-left:auto;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.status{flex:0 0 auto;font-size:11px;color:var(--text-muted);line-height:1.2;display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:4px 14px 6px;background:var(--bg-primary)}
+.status .ok{color:var(--primary)}.status .err{color:var(--rating-terrible-text)}
+.judge button.link{background:none;border:0;padding:0;color:var(--text-muted);text-decoration:underline;font-size:12px;cursor:pointer}
+.judge .build{margin-left:auto;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;color:var(--text-muted)}
+.status button.link{background:none;border:0;padding:0;color:var(--text-muted);text-decoration:underline;font-size:11px;cursor:pointer}
+.status .build{margin-left:auto;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:11px;color:var(--text-muted)}
 } /* end @layer app */
 </style>
 
@@ -352,7 +331,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'df2d7d7 2026-09-09';
+  const BUILD = '8896e3e 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
@@ -406,33 +385,33 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     // 능력 → 색: 강점(초록) / 낮음(빨강) / 매우 낮음(회색) / 보통(기본)
     // rating 5구간으로 색 결정. average는 --ink (다크에서 흰) 로 잘 보이게
     const col = v => {
-      if (v == null) return 'var(--muted)';
+      if (v == null) return 'var(--text-muted)';
       if (v >= 17) return 'var(--rating-elite-text)';
       if (v >= 13) return 'var(--rating-good-text)';
-      if (v >= 9)  return 'var(--ink)';
+      if (v >= 9)  return 'var(--text-normal)';
       if (v >= 5)  return 'var(--rating-poor-text)';
       return 'var(--rating-terrible-text)';
     };
     let s = '<svg viewBox="0 0 200 172" xmlns="http://www.w3.org/2000/svg">';
     // 다이아그램 위치 감만 남기고 그라운드 색은 뺌 (점선 다이아몬드)
-    s += '<path d="M100 148 L30 90 L100 32 L170 90 Z" fill="none" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>';
+    s += '<path d="M100 148 L30 90 L100 32 L170 90 Z" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>';
     const w = 34, h = 26;
     for (const [id, x, y] of FIELD) {
       const sk = P && P.skill ? P.skill[id] : null;
       const ap = P && P.apt ? P.apt[id] : null;
       const main = mains.includes(id);
       const dim = sk != null && sk <= 1 && (ap == null || ap <= 7) && !main;
-      const fill = main ? 'var(--primary-tint)' : 'var(--card)';
-      const stroke = main ? 'var(--accent)' : 'var(--rule)';
+      const fill = main ? 'var(--primary-tint)' : 'var(--bg-secondary)';
+      const stroke = main ? 'var(--primary)' : 'var(--border)';
       const sw = main ? 1.5 : 1;
       const op = dim ? .55 : 1;
       // 자리 이름을 칩 위에 얇게
-      s += `<text x="${x}" y="${y - h / 2 - 3}" text-anchor="middle" font-size="7.5" fill="var(--muted)" font-weight="600" letter-spacing=".08em" opacity="${op}">${id}</text>`;
+      s += `<text x="${x}" y="${y - h / 2 - 3}" text-anchor="middle" font-size="7.5" fill="var(--text-muted)" font-weight="600" letter-spacing=".08em" opacity="${op}">${id}</text>`;
       // 라운드 칩
       s += `<rect x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" opacity="${op}"/>`;
       // 숫자 (익숙함/적성) — Pretendard tabular
-      if (sk == null) { s += `<text x="${x}" y="${y + 4}" text-anchor="middle" font-size="12" fill="var(--muted)" opacity="${op}">·</text>`; continue; }
-      s += `<text x="${x}" y="${y + 4}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${col(sk)}" opacity="${op}" style="font-variant-numeric:tabular-nums">${sk}<tspan font-size="9" fill="var(--muted)" font-weight="500">/${ap == null ? '?' : ap}</tspan></text>`;
+      if (sk == null) { s += `<text x="${x}" y="${y + 4}" text-anchor="middle" font-size="12" fill="var(--text-muted)" opacity="${op}">·</text>`; continue; }
+      s += `<text x="${x}" y="${y + 4}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${col(sk)}" opacity="${op}" style="font-variant-numeric:tabular-nums">${sk}<tspan font-size="9" fill="var(--text-muted)" font-weight="500">/${ap == null ? '?' : ap}</tspan></text>`;
     }
     return s + '</svg>';
   }
@@ -568,12 +547,12 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   function renderChart(){
     const v = variant(); const e = entry();
     let s = '';
-    for (const t of [5, 10, 15, 20]) s += `<line x1="${padL}" x2="${W - padR}" y1="${yOf(t)}" y2="${yOf(t)}" stroke="var(--rule)" stroke-dasharray="3 4"/><text x="${padL - 6}" y="${yOf(t) + 4}" text-anchor="end">${t}</text>`;
-    for (let a = 16; a <= 40; a++) s += `<line x1="${xOf(a)}" x2="${xOf(a)}" y1="${H - padB}" y2="${H - padB + (a % 2 ? 3 : 6)}" stroke="var(--rule)"/>`;
+    for (const t of [5, 10, 15, 20]) s += `<line x1="${padL}" x2="${W - padR}" y1="${yOf(t)}" y2="${yOf(t)}" stroke="var(--border)" stroke-dasharray="3 4"/><text x="${padL - 6}" y="${yOf(t) + 4}" text-anchor="end">${t}</text>`;
+    for (let a = 16; a <= 40; a++) s += `<line x1="${xOf(a)}" x2="${xOf(a)}" y1="${H - padB}" y2="${H - padB + (a % 2 ? 3 : 6)}" stroke="var(--border)"/>`;
     for (const a of [16, 20, 25, 30, 35, 40]) s += `<text x="${xOf(a)}" y="${H - 6}" text-anchor="middle">${a}</text>`;
     // 재검이면 이전 판 곡선을 점선으로 (recheck.curve_before[role] = 나이별 OVR)
     const prev = e.recheck && e.recheck.curve_before && e.recheck.curve_before[role];
-    if (prev) s += `<polyline points="${prev.map((o, i) => `${xOf(16 + i)},${yOf(o)}`).join(' ')}" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 5"/>`;
+    if (prev) s += `<polyline points="${prev.map((o, i) => `${xOf(16 + i)},${yOf(o)}`).join(' ')}" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="6 5"/>`;
     // 띠: 최소로 컸을 때 ~ 최대로 컸을 때
     if (v.band_lo && v.band_hi && v.band_lo.length === 25) {
       const up = v.band_hi.map((o, i) => `${xOf(16 + i)},${yOf(o)}`).join(' ');
@@ -587,15 +566,15 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
       const half = (sh[1] - 1) / 2;
       const pStart = Math.max(16, sh[0] - half), pEnd = Math.min(40, sh[0] + half), aging = Math.min(40, sh[0] + half + 1);
       s += `<rect x="${xOf(pStart)}" y="${padT - 4}" width="${Math.max(0, xOf(pEnd) - xOf(pStart))}" height="${H - padB - padT + 4}" fill="var(--chart-1)" opacity=".08"/>`;
-      const mark = (a, label, anchor) => `<line x1="${xOf(a)}" x2="${xOf(a)}" y1="${padT - 4}" y2="${H - padB}" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="${xOf(a) + (anchor === 'end' ? -4 : 4)}" y="${padT + 8}" text-anchor="${anchor}" style="font:11px 'IBM Plex Sans KR',sans-serif;fill:var(--muted)">${label} ${Math.round(a)}세</text>`;
+      const mark = (a, label, anchor) => `<line x1="${xOf(a)}" x2="${xOf(a)}" y1="${padT - 4}" y2="${H - padB}" stroke="var(--text-muted)" stroke-dasharray="4 4"/><text x="${xOf(a) + (anchor === 'end' ? -4 : 4)}" y="${padT + 8}" text-anchor="${anchor}" style="font:11px 'IBM Plex Sans KR',sans-serif;fill:var(--text-muted)">${label} ${Math.round(a)}세</text>`;
       s += mark(pStart, '전성기 시작', 'end');
       if (aging < 40) s += mark(aging, '노화 시작', 'start');
     }
     const pts = v.ages.map(r => `${xOf(r.age)},${yOf(ovrOf(r))}`).join(' ');
     s += `<polyline points="${pts}" fill="none" stroke="var(--chart-1)" stroke-width="3.5" stroke-linejoin="round"/>`;
     const x = xOf(age);
-    s += `<line x1="${x}" x2="${x}" y1="${padT - 6}" y2="${H - padB}" stroke="var(--now)" stroke-width="2"/>`;
-    { const ov = ovrOf(row()); s += `<circle cx="${x}" cy="${yOf(ov)}" r="6" fill="var(--now)" stroke="var(--card)" stroke-width="2"/><text x="${x + (x > W - 80 ? -10 : 10)}" y="${yOf(ov) - 9}" text-anchor="${x > W - 80 ? 'end' : 'start'}" style="font:600 13px 'IBM Plex Mono',monospace;fill:var(--ink)">OVR ${ov}</text>`; }
+    s += `<line x1="${x}" x2="${x}" y1="${padT - 6}" y2="${H - padB}" stroke="var(--chart-1)" stroke-width="2"/>`;
+    { const ov = ovrOf(row()); s += `<circle cx="${x}" cy="${yOf(ov)}" r="6" fill="var(--chart-1)" stroke="var(--bg-secondary)" stroke-width="2"/><text x="${x + (x > W - 80 ? -10 : 10)}" y="${yOf(ov) - 9}" text-anchor="${x > W - 80 ? 'end' : 'start'}" style="font:600 13px 'IBM Plex Mono',monospace;fill:var(--text-normal)">OVR ${ov}</text>`; }
     const tx = Math.min(Math.max(x, padL + 24), W - padR - 24);
     s += `<text class="agebig" x="${tx}" y="${padT - 9}" text-anchor="middle">${age}세</text>`;
     $('chart').innerHTML = s;
