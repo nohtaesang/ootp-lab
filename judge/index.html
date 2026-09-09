@@ -1,13 +1,15 @@
 <title>드래프트 선수 판정</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <style>
-/* 팔레트는 게임 앱과 톤 통일(zinc + 보라 액센트). 기본 다크. */
+/* 게임 앱과 톤 통일: zinc + 보라 accent. 기본 다크. accent 위 텍스트는 흰색으로 대비 확보. */
 :root{
   --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
-  --accent:hsl(265,55%,60%);--accent-ink:#0a0a0d;--accent-soft:rgba(167,139,250,.16);
+  --accent:hsl(265,55%,60%);--accent-ink:#ffffff;--accent-soft:rgba(167,139,250,.14);
   --lo:#F08A8A;--hi:#6FE09A;--warn:#E8C36A;--now:#7FB3FF;--now-soft:rgba(127,179,255,.18);
-  --bar-bg:#27272a;--bar-ink:#fafafa;--bar-muted:#a1a1aa;--bar-rule:#3f3f46;--bar-field:#1c1c20;--bar-accent:hsl(265,55%,60%);--bar-accent-ink:#0a0a0d;
+  --bar-bg:#27272a;--bar-ink:#fafafa;--bar-muted:#a1a1aa;--bar-rule:#3f3f46;--bar-field:#1c1c20;--bar-accent:hsl(265,55%,60%);--bar-accent-ink:#ffffff;
 }
 :root[data-theme="light"]{
   --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
@@ -17,7 +19,7 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.45;word-break:keep-all}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.45;word-break:keep-all;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 body{display:flex;flex-direction:column;min-height:100vh}
 .app{flex:1 1 auto;display:flex;flex-direction:column;gap:10px;padding:10px 14px 0;min-height:0}
 .app > header{flex:0 0 auto}
@@ -325,7 +327,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '8ab9f3e 2026-09-09';
+  const BUILD = '9b69c9f 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';

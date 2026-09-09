@@ -1,11 +1,13 @@
 <title>성장 시연</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <meta name="robots" content="noindex, nofollow">
 <style>
-/* 팔레트는 게임 앱과 톤 통일. 기본 다크. */
+/* 게임 앱과 톤 통일. 기본 다크. */
 :root{
   --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
-  --accent:hsl(265,55%,60%);--accent-ink:#0a0a0d;--accent-soft:rgba(167,139,250,.16);
+  --accent:hsl(265,55%,60%);--accent-ink:#ffffff;--accent-soft:rgba(167,139,250,.14);
   --pos:#7ED89A;--neg:#E28A80;
 }
 :root[data-theme="light"]{
@@ -14,7 +16,7 @@
   --pos:#1F6F4A;--neg:#B4463C;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .wrap{max-width:1400px;margin:0 auto}
 h1{font-size:22px;margin:0 0 4px;font-weight:700}
 .sub{color:var(--muted);font-size:14px;margin:0 0 20px}
