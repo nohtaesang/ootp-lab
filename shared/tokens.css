@@ -101,18 +101,23 @@
     --rating-elite-text:    #4ade80;                    /* 강한 초록 */
     --rating-elite-tint:    rgba(74,222,128,.20);
     --rating-elite-border:  rgba(74,222,128,.42);
+    --rating-elite-on:      var(--c-n-100);             /* 채워진 배지: 밝은 초록 위 검정 (WCAG 12.8:1) */
     --rating-good-text:     #a3e635;                    /* 라임 (약함) */
     --rating-good-tint:     rgba(163,230,53,.10);
     --rating-good-border:   rgba(163,230,53,.28);
+    --rating-good-on:       var(--c-n-100);             /* 라임 위 검정 (15:1) */
     --rating-average-text:  var(--c-n-30);              /* muted, 배경 없음 */
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
+    --rating-average-on:    var(--c-n-05);              /* rarely used, on-neutral */
     --rating-poor-text:     #fb923c;                    /* 앰버 (약함) */
     --rating-poor-tint:     rgba(251,146,60,.10);
     --rating-poor-border:   rgba(251,146,60,.28);
+    --rating-poor-on:       var(--c-n-100);             /* 앰버 위 검정 (10:1) */
     --rating-terrible-text: #ef4444;                    /* 강한 빨강 */
     --rating-terrible-tint: rgba(239,68,68,.20);
     --rating-terrible-border:rgba(239,68,68,.42);
+    --rating-terrible-on:   var(--c-n-100);             /* 밝은 빨강 위 검정 (5.6:1) — 흰색은 3.75:1 실패 */
 
     /* ─ ROLE: chart series ─ */
     --chart-1: var(--c-teal-60);
@@ -180,18 +185,23 @@
     --rating-elite-text:    #15803d;
     --rating-elite-tint:    rgba(21,128,61,.14);
     --rating-elite-border:  rgba(21,128,61,.34);
+    --rating-elite-on:      var(--c-n-0);      /* 진한 초록 위 흰색 */
     --rating-good-text:     #4d7c0f;
     --rating-good-tint:     rgba(77,124,15,.08);
     --rating-good-border:   rgba(77,124,15,.22);
+    --rating-good-on:       var(--c-n-0);      /* 진한 라임 위 흰색 */
     --rating-average-text:  var(--c-n-50);
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
+    --rating-average-on:    var(--c-n-100);
     --rating-poor-text:     #c2410c;
     --rating-poor-tint:     rgba(194,65,12,.08);
     --rating-poor-border:   rgba(194,65,12,.22);
+    --rating-poor-on:       var(--c-n-0);
     --rating-terrible-text: #dc2626;
     --rating-terrible-tint: rgba(220,38,38,.14);
     --rating-terrible-border:rgba(220,38,38,.34);
+    --rating-terrible-on:   var(--c-n-0);
 
     --chart-1: var(--c-teal-40);
     --chart-2: var(--c-amber-40);
