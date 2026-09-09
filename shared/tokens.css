@@ -93,31 +93,33 @@
     --primary-on:   var(--c-n-0);
     --primary-tint: rgba(167,139,250,.14);
 
-    /* ─ ROLE: rating scale 5구간 ─
-     *   elite/terrible = 강한 초록/빨강 강조 (진한 tint + 굵은 텍스트)
-     *   good/poor      = 약한 톤 (얕은 tint)
-     *   average        = muted (배경 없음)
+    /* ─ ROLE: rating scale 5구간 (FM 스타일: 좋은 값은 눈에 튀고 낮은 값은 흐림) ─
+     *   elite  = 짙은 초록 (진한 tint + 굵음, 극단 강조)
+     *   good   = 밝은 초록 (약한 강조, 텍스트만)
+     *   average= 흰색 (기본 텍스트, 배경 없음)
+     *   poor   = 회색 (muted, 흐릿)
+     *   terrible=어두운 회색 (faint, 아주 흐릿 — 낮은 값은 무시되도록)
      */
-    --rating-elite-text:    #4ade80;                    /* 강한 초록 */
+    --rating-elite-text:    #4ade80;                    /* 짙은 초록 (bg-secondary 대비 8.5:1) */
     --rating-elite-tint:    rgba(74,222,128,.20);
     --rating-elite-border:  rgba(74,222,128,.42);
-    --rating-elite-on:      var(--c-n-100);             /* 채워진 배지: 밝은 초록 위 검정 (WCAG 12.8:1) */
-    --rating-good-text:     #a3e635;                    /* 라임 (약함) */
-    --rating-good-tint:     rgba(163,230,53,.10);
-    --rating-good-border:   rgba(163,230,53,.28);
-    --rating-good-on:       var(--c-n-100);             /* 라임 위 검정 (15:1) */
-    --rating-average-text:  var(--c-n-30);              /* muted, 배경 없음 */
+    --rating-elite-on:      var(--c-n-100);
+    --rating-good-text:     #86efac;                    /* 밝은 초록 (약한 강조) */
+    --rating-good-tint:     transparent;
+    --rating-good-border:   transparent;
+    --rating-good-on:       var(--c-n-100);
+    --rating-average-text:  var(--c-n-05);              /* 흰색 = 기본 텍스트 */
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
-    --rating-average-on:    var(--c-n-05);              /* rarely used, on-neutral */
-    --rating-poor-text:     #fb923c;                    /* 앰버 (약함) */
-    --rating-poor-tint:     rgba(251,146,60,.10);
-    --rating-poor-border:   rgba(251,146,60,.28);
-    --rating-poor-on:       var(--c-n-100);             /* 앰버 위 검정 (10:1) */
-    --rating-terrible-text: #f87171;                    /* 강한 빨강 (bg-secondary 대비 5.4:1 확보) */
-    --rating-terrible-tint: rgba(248,113,113,.20);
-    --rating-terrible-border:rgba(248,113,113,.42);
-    --rating-terrible-on:   var(--c-n-100);             /* 밝은 빨강 위 검정 */
+    --rating-average-on:    var(--c-n-100);
+    --rating-poor-text:     var(--c-n-30);              /* muted 회색 */
+    --rating-poor-tint:     transparent;
+    --rating-poor-border:   transparent;
+    --rating-poor-on:       var(--c-n-05);
+    --rating-terrible-text: var(--c-n-50);              /* faint 어두운 회색 (낮은 값은 흐릿) */
+    --rating-terrible-tint: transparent;
+    --rating-terrible-border:transparent;
+    --rating-terrible-on:   var(--c-n-05);
 
     /* ─ ROLE: chart series ─ */
     --chart-1: var(--c-teal-60);
@@ -185,22 +187,22 @@
     --rating-elite-text:    #15803d;
     --rating-elite-tint:    rgba(21,128,61,.14);
     --rating-elite-border:  rgba(21,128,61,.34);
-    --rating-elite-on:      var(--c-n-0);      /* 진한 초록 위 흰색 */
+    --rating-elite-on:      var(--c-n-0);
     --rating-good-text:     #4d7c0f;
-    --rating-good-tint:     rgba(77,124,15,.08);
-    --rating-good-border:   rgba(77,124,15,.22);
-    --rating-good-on:       var(--c-n-0);      /* 진한 라임 위 흰색 */
-    --rating-average-text:  var(--c-n-50);
+    --rating-good-tint:     transparent;
+    --rating-good-border:   transparent;
+    --rating-good-on:       var(--c-n-0);
+    --rating-average-text:  var(--c-n-100);   /* 라이트: 검정 = 기본 */
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
     --rating-average-on:    var(--c-n-100);
-    --rating-poor-text:     #c2410c;
-    --rating-poor-tint:     rgba(194,65,12,.08);
-    --rating-poor-border:   rgba(194,65,12,.22);
+    --rating-poor-text:     var(--c-n-50);    /* muted 회색 */
+    --rating-poor-tint:     transparent;
+    --rating-poor-border:   transparent;
     --rating-poor-on:       var(--c-n-0);
-    --rating-terrible-text: #dc2626;
-    --rating-terrible-tint: rgba(220,38,38,.14);
-    --rating-terrible-border:rgba(220,38,38,.34);
+    --rating-terrible-text: var(--c-n-30);    /* faint */
+    --rating-terrible-tint: transparent;
+    --rating-terrible-border:transparent;
     --rating-terrible-on:   var(--c-n-0);
 
     --chart-1: var(--c-teal-40);
