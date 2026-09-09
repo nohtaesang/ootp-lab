@@ -33,7 +33,7 @@
     --c-n-100: #0a0a0d;
 
     /* ─ PRIMITIVE: hue ─ */
-    --c-purple-40: #6d28d9;   --c-purple-60: hsl(265,55%,60%);
+    --c-purple-40: #6d28d9;   --c-purple-60: hsl(265,55%,55%);
     --c-green-40:  #15803d;   --c-green-60:  #6FE09A;
     --c-lime-40:   #4d7c0f;   --c-lime-60:   #a3e635;
     --c-amber-40:  #a16207;   --c-amber-60:  #FBBF24;
@@ -114,10 +114,10 @@
     --rating-poor-tint:     rgba(251,146,60,.10);
     --rating-poor-border:   rgba(251,146,60,.28);
     --rating-poor-on:       var(--c-n-100);             /* 앰버 위 검정 (10:1) */
-    --rating-terrible-text: #ef4444;                    /* 강한 빨강 */
-    --rating-terrible-tint: rgba(239,68,68,.20);
-    --rating-terrible-border:rgba(239,68,68,.42);
-    --rating-terrible-on:   var(--c-n-100);             /* 밝은 빨강 위 검정 (5.6:1) — 흰색은 3.75:1 실패 */
+    --rating-terrible-text: #f87171;                    /* 강한 빨강 (bg-secondary 대비 5.4:1 확보) */
+    --rating-terrible-tint: rgba(248,113,113,.20);
+    --rating-terrible-border:rgba(248,113,113,.42);
+    --rating-terrible-on:   var(--c-n-100);             /* 밝은 빨강 위 검정 */
 
     /* ─ ROLE: chart series ─ */
     --chart-1: var(--c-teal-60);
