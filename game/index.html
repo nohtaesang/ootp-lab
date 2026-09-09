@@ -237,6 +237,15 @@ input:focus, select:focus{
 }
 .sidebar-item .item-glyph svg{width: 100%; height: 100%; stroke-width: 1.75}
 .sidebar-item.active .item-glyph{color: var(--accent)}
+.sidebar-item .item-external{
+  margin-left: auto;
+  width: 12px; height: 12px;
+  color: var(--text-faint);
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto;
+}
+.sidebar-item .item-external svg{width: 100%; height: 100%; stroke-width: 1.75}
+.app.sidebar-collapsed .sidebar-item .item-external{display: none}
 .app.sidebar-collapsed .sidebar-item{justify-content: center; padding: var(--size-6) 0}
 .app.sidebar-collapsed .sidebar-item .item-label{display: none}
 
@@ -1098,7 +1107,11 @@ input:focus, select:focus{
     const t = activeTab();
     const ctx = t ? routeContext(t.route) : null;
 
-    // Sidebar: 카테고리 + Lab 섹션 (자리 예약)
+    // Sidebar: 카테고리 + Lab 섹션 (검증 도구 · 외부 링크)
+    const labItems = [
+      { href: '../judge/',  icon: 'clipboard-check', label: '판정' },
+      { href: '../growth/', icon: 'sprout',          label: '성장 시연' },
+    ];
     document.getElementById('sidebar-items').innerHTML =
       CATEGORIES.map(c =>
         `<a class="sidebar-item ${c.key === ctx ? 'active' : ''}" data-route="${c.home}">
@@ -1107,12 +1120,14 @@ input:focus, select:focus{
         </a>`
       ).join('') +
       `<div class="nav-divider"></div>
-       <div class="nav-group-label">Lab</div>
-       <a class="sidebar-item" style="opacity:.4;pointer-events:none">
-         <span class="item-glyph"><i data-lucide="flask-conical"></i></span>
-         <span class="item-label">(자리 예약)</span>
-       </a>`;
-    document.querySelectorAll('.sidebar-item').forEach(el => {
+       <div class="nav-group-label">Lab</div>` +
+      labItems.map(l => `
+        <a class="sidebar-item" href="${l.href}" target="_blank" rel="noopener">
+          <span class="item-glyph"><i data-lucide="${l.icon}"></i></span>
+          <span class="item-label">${l.label}</span>
+          <i class="item-external" data-lucide="external-link"></i>
+        </a>`).join('');
+    document.querySelectorAll('.sidebar-item[data-route]').forEach(el => {
       el.addEventListener('click', e => {
         e.preventDefault();
         switchTo(el.dataset.route, { newTab: e.metaKey || e.ctrlKey });
