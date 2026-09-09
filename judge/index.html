@@ -3,68 +3,40 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared/tokens.css">
 <style>
-/* ─── 색 시스템 v2 (역할 5축, #90 결정) ────────────────────────────
- *   rating scale (elite/good/average=muted/poor/terrible) — 값의 좋고 나쁨
- *   chart-1/2/3 — 데이터 곡선 구분 (rating과 별개)
- *   primary — 상호작용/활성 (버튼·탭·슬라이더 accent-color)
- *   attention — 이벤트 노티 (부상·재검·특이점)
- *   muted — 평균·비활성·부가정보
- *
- * 컴포넌트 CSS 변경 최소화 위해 기존 별칭 이름(--hi/--lo/--warn/--now) 유지,
- * 값만 역할 5축에서 가져온다. success/danger/warning/info는 삭제.
- * ────────────────────────────────────────────────────────────── */
-:root{
-  /* 표면/텍스트 (zinc) */
-  --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
-
-  /* Primary — 상호작용/활성 */
-  --primary:hsl(265,55%,60%); --primary-on:#ffffff; --primary-tint:rgba(167,139,250,.14);
-
-  /* Rating 5구간 — 값의 좋고 나쁨 */
-  --rating-elite-text:#6FE09A;    --rating-elite-tint:rgba(111,224,154,.14);   --rating-elite-border:rgba(111,224,154,.36);
-  --rating-good-text:#a3e635;     --rating-good-tint:rgba(163,230,53,.14);     --rating-good-border:rgba(163,230,53,.32);
-  --rating-average-text:#a1a1aa;  --rating-average-tint:transparent;           --rating-average-border:transparent;
-  --rating-poor-text:#fb923c;     --rating-poor-tint:rgba(251,146,60,.14);     --rating-poor-border:rgba(251,146,60,.34);
-  --rating-terrible-text:#F08A8A; --rating-terrible-tint:rgba(240,138,138,.16);--rating-terrible-border:rgba(240,138,138,.36);
-
-  /* Chart series — 데이터 곡선/시리즈 구분 */
-  --chart-1:#4dd4c0; --chart-2:#FBBF24; --chart-3:#a1a1aa;
-
-  /* Attention — 이벤트 노티 (부상·재검·특이점) */
-  --attention-text:#FBBF24; --attention-tint:rgba(251,191,36,.14); --attention-border:rgba(251,191,36,.42);
-
-  /* 판정 앱 컴포넌트 별칭 (컴포넌트 CSS 변경 최소화) */
-  --accent:var(--primary); --accent-ink:var(--primary-on); --accent-soft:var(--primary-tint);
-  --hi:var(--rating-elite-text); --lo:var(--rating-terrible-text); --warn:var(--attention-text); --now:var(--chart-1); --now-soft:var(--primary-tint);
-
-  /* 판정 바(하단) — 카드와 같은 톤 */
-  --bar-bg:#27272a;--bar-ink:#fafafa;--bar-muted:#a1a1aa;--bar-rule:#3f3f46;--bar-field:#1c1c20;--bar-accent:var(--primary);--bar-accent-ink:var(--primary-on);
+/* 판정 앱 로컬 별칭 — tokens.css의 role에 매핑. 원시값 없음.
+ * @layer app: tokens < app 우선순위를 CSS Cascade Layers로 명시. */
+@layer app {
+  :root {
+    --bg: var(--bg-primary);
+    --card: var(--bg-secondary);
+    --ink: var(--text-normal);
+    --muted: var(--text-muted);
+    --rule: var(--border);
+    --soft: var(--bg-tertiary);
+    --hi:  var(--rating-elite-text);
+    --lo:  var(--rating-terrible-text);
+    --warn:var(--attention-text);
+    --now: var(--chart-1);
+    --now-soft: var(--primary-tint);
+    --accent-soft: var(--primary-tint);
+    --bar-bg: var(--bg-secondary);
+    --bar-ink: var(--text-normal);
+    --bar-muted: var(--text-muted);
+    --bar-rule: var(--border);
+    --bar-field: var(--bg-primary);
+    --bar-accent: var(--primary);
+    --bar-accent-ink: var(--primary-on);
+  }
+  html, body { height: 100% }
+  body {
+    font-family: "Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    font-size: 13px;
+    word-break: keep-all;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
 }
-:root[data-theme="light"]{
-  --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
-
-  --primary:hsl(265,55%,50%); --primary-on:#ffffff; --primary-tint:rgba(139,92,246,.10);
-
-  --rating-elite-text:#15803d;    --rating-elite-tint:rgba(21,128,61,.10);   --rating-elite-border:rgba(21,128,61,.28);
-  --rating-good-text:#4d7c0f;     --rating-good-tint:rgba(77,124,15,.10);    --rating-good-border:rgba(77,124,15,.28);
-  --rating-average-text:#71717a;  --rating-average-tint:transparent;         --rating-average-border:transparent;
-  --rating-poor-text:#c2410c;     --rating-poor-tint:rgba(194,65,12,.10);    --rating-poor-border:rgba(194,65,12,.28);
-  --rating-terrible-text:#b91c1c; --rating-terrible-tint:rgba(185,28,28,.10);--rating-terrible-border:rgba(185,28,28,.28);
-
-  --chart-1:#0f766e; --chart-2:#a16207; --chart-3:#71717a;
-
-  --attention-text:#a16207; --attention-tint:rgba(161,98,7,.10); --attention-border:rgba(161,98,7,.34);
-
-  --accent:var(--primary); --accent-ink:var(--primary-on); --accent-soft:var(--primary-tint);
-  --hi:var(--rating-elite-text); --lo:var(--rating-terrible-text); --warn:var(--attention-text); --now:var(--chart-1); --now-soft:var(--primary-tint);
-
-  --bar-bg:#f4f4f5;--bar-ink:#0a0a0d;--bar-muted:#71717a;--bar-rule:#e4e4e7;--bar-field:#ffffff;--bar-accent:var(--primary);--bar-accent-ink:var(--primary-on);
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:13px;line-height:1.45;word-break:keep-all;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;accent-color:var(--primary)}
-body{display:flex;flex-direction:column;min-height:100vh}
 .app{flex:1 1 auto;display:flex;flex-direction:column;gap:10px;padding:10px 14px 0;min-height:0}
 .app > header{flex:0 0 auto}
 .app > .checklist{flex:0 0 auto}

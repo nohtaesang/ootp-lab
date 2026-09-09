@@ -2,23 +2,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared/tokens.css">
 <meta name="robots" content="noindex, nofollow">
 <style>
-/* 판정 앱과 같은 semantic 팔레트. 기본 다크. */
-:root{
-  --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
-  --success-text:#6FE09A; --danger-text:#F08A8A;
-  --accent:hsl(265,55%,60%);--accent-ink:#ffffff;--accent-soft:rgba(167,139,250,.14);
-  --pos:var(--success-text);--neg:var(--danger-text);
+@layer app {
+  :root {
+    --bg: var(--bg-primary);
+    --card: var(--bg-secondary);
+    --ink: var(--text-normal);
+    --muted: var(--text-muted);
+    --rule: var(--border);
+    --soft: var(--bg-tertiary);
+    --accent-soft: var(--primary-tint);
+    --pos: var(--rating-elite-text);
+    --neg: var(--rating-terrible-text);
+  }
+  body {
+    font-family: "Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+    font-size: 15px; line-height: 1.5; padding: 20px;
+  }
 }
-:root[data-theme="light"]{
-  --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
-  --success-text:#15803d; --danger-text:#b91c1c;
-  --accent:hsl(265,55%,50%);--accent-ink:#ffffff;--accent-soft:rgba(139,92,246,.10);
-  --pos:var(--success-text);--neg:var(--danger-text);
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .wrap{max-width:1400px;margin:0 auto}
 h1{font-size:22px;margin:0 0 4px;font-weight:700}
 .sub{color:var(--muted);font-size:14px;margin:0 0 20px}

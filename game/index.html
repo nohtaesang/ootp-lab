@@ -7,11 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared/tokens.css">
 <style>
 /* ============================================================
- * DESIGN TOKENS — Obsidian 감각의 얇은 시스템.
- * 모든 원시 값은 여기 한 곳. 컴포넌트는 var(--...)만 참조.
- * 나중에 스타일 통째로 바꾸려면 이 블록만 갈아끼운다.
+ * 게임 앱 컴포넌트 CSS.
+ * 토큰(primitive/role)은 shared/tokens.css에서 옴.
+ * 아래의 :root 블록은 게임 앱 v1 시절 원본 — 지금은 tokens.css가
+ * 대체하지만 fallback으로 남겨 둔다(다음 세션에 정리 예정).
  * ============================================================ */
 :root{
   /* ── Color scale (neutral) ── */
