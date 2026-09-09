@@ -93,10 +93,10 @@
     --border:       var(--c-n-70);
     --border-strong: var(--c-n-60);
 
-    /* ─ ROLE: primary (상호작용/활성) — 인디고 (블루-보라, 사용자 결정 2026-09-10) */
-    --primary:      var(--c-indigo-60);
+    /* ─ ROLE: primary (상호작용/활성) — 보라 (원래대로 복구 2026-09-10) */
+    --primary:      var(--c-purple-60);
     --primary-on:   var(--c-n-0);
-    --primary-tint: rgba(99,102,241,.14);
+    --primary-tint: rgba(167,139,250,.10);
 
     /* ─ ROLE: rating 4구간 (능력값의 좋고 나쁨) 사용자 결정 2026-09-10
      *   최상 (elite, 17-20) = 쑥색 (semantic success 초록과 다른 톤)
@@ -105,11 +105,11 @@
      *   나쁨 (poor+terrible)= 회색 muted
      * 빨강 없음 (semantic danger 축이 별도로 담당).
      */
-    --rating-elite-text:    var(--c-sage-60);           /* 쑥색 */
-    --rating-elite-tint:    rgba(140,168,120,.18);
-    --rating-elite-border:  rgba(140,168,120,.38);
+    --rating-elite-text:    var(--c-cyan-60);           /* 청록 (옵션 D) */
+    --rating-elite-tint:    transparent;
+    --rating-elite-border:  transparent;
     --rating-elite-on:      var(--c-n-100);
-    --rating-good-text:     var(--c-orange-60);         /* 주황 */
+    --rating-good-text:     #fda4af;                    /* 산호 (옵션 D) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-100);
@@ -192,15 +192,15 @@
     --border:       var(--c-n-20);
     --border-strong: var(--c-n-30);
 
-    --primary:      var(--c-indigo-40);
+    --primary:      var(--c-purple-40);
     --primary-on:   var(--c-n-0);
-    --primary-tint: rgba(79,70,229,.10);
+    --primary-tint: rgba(109,40,217,.08);
 
-    --rating-elite-text:    var(--c-sage-40);           /* 진한 쑥색 (라이트) */
-    --rating-elite-tint:    rgba(85,107,47,.10);
-    --rating-elite-border:  rgba(85,107,47,.30);
+    --rating-elite-text:    var(--c-cyan-40);           /* 진한 청록 (라이트) */
+    --rating-elite-tint:    transparent;
+    --rating-elite-border:  transparent;
     --rating-elite-on:      var(--c-n-0);
-    --rating-good-text:     var(--c-orange-40);         /* 진한 주황 (라이트) */
+    --rating-good-text:     #e11d48;                    /* 진한 로즈 (라이트) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-0);
