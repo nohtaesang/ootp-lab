@@ -143,6 +143,8 @@
      */
     --success-text:   #4ade80;   --success-tint: rgba(74,222,128,.20);   --success-border: rgba(74,222,128,.42);   --success-on: var(--c-n-100);
     --danger-text:    #f87171;   --danger-tint:  rgba(248,113,113,.20);  --danger-border:  rgba(248,113,113,.42);  --danger-on:  var(--c-n-100);
+    /* info: 정보 알림/팁 (파랑). semantic 축의 부드러운 안내 */
+    --info-text:      #7dd3fc;   --info-tint:    rgba(125,211,252,.14);  --info-border:    rgba(125,211,252,.34);  --info-on:    var(--c-n-100);
 
     /* ─ 게임 앱 호환 별칭 (기존 컴포넌트 이름 유지) ─ */
     --accent:          var(--primary);
@@ -228,6 +230,7 @@
 
     --success-text:   #15803d;   --success-tint: rgba(21,128,61,.10);   --success-border: rgba(21,128,61,.30);   --success-on: var(--c-n-0);
     --danger-text:    #b91c1c;   --danger-tint:  rgba(185,28,28,.10);   --danger-border:  rgba(185,28,28,.30);   --danger-on:  var(--c-n-0);
+    --info-text:      #0369a1;   --info-tint:    rgba(3,105,161,.10);   --info-border:    rgba(3,105,161,.30);    --info-on:    var(--c-n-0);
 
     --accent:         var(--primary);
     --text-on-accent: var(--primary-on);
