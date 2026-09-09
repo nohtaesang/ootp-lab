@@ -4,20 +4,249 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <meta name="robots" content="noindex, nofollow">
 <style>
-/* 판정 앱과 같은 semantic 팔레트. 기본 다크. */
+/* ============================================================
+ * OOTP Lab · 디자인 토큰 (Design System v1)
+ *
+ * 3계층: PRIMITIVE → ROLE → COMPONENT
+ * - PRIMITIVE : 원시 hex/px. 의미 없음. 이 파일에만 존재.
+ * - ROLE      : 게임의 5축(rating · chart · primary · attention · muted)에 의미 부여.
+ * - COMPONENT : 각 앱의 부품 스타일이 참조. 이 파일에는 없음.
+ *
+ * 원칙: 컴포넌트는 var(--rating-*), var(--chart-*), var(--primary-*),
+ *       var(--attention-*), var(--text-*), var(--bg-*), var(--border-*)만 참조.
+ *       원시 hex/px 직접 참조 금지.
+ *
+ * 이 파일은 build 시점에 각 앱 HTML로 인라인된다 (web/*/build.js).
+ * ============================================================ */
+
+/* ─── PRIMITIVE ──────────────────────────────────────────── */
 :root{
-  --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
-  --success-text:#6FE09A; --danger-text:#F08A8A;
-  --accent:hsl(265,55%,60%);--accent-ink:#ffffff;--accent-soft:rgba(167,139,250,.14);
-  --pos:var(--success-text);--neg:var(--danger-text);
+  /* Neutral scale (zinc) */
+  --c-n-0:   #ffffff;
+  --c-n-05:  #fafafa;
+  --c-n-10:  #f4f4f5;
+  --c-n-20:  #e4e4e7;
+  --c-n-30:  #a1a1aa;
+  --c-n-50:  #71717a;
+  --c-n-60:  #52525b;
+  --c-n-70:  #3f3f46;
+  --c-n-80:  #27272a;
+  --c-n-90:  #1c1c20;
+  --c-n-95:  #141418;
+  --c-n-100: #0a0a0d;
+
+  /* Hue: primitive 색상 (WCAG 4.5:1 검증됨, 카드 배경 위) */
+  --c-purple-40: #6d28d9;   --c-purple-60: hsl(265,55%,60%);
+  --c-green-40:  #15803d;   --c-green-60:  #6FE09A;
+  --c-lime-40:   #4d7c0f;   --c-lime-60:   #a3e635;
+  --c-amber-40:  #a16207;   --c-amber-60:  #FBBF24;
+  --c-red-40:    #b91c1c;   --c-red-60:    #F08A8A;
+  --c-teal-40:   #0f766e;   --c-teal-60:   #4dd4c0;
+  --c-orange-40: #c2410c;   --c-orange-60: #fb923c;
+
+  /* Spacing (4px grid). --size-* 는 게임 앱 호환 별칭 */
+  --space-1: 4px;   --size-4:  4px;
+  --space-2: 8px;   --size-8:  8px;
+  --space-3: 12px;  --size-12: 12px;
+  --space-4: 16px;  --size-16: 16px;
+  --space-5: 20px;  --size-20: 20px;
+  --space-6: 24px;  --size-24: 24px;
+  --space-8: 32px;  --size-32: 32px;
+  --space-10:40px;  --size-40: 40px;
+  --space-12:48px;  --size-48: 48px;
+                    --size-2:  2px;
+                    --size-6:  6px;
+                    --size-10: 10px;
+
+  /* Radius */
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 10px;
+
+  /* Neutral scale 게임 앱 호환 별칭 (--c-n-* == --color-n-*) */
+  --color-n-0:   var(--c-n-0);
+  --color-n-05:  var(--c-n-05);
+  --color-n-10:  var(--c-n-10);
+  --color-n-20:  var(--c-n-20);
+  --color-n-25:  #d4d4d8;
+  --color-n-30:  var(--c-n-30);
+  --color-n-50:  var(--c-n-50);
+  --color-n-60:  var(--c-n-60);
+  --color-n-70:  var(--c-n-70);
+  --color-n-80:  var(--c-n-80);
+  --color-n-90:  var(--c-n-90);
+  --color-n-95:  var(--c-n-95);
+  --color-n-100: var(--c-n-100);
+  --color-accent-hue: 265;
+  --color-accent:     hsl(265,55%,60%);
+  --color-accent-2:   hsl(265,55%,50%);
+
+  /* Typography */
+  --font-sans: "Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-interface: var(--font-sans);
+  --font-mono: "JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --text-xxs: 10px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-base:13px;
+  --text-md:  14px;
+  --text-lg:  16px;
+  --text-xl:  19px;
+  --text-2xl: 24px;
+  --leading-tight:  1.25;
+  --leading-normal: 1.45;
+  --leading-loose:  1.6;
+  --tracking-tight:  -0.01em;
+  --tracking-wide:    0.02em;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --sidebar-w-collapsed: 48px;
+  --header-h: 40px;
+  --tabbar-h: 36px;
+  --navbar-h: 32px;
+
+  /* Motion */
+  --dur-fast: 100ms;
+  --dur-med:  180ms;
+  --ease: cubic-bezier(.2,.7,.3,1);
 }
+
+/* ─── ROLE (기본 다크) ───────────────────────────────────── */
+:root{
+  /* Surface & text */
+  --bg-primary:      var(--c-n-90);
+  --bg-secondary:    var(--c-n-80);
+  --bg-tertiary:     var(--c-n-95);
+  --bg-hover:        rgba(255,255,255,.05);
+  --bg-active:       rgba(255,255,255,.08);
+  --text-normal:     var(--c-n-05);
+  --text-muted:      var(--c-n-30);
+  --text-faint:      var(--c-n-50);
+  --border:          var(--c-n-70);
+  --border-strong:   var(--c-n-60);
+
+  /* Primary — 상호작용/활성 */
+  --primary:      var(--c-purple-60);
+  --primary-on:   #ffffff;
+  --primary-tint: rgba(167,139,250,.14);
+  --accent:       var(--primary);          /* 게임 앱 호환 */
+  --text-on-accent: var(--primary-on);     /* 게임 앱 호환 */
+  --bg-hover:     rgba(255,255,255,.05);   /* 게임 앱 sidebar hover */
+  --bg-active:    rgba(255,255,255,.08);
+  --bg-selected:  rgba(255,255,255,.06);
+
+  /* Rating scale (5구간, 값의 좋고 나쁨) */
+  --rating-elite-text:    var(--c-green-60);
+  --rating-elite-tint:    rgba(111,224,154,.16);
+  --rating-elite-border:  rgba(111,224,154,.36);
+  --rating-good-text:     var(--c-lime-60);
+  --rating-good-tint:     rgba(163,230,53,.14);
+  --rating-good-border:   rgba(163,230,53,.32);
+  --rating-average-text:  var(--c-n-30);           /* muted */
+  --rating-average-tint:  transparent;
+  --rating-average-border:transparent;
+  --rating-poor-text:     var(--c-orange-60);
+  --rating-poor-tint:     rgba(251,146,60,.14);
+  --rating-poor-border:   rgba(251,146,60,.34);
+  --rating-terrible-text: var(--c-red-60);
+  --rating-terrible-tint: rgba(240,138,138,.16);
+  --rating-terrible-border:rgba(240,138,138,.36);
+
+  /* Chart series — 데이터 곡선 구분 (rating과 별개) */
+  --chart-1: var(--c-teal-60);
+  --chart-2: var(--c-amber-60);
+  --chart-3: var(--c-n-30);
+
+  /* Attention — 이벤트 노티 (부상·이적·계약만료·재검) */
+  --attention-text:   var(--c-amber-60);
+  --attention-tint:   rgba(251,191,36,.14);
+  --attention-border: rgba(251,191,36,.42);
+  --attention-on:     #0a0a0d;
+}
+
+/* ─── ROLE (라이트) ──────────────────────────────────────── */
 :root[data-theme="light"]{
-  --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
-  --success-text:#15803d; --danger-text:#b91c1c;
-  --accent:hsl(265,55%,50%);--accent-ink:#ffffff;--accent-soft:rgba(139,92,246,.10);
-  --pos:var(--success-text);--neg:var(--danger-text);
+  --bg-primary:   var(--c-n-05);
+  --bg-secondary: var(--c-n-0);
+  --bg-tertiary:  var(--c-n-10);
+  --bg-hover:     rgba(0,0,0,.04);
+  --bg-active:    rgba(0,0,0,.06);
+  --bg-selected:  rgba(0,0,0,.05);
+  --text-normal:  var(--c-n-100);
+  --text-muted:   var(--c-n-50);
+  --text-faint:   var(--c-n-30);
+  --border:       var(--c-n-20);
+  --border-strong: var(--c-n-30);
+
+  --primary:      var(--c-purple-40);
+  --primary-on:   #ffffff;
+  --primary-tint: rgba(139,92,246,.10);
+  --accent:       var(--primary);
+  --text-on-accent: var(--primary-on);
+
+  --rating-elite-text:    var(--c-green-40);
+  --rating-elite-tint:    rgba(21,128,61,.10);
+  --rating-elite-border:  rgba(21,128,61,.28);
+  --rating-good-text:     var(--c-lime-40);
+  --rating-good-tint:     rgba(77,124,15,.10);
+  --rating-good-border:   rgba(77,124,15,.28);
+  --rating-average-text:  var(--c-n-50);
+  --rating-average-tint:  transparent;
+  --rating-average-border:transparent;
+  --rating-poor-text:     var(--c-orange-40);
+  --rating-poor-tint:     rgba(194,65,12,.10);
+  --rating-poor-border:   rgba(194,65,12,.28);
+  --rating-terrible-text: var(--c-red-40);
+  --rating-terrible-tint: rgba(185,28,28,.10);
+  --rating-terrible-border:rgba(185,28,28,.28);
+
+  --chart-1: var(--c-teal-40);
+  --chart-2: var(--c-amber-40);
+  --chart-3: var(--c-n-50);
+
+  --attention-text:   var(--c-amber-40);
+  --attention-tint:   rgba(161,98,7,.10);
+  --attention-border: rgba(161,98,7,.34);
+  --attention-on:     #ffffff;
 }
-*{box-sizing:border-box}
+
+/* ─── RESET · BASE ───────────────────────────────────────── */
+*, *::before, *::after{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background: var(--bg-primary);
+  color: var(--text-normal);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  accent-color: var(--primary);   /* 브라우저 기본 <input> accent 통일 (하늘색 → primary) */
+}
+button{font: inherit; color: inherit; cursor: pointer}
+a{color: inherit; text-decoration: none}
+::selection{background: var(--primary); color: var(--primary-on)}
+
+
+/* 성장 앱 로컬 별칭 */
+:root{
+  --bg: var(--bg-primary);
+  --card: var(--bg-secondary);
+  --ink: var(--text-normal);
+  --muted: var(--text-muted);
+  --rule: var(--border);
+  --soft: var(--bg-tertiary);
+  --accent: var(--primary);
+  --accent-ink: var(--primary-on);
+  --accent-soft: var(--primary-tint);
+  --pos: var(--rating-elite-text);
+  --neg: var(--rating-terrible-text);
+}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:20px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .wrap{max-width:1400px;margin:0 auto}
 h1{font-size:22px;margin:0 0 4px;font-weight:700}

@@ -4,51 +4,266 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600;700&display=swap">
 <style>
-/* ─── 색 시스템 (semantic + 대비 확보) ─────────────────────────────
- * primary = 보라(상호작용·활성), success = 초록(좋은 값·상승),
- * danger  = 빨강(나쁜 값·하락), warning = 노랑(특이·주의),
- * info    = 파랑(현재 위치·중립 강조).
- * 각 색은 -text(전경 텍스트), -tint(배경 배지), -border(경계).
- * 다크·라이트 모두 카드 배경 대비 최소 4.5:1 이상.
+/* ============================================================
+ * OOTP Lab · 디자인 토큰 (Design System v1)
+ *
+ * 3계층: PRIMITIVE → ROLE → COMPONENT
+ * - PRIMITIVE : 원시 hex/px. 의미 없음. 이 파일에만 존재.
+ * - ROLE      : 게임의 5축(rating · chart · primary · attention · muted)에 의미 부여.
+ * - COMPONENT : 각 앱의 부품 스타일이 참조. 이 파일에는 없음.
+ *
+ * 원칙: 컴포넌트는 var(--rating-*), var(--chart-*), var(--primary-*),
+ *       var(--attention-*), var(--text-*), var(--bg-*), var(--border-*)만 참조.
+ *       원시 hex/px 직접 참조 금지.
+ *
+ * 이 파일은 build 시점에 각 앱 HTML로 인라인된다 (web/*/build.js).
+ * ============================================================ */
+
+/* ─── PRIMITIVE ──────────────────────────────────────────── */
+:root{
+  /* Neutral scale (zinc) */
+  --c-n-0:   #ffffff;
+  --c-n-05:  #fafafa;
+  --c-n-10:  #f4f4f5;
+  --c-n-20:  #e4e4e7;
+  --c-n-30:  #a1a1aa;
+  --c-n-50:  #71717a;
+  --c-n-60:  #52525b;
+  --c-n-70:  #3f3f46;
+  --c-n-80:  #27272a;
+  --c-n-90:  #1c1c20;
+  --c-n-95:  #141418;
+  --c-n-100: #0a0a0d;
+
+  /* Hue: primitive 색상 (WCAG 4.5:1 검증됨, 카드 배경 위) */
+  --c-purple-40: #6d28d9;   --c-purple-60: hsl(265,55%,60%);
+  --c-green-40:  #15803d;   --c-green-60:  #6FE09A;
+  --c-lime-40:   #4d7c0f;   --c-lime-60:   #a3e635;
+  --c-amber-40:  #a16207;   --c-amber-60:  #FBBF24;
+  --c-red-40:    #b91c1c;   --c-red-60:    #F08A8A;
+  --c-teal-40:   #0f766e;   --c-teal-60:   #4dd4c0;
+  --c-orange-40: #c2410c;   --c-orange-60: #fb923c;
+
+  /* Spacing (4px grid). --size-* 는 게임 앱 호환 별칭 */
+  --space-1: 4px;   --size-4:  4px;
+  --space-2: 8px;   --size-8:  8px;
+  --space-3: 12px;  --size-12: 12px;
+  --space-4: 16px;  --size-16: 16px;
+  --space-5: 20px;  --size-20: 20px;
+  --space-6: 24px;  --size-24: 24px;
+  --space-8: 32px;  --size-32: 32px;
+  --space-10:40px;  --size-40: 40px;
+  --space-12:48px;  --size-48: 48px;
+                    --size-2:  2px;
+                    --size-6:  6px;
+                    --size-10: 10px;
+
+  /* Radius */
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 10px;
+
+  /* Neutral scale 게임 앱 호환 별칭 (--c-n-* == --color-n-*) */
+  --color-n-0:   var(--c-n-0);
+  --color-n-05:  var(--c-n-05);
+  --color-n-10:  var(--c-n-10);
+  --color-n-20:  var(--c-n-20);
+  --color-n-25:  #d4d4d8;
+  --color-n-30:  var(--c-n-30);
+  --color-n-50:  var(--c-n-50);
+  --color-n-60:  var(--c-n-60);
+  --color-n-70:  var(--c-n-70);
+  --color-n-80:  var(--c-n-80);
+  --color-n-90:  var(--c-n-90);
+  --color-n-95:  var(--c-n-95);
+  --color-n-100: var(--c-n-100);
+  --color-accent-hue: 265;
+  --color-accent:     hsl(265,55%,60%);
+  --color-accent-2:   hsl(265,55%,50%);
+
+  /* Typography */
+  --font-sans: "Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-interface: var(--font-sans);
+  --font-mono: "JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --text-xxs: 10px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-base:13px;
+  --text-md:  14px;
+  --text-lg:  16px;
+  --text-xl:  19px;
+  --text-2xl: 24px;
+  --leading-tight:  1.25;
+  --leading-normal: 1.45;
+  --leading-loose:  1.6;
+  --tracking-tight:  -0.01em;
+  --tracking-wide:    0.02em;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Layout */
+  --sidebar-w: 240px;
+  --sidebar-w-collapsed: 48px;
+  --header-h: 40px;
+  --tabbar-h: 36px;
+  --navbar-h: 32px;
+
+  /* Motion */
+  --dur-fast: 100ms;
+  --dur-med:  180ms;
+  --ease: cubic-bezier(.2,.7,.3,1);
+}
+
+/* ─── ROLE (기본 다크) ───────────────────────────────────── */
+:root{
+  /* Surface & text */
+  --bg-primary:      var(--c-n-90);
+  --bg-secondary:    var(--c-n-80);
+  --bg-tertiary:     var(--c-n-95);
+  --bg-hover:        rgba(255,255,255,.05);
+  --bg-active:       rgba(255,255,255,.08);
+  --text-normal:     var(--c-n-05);
+  --text-muted:      var(--c-n-30);
+  --text-faint:      var(--c-n-50);
+  --border:          var(--c-n-70);
+  --border-strong:   var(--c-n-60);
+
+  /* Primary — 상호작용/활성 */
+  --primary:      var(--c-purple-60);
+  --primary-on:   #ffffff;
+  --primary-tint: rgba(167,139,250,.14);
+  --accent:       var(--primary);          /* 게임 앱 호환 */
+  --text-on-accent: var(--primary-on);     /* 게임 앱 호환 */
+  --bg-hover:     rgba(255,255,255,.05);   /* 게임 앱 sidebar hover */
+  --bg-active:    rgba(255,255,255,.08);
+  --bg-selected:  rgba(255,255,255,.06);
+
+  /* Rating scale (5구간, 값의 좋고 나쁨) */
+  --rating-elite-text:    var(--c-green-60);
+  --rating-elite-tint:    rgba(111,224,154,.16);
+  --rating-elite-border:  rgba(111,224,154,.36);
+  --rating-good-text:     var(--c-lime-60);
+  --rating-good-tint:     rgba(163,230,53,.14);
+  --rating-good-border:   rgba(163,230,53,.32);
+  --rating-average-text:  var(--c-n-30);           /* muted */
+  --rating-average-tint:  transparent;
+  --rating-average-border:transparent;
+  --rating-poor-text:     var(--c-orange-60);
+  --rating-poor-tint:     rgba(251,146,60,.14);
+  --rating-poor-border:   rgba(251,146,60,.34);
+  --rating-terrible-text: var(--c-red-60);
+  --rating-terrible-tint: rgba(240,138,138,.16);
+  --rating-terrible-border:rgba(240,138,138,.36);
+
+  /* Chart series — 데이터 곡선 구분 (rating과 별개) */
+  --chart-1: var(--c-teal-60);
+  --chart-2: var(--c-amber-60);
+  --chart-3: var(--c-n-30);
+
+  /* Attention — 이벤트 노티 (부상·이적·계약만료·재검) */
+  --attention-text:   var(--c-amber-60);
+  --attention-tint:   rgba(251,191,36,.14);
+  --attention-border: rgba(251,191,36,.42);
+  --attention-on:     #0a0a0d;
+}
+
+/* ─── ROLE (라이트) ──────────────────────────────────────── */
+:root[data-theme="light"]{
+  --bg-primary:   var(--c-n-05);
+  --bg-secondary: var(--c-n-0);
+  --bg-tertiary:  var(--c-n-10);
+  --bg-hover:     rgba(0,0,0,.04);
+  --bg-active:    rgba(0,0,0,.06);
+  --bg-selected:  rgba(0,0,0,.05);
+  --text-normal:  var(--c-n-100);
+  --text-muted:   var(--c-n-50);
+  --text-faint:   var(--c-n-30);
+  --border:       var(--c-n-20);
+  --border-strong: var(--c-n-30);
+
+  --primary:      var(--c-purple-40);
+  --primary-on:   #ffffff;
+  --primary-tint: rgba(139,92,246,.10);
+  --accent:       var(--primary);
+  --text-on-accent: var(--primary-on);
+
+  --rating-elite-text:    var(--c-green-40);
+  --rating-elite-tint:    rgba(21,128,61,.10);
+  --rating-elite-border:  rgba(21,128,61,.28);
+  --rating-good-text:     var(--c-lime-40);
+  --rating-good-tint:     rgba(77,124,15,.10);
+  --rating-good-border:   rgba(77,124,15,.28);
+  --rating-average-text:  var(--c-n-50);
+  --rating-average-tint:  transparent;
+  --rating-average-border:transparent;
+  --rating-poor-text:     var(--c-orange-40);
+  --rating-poor-tint:     rgba(194,65,12,.10);
+  --rating-poor-border:   rgba(194,65,12,.28);
+  --rating-terrible-text: var(--c-red-40);
+  --rating-terrible-tint: rgba(185,28,28,.10);
+  --rating-terrible-border:rgba(185,28,28,.28);
+
+  --chart-1: var(--c-teal-40);
+  --chart-2: var(--c-amber-40);
+  --chart-3: var(--c-n-50);
+
+  --attention-text:   var(--c-amber-40);
+  --attention-tint:   rgba(161,98,7,.10);
+  --attention-border: rgba(161,98,7,.34);
+  --attention-on:     #ffffff;
+}
+
+/* ─── RESET · BASE ───────────────────────────────────────── */
+*, *::before, *::after{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background: var(--bg-primary);
+  color: var(--text-normal);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  accent-color: var(--primary);   /* 브라우저 기본 <input> accent 통일 (하늘색 → primary) */
+}
+button{font: inherit; color: inherit; cursor: pointer}
+a{color: inherit; text-decoration: none}
+::selection{background: var(--primary); color: var(--primary-on)}
+
+
+/* ─── 판정 앱 로컬 별칭 (컴포넌트 CSS 변경 최소화) ─────────────────
+ * 이 앱의 컴포넌트가 참조하는 이름을 tokens의 role 값으로 매핑.
+ * 원시 hex는 이 파일에 없다 — 다 tokens.css로.
  * ────────────────────────────────────────────────────────────── */
 :root{
-  /* 표면/텍스트 (zinc) */
-  --bg:#1c1c20;--card:#27272a;--ink:#fafafa;--muted:#a1a1aa;--rule:#3f3f46;--soft:#141418;
-
-  /* semantic 팔레트 (다크: 카드 #27272a 위 텍스트 대비 확보) */
-  --primary-text:#c4b5fd;   --primary-tint:rgba(167,139,250,.14);  --primary-border:rgba(167,139,250,.35);
-  --success-text:#6FE09A;   --success-tint:rgba(111,224,154,.14);  --success-border:rgba(111,224,154,.35);
-  --danger-text:#F08A8A;    --danger-tint:rgba(240,138,138,.14);   --danger-border:rgba(240,138,138,.35);
-  --warning-text:#FBBF24;   --warning-tint:rgba(251,191,36,.14);   --warning-border:rgba(251,191,36,.40);
-  --info-text:#7FB3FF;      --info-tint:rgba(127,179,255,.16);     --info-border:rgba(127,179,255,.35);
-
-  /* 채워진 강조(primary 버튼): 흰 텍스트로 대비 확보 */
-  --accent:hsl(265,55%,60%); --accent-ink:#ffffff; --accent-soft:var(--primary-tint);
-
-  /* 판정 앱 컴포넌트가 참조하는 이름 → semantic으로 매핑 */
-  --hi:var(--success-text); --lo:var(--danger-text); --warn:var(--warning-text); --now:var(--info-text); --now-soft:var(--info-tint);
-
-  /* 판정 바(하단) — 카드와 같은 톤 */
-  --bar-bg:#27272a;--bar-ink:#fafafa;--bar-muted:#a1a1aa;--bar-rule:#3f3f46;--bar-field:#1c1c20;--bar-accent:var(--accent);--bar-accent-ink:#ffffff;
+  --bg: var(--bg-primary);
+  --card: var(--bg-secondary);
+  --ink: var(--text-normal);
+  --muted: var(--text-muted);
+  --rule: var(--border);
+  --soft: var(--bg-tertiary);
+  --accent: var(--primary);
+  --accent-ink: var(--primary-on);
+  --accent-soft: var(--primary-tint);
+  /* rating 5구간이 판정 앱의 --hi/--lo/--warn 이름으로 흘러들어감 */
+  --hi: var(--rating-elite-text);
+  --lo: var(--rating-terrible-text);
+  --warn: var(--attention-text);
+  --now: var(--chart-1);
+  --now-soft: var(--primary-tint);
+  /* 판정 바 (하단 액션 바) */
+  --bar-bg: var(--bg-secondary);
+  --bar-ink: var(--text-normal);
+  --bar-muted: var(--text-muted);
+  --bar-rule: var(--border);
+  --bar-field: var(--bg-primary);
+  --bar-accent: var(--primary);
+  --bar-accent-ink: var(--primary-on);
 }
-:root[data-theme="light"]{
-  --bg:#fafafa;--card:#ffffff;--ink:#0a0a0d;--muted:#71717a;--rule:#e4e4e7;--soft:#f4f4f5;
-
-  --primary-text:#6d28d9;   --primary-tint:rgba(139,92,246,.10);  --primary-border:rgba(139,92,246,.30);
-  --success-text:#15803d;   --success-tint:rgba(21,128,61,.10);   --success-border:rgba(21,128,61,.30);
-  --danger-text:#b91c1c;    --danger-tint:rgba(185,28,28,.09);    --danger-border:rgba(185,28,28,.30);
-  --warning-text:#a16207;   --warning-tint:rgba(161,98,7,.10);    --warning-border:rgba(161,98,7,.30);
-  --info-text:#1d4ed8;      --info-tint:rgba(29,78,216,.10);      --info-border:rgba(29,78,216,.30);
-
-  --accent:hsl(265,55%,50%); --accent-ink:#ffffff; --accent-soft:var(--primary-tint);
-
-  --hi:var(--success-text); --lo:var(--danger-text); --warn:var(--warning-text); --now:var(--info-text); --now-soft:var(--info-tint);
-
-  --bar-bg:#f4f4f5;--bar-ink:#0a0a0d;--bar-muted:#71717a;--bar-rule:#e4e4e7;--bar-field:#ffffff;--bar-accent:var(--accent);--bar-accent-ink:#ffffff;
-}
-*{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:13px;line-height:1.45;word-break:keep-all;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:"Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:13px;word-break:keep-all}
 body{display:flex;flex-direction:column;min-height:100vh}
 .app{flex:1 1 auto;display:flex;flex-direction:column;gap:10px;padding:10px 14px 0;min-height:0}
 .app > header{flex:0 0 auto}
@@ -117,9 +332,9 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .labels{display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:12px}
 .labels .lrow{display:flex;gap:8px;align-items:flex-start}
 .labels .lab{flex:0 0 auto;display:inline-block;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;letter-spacing:.02em;line-height:1.5}
-.labels .lab.hi{background:var(--success-tint);color:var(--success-text);border:1px solid var(--success-border)}
-.labels .lab.lo{background:var(--danger-tint);color:var(--danger-text);border:1px solid var(--danger-border)}
-.labels .lab.odd{background:var(--warning-tint);color:var(--warning-text);border:1px solid var(--warning-border)}
+.labels .lab.hi{background:var(--rating-elite-tint);color:var(--rating-elite-text);border:1px solid var(--rating-elite-border)}
+.labels .lab.lo{background:var(--rating-terrible-tint);color:var(--rating-terrible-text);border:1px solid var(--rating-terrible-border)}
+.labels .lab.odd{background:var(--attention-tint);color:var(--attention-text);border:1px solid var(--attention-border)}
 .labels span.v{margin-right:6px}
 .talcols h4,.group h4{font-size:12px;color:var(--muted);margin:0 0 2px;font-weight:600;letter-spacing:.04em}
 .list{display:grid;grid-template-columns:1fr auto;column-gap:0}
@@ -188,9 +403,9 @@ summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .big3 b em{font-style:normal;font-size:13px;color:var(--muted);font-weight:500}
 .hint{font-size:12px;color:var(--muted);margin:10px 0 0}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
-.legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--accent);vertical-align:middle;margin-right:5px}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--chart-1);vertical-align:middle;margin-right:5px}
 .legend i.prev{border-top:2px dashed var(--muted)}
-.legend i.band{border-top:0;height:10px;background:var(--accent);opacity:.25;border-radius:2px}
+.legend i.band{border-top:0;height:10px;background:var(--chart-1);opacity:.25;border-radius:2px}
 .heat{margin-top:12px}
 .heat table{font-size:13px;margin:0;table-layout:fixed;width:100%}
 .heat col.lab{width:14.99%}.heat col.age{width:6.52%}
@@ -360,7 +575,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'e408463 2026-09-09';
+  const BUILD = '3ec6604 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
@@ -571,21 +786,21 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
     if (v.band_lo && v.band_hi && v.band_lo.length === 25) {
       const up = v.band_hi.map((o, i) => `${xOf(16 + i)},${yOf(o)}`).join(' ');
       const down = v.band_lo.map((o, i) => `${xOf(16 + i)},${yOf(o)}`).reverse().join(' ');
-      s += `<polygon points="${up} ${down}" fill="var(--accent)" opacity=".13"/>`;
-      s += `<polyline points="${up}" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="2 3" opacity=".7"/><polyline points="${v.band_lo.map((o, i) => `${xOf(16 + i)},${yOf(o)}`).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="2 3" opacity=".7"/>`;
+      s += `<polygon points="${up} ${down}" fill="var(--chart-1)" opacity=".13"/>`;
+      s += `<polyline points="${up}" fill="none" stroke="var(--chart-1)" stroke-width="1.2" stroke-dasharray="2 3" opacity=".7"/><polyline points="${v.band_lo.map((o, i) => `${xOf(16 + i)},${yOf(o)}`).join(' ')}" fill="none" stroke="var(--chart-1)" stroke-width="1.2" stroke-dasharray="2 3" opacity=".7"/>`;
     }
     // 전성기 구간(정점 98% 이상 유지)과 노화 시작: 카드 1의 곡선 요약과 같은 값
     const sh = e.shape || null;
     if (sh) {
       const half = (sh[1] - 1) / 2;
       const pStart = Math.max(16, sh[0] - half), pEnd = Math.min(40, sh[0] + half), aging = Math.min(40, sh[0] + half + 1);
-      s += `<rect x="${xOf(pStart)}" y="${padT - 4}" width="${Math.max(0, xOf(pEnd) - xOf(pStart))}" height="${H - padB - padT + 4}" fill="var(--accent)" opacity=".08"/>`;
+      s += `<rect x="${xOf(pStart)}" y="${padT - 4}" width="${Math.max(0, xOf(pEnd) - xOf(pStart))}" height="${H - padB - padT + 4}" fill="var(--chart-1)" opacity=".08"/>`;
       const mark = (a, label, anchor) => `<line x1="${xOf(a)}" x2="${xOf(a)}" y1="${padT - 4}" y2="${H - padB}" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="${xOf(a) + (anchor === 'end' ? -4 : 4)}" y="${padT + 8}" text-anchor="${anchor}" style="font:11px 'IBM Plex Sans KR',sans-serif;fill:var(--muted)">${label} ${Math.round(a)}세</text>`;
       s += mark(pStart, '전성기 시작', 'end');
       if (aging < 40) s += mark(aging, '노화 시작', 'start');
     }
     const pts = v.ages.map(r => `${xOf(r.age)},${yOf(ovrOf(r))}`).join(' ');
-    s += `<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="3.5" stroke-linejoin="round"/>`;
+    s += `<polyline points="${pts}" fill="none" stroke="var(--chart-1)" stroke-width="3.5" stroke-linejoin="round"/>`;
     const x = xOf(age);
     s += `<line x1="${x}" x2="${x}" y1="${padT - 6}" y2="${H - padB}" stroke="var(--now)" stroke-width="2"/>`;
     { const ov = ovrOf(row()); s += `<circle cx="${x}" cy="${yOf(ov)}" r="6" fill="var(--now)" stroke="var(--card)" stroke-width="2"/><text x="${x + (x > W - 80 ? -10 : 10)}" y="${yOf(ov) - 9}" text-anchor="${x > W - 80 ? 'end' : 'start'}" style="font:600 13px 'IBM Plex Mono',monospace;fill:var(--ink)">OVR ${ov}</text>`; }
