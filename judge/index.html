@@ -63,7 +63,10 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .roleline b{font-weight:700;font-size:14px;color:var(--text-normal)}
 .roleline .pos{display:inline-flex;align-items:center;background:var(--bg-tertiary);color:var(--text-normal);border:1px solid var(--border);border-radius:5px;padding:2px 9px;font-weight:600;margin-left:6px;font-size:12px}
 .roleline small{color:var(--text-muted);font-size:11px;margin-left:6px}
-.face{width:100%;max-width:240px;aspect-ratio:200/172;border-radius:8px;background:transparent;overflow:visible;border:0;margin:0}
+.face{width:100%;max-width:280px;aspect-ratio:200/172;border-radius:8px;background:transparent;overflow:visible;border:0;margin:8px auto 0}
+.posblock{margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border)}
+.posblock .postitle{margin:0 0 var(--space-1);font-size:12px;color:var(--text-muted);font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.posblock .facehint{margin:6px 0 0;font-size:11px;color:var(--text-muted);text-align:center}
 .facehint{font-size:10px;color:var(--text-muted);margin:var(--space-1) 0 0;text-align:left;letter-spacing:.02em}
 .face svg{display:block;width:100%;height:100%;overflow:visible}
 .face text{font-family:var(--font-sans)}
@@ -278,7 +281,6 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
       <p class="basics" id="basics"></p>
       <p class="roleline" id="roleline" hidden></p>
     </div>
-    <div><div class="face" id="face"></div><p class="facehint">익숙함 / 적성</p></div>
   </div>
   <div class="summary" id="summary"></div>
   <p class="covers" id="covers" hidden></p>
@@ -317,6 +319,11 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
   <p class="nowline" id="nowtitle"></p>
   <div class="groups" id="groups"></div>
   <div class="tablewrap" id="pitchwrap"><table id="pitches" class="t-data"></table></div>
+  <div class="posblock">
+    <h4 class="postitle">수비 적성 · 익숙함</h4>
+    <div class="face" id="face"></div>
+    <p class="facehint">숫자 = 익숙함 · 테두리 = 적성 (천장). 원래 맡은 메인 포지션 위주 성장 가정.</p>
+  </div>
 </section>
 </div>
 
@@ -349,7 +356,7 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'ea3e4af 2026-09-09';
+  const BUILD = '09d2cc2 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   // rating 5구간 (#90): 판정 앱의 모든 능력값 색은 이 함수 하나로 통일 (Phase 12).
