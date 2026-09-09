@@ -1825,21 +1825,21 @@ input:focus, select:focus{
         <span class="pos-num">${skill}</span>
       </div>`;
     }).join('');
+    const threshold = p.main_defense_threshold || 12;
     const mainDefOpts = OFFENSIVE_POSITIONS.filter(id => posSkill[id] !== undefined).map(id => {
       const label = POSITION_LABELS[id] || id;
       const skill = posSkill[id] ?? 0;
       const eligible = candidates.has(id);
-      const attr = eligible ? '' : 'disabled';
       const sel = id === savedMain ? 'selected' : '';
-      const hint = eligible ? `숙련 ${skill}` : `숙련 ${skill} — 최소 ${p.main_defense_threshold || 12} 필요`;
-      return `<option value="${id}" ${sel} ${attr}>${label} · ${hint}</option>`;
+      const hint = eligible ? `숙련 ${skill}` : `숙련 ${skill} · 권장 ${threshold}+`;
+      return `<option value="${id}" ${sel}>${label} · ${hint}</option>`;
     }).join('');
     const positionCard = `<div class="card">
       <h2 class="section-title">포지션 · 메인 수비</h2>
       <div class="main-def-block">
         <label class="main-def-label">메인 수비 포지션</label>
         <select id="main-def-sel" class="main-def-sel">${mainDefOpts}</select>
-        <p class="main-def-hint">팀 훈련이 이 포지션의 숙련을 올려요. 다른 포지션은 개인 훈련으로. 후보는 숙련 ${p.main_defense_threshold || 12} 이상만.</p>
+        <p class="main-def-hint">팀 훈련이 이 포지션의 숙련을 올려요. 다른 포지션은 개인 훈련으로. 권장 숙련 ${threshold} 이상 — 그보다 낮으면 실전 수비가 처참할 수 있어요.</p>
       </div>
       <div class="pos-grid">
         <div class="pos-head-row">
