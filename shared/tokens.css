@@ -40,6 +40,9 @@
     --c-red-40:    #b91c1c;   --c-red-60:    #F08A8A;
     --c-teal-40:   #0f766e;   --c-teal-60:   #4dd4c0;
     --c-orange-40: #c2410c;   --c-orange-60: #fb923c;
+    --c-cyan-40:   #0e7490;   --c-cyan-60:   hsl(190,75%,55%);
+    --c-pink-40:   #be185d;   --c-pink-60:   #f472b6;
+    --c-pink-light:#fbcfe8;
 
     /* ─ PRIMITIVE: spacing (4px grid) ─ */
     --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
@@ -88,27 +91,28 @@
     --border:       var(--c-n-70);
     --border-strong: var(--c-n-60);
 
-    /* ─ ROLE: primary (상호작용/활성) ─ */
-    --primary:      var(--c-purple-60);
-    --primary-on:   var(--c-n-0);
-    --primary-tint: rgba(167,139,250,.14);
+    /* ─ ROLE: primary (상호작용/활성) — 시안 계열 (사용자 결정 2026-09-10)
+     * 다크에서 밝은 시안 위 검정 텍스트 (흰은 대비 부족) */
+    --primary:      var(--c-cyan-60);
+    --primary-on:   var(--c-n-100);           /* 검정: 밝은 시안 위 대비 확보 */
+    --primary-tint: rgba(34,211,238,.14);
 
-    /* ─ ROLE: rating scale 5구간 (FM 스타일: 좋은 값은 눈에 튀고 낮은 값은 흐림) ─
-     *   elite  = 짙은 초록 (진한 tint + 굵음, 극단 강조)
-     *   good   = 밝은 초록 (약한 강조, 텍스트만)
-     *   average= 흰색 (기본 텍스트, 배경 없음)
-     *   poor   = 회색 (muted, 흐릿)
-     *   terrible=어두운 회색 (faint, 아주 흐릿 — 낮은 값은 무시되도록)
+    /* ─ ROLE: rating 4구간 (능력값의 좋고 나쁨) 사용자 결정 2026-09-10
+     *   최상 (elite, 17-20) = 네온 핑크 (진한 강조 + 굵음)
+     *   좋음 (good, 13-16)  = 연한 핑크 (어울리는 색)
+     *   중간 (average, 9-12)= 흰 (기본)
+     *   나쁨 (poor+terrible)= 회색 muted (튀지 않음)
+     * 빨강 없음 (semantic danger 축이 별도로 담당).
      */
-    --rating-elite-text:    #4ade80;                    /* 짙은 초록 (bg-secondary 대비 8.5:1) */
-    --rating-elite-tint:    rgba(74,222,128,.20);
-    --rating-elite-border:  rgba(74,222,128,.42);
+    --rating-elite-text:    var(--c-pink-60);           /* 네온 핑크 (bg-secondary 대비 5.7:1) */
+    --rating-elite-tint:    rgba(244,114,182,.20);
+    --rating-elite-border:  rgba(244,114,182,.42);
     --rating-elite-on:      var(--c-n-100);
-    --rating-good-text:     #fbbf24;                    /* 노랑 (사용자 결정: 초록→노랑→흰→회색) */
+    --rating-good-text:     var(--c-pink-light);        /* 연한 핑크 */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-100);
-    --rating-average-text:  var(--c-n-05);              /* 흰색 = 기본 텍스트 */
+    --rating-average-text:  var(--c-n-05);              /* 흰 */
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
     --rating-average-on:    var(--c-n-100);
@@ -116,7 +120,7 @@
     --rating-poor-tint:     transparent;
     --rating-poor-border:   transparent;
     --rating-poor-on:       var(--c-n-05);
-    --rating-terrible-text: var(--c-n-50);              /* faint 어두운 회색 (낮은 값은 흐릿) */
+    --rating-terrible-text: var(--c-n-30);              /* poor와 통일 (4구간) */
     --rating-terrible-tint: transparent;
     --rating-terrible-border:transparent;
     --rating-terrible-on:   var(--c-n-05);
@@ -187,27 +191,27 @@
     --border:       var(--c-n-20);
     --border-strong: var(--c-n-30);
 
-    --primary:      var(--c-purple-40);
+    --primary:      var(--c-cyan-40);
     --primary-on:   var(--c-n-0);
-    --primary-tint: rgba(139,92,246,.10);
+    --primary-tint: rgba(8,145,178,.10);
 
-    --rating-elite-text:    #15803d;
-    --rating-elite-tint:    rgba(21,128,61,.14);
-    --rating-elite-border:  rgba(21,128,61,.34);
+    --rating-elite-text:    var(--c-pink-40);
+    --rating-elite-tint:    rgba(190,24,93,.10);
+    --rating-elite-border:  rgba(190,24,93,.30);
     --rating-elite-on:      var(--c-n-0);
-    --rating-good-text:     #a16207;    /* 진한 노랑 (라이트) */
+    --rating-good-text:     #db2777;                    /* 진한 핑크 (라이트) */
     --rating-good-tint:     transparent;
     --rating-good-border:   transparent;
     --rating-good-on:       var(--c-n-0);
-    --rating-average-text:  var(--c-n-100);   /* 라이트: 검정 = 기본 */
+    --rating-average-text:  var(--c-n-100);
     --rating-average-tint:  transparent;
     --rating-average-border:transparent;
     --rating-average-on:    var(--c-n-100);
-    --rating-poor-text:     var(--c-n-50);    /* muted 회색 */
+    --rating-poor-text:     var(--c-n-50);
     --rating-poor-tint:     transparent;
     --rating-poor-border:   transparent;
     --rating-poor-on:       var(--c-n-0);
-    --rating-terrible-text: var(--c-n-30);    /* faint */
+    --rating-terrible-text: var(--c-n-50);              /* poor와 통일 */
     --rating-terrible-tint: transparent;
     --rating-terrible-border:transparent;
     --rating-terrible-on:   var(--c-n-0);
