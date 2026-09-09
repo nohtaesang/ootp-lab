@@ -55,12 +55,13 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .profile{display:flex;flex-direction:column;gap:var(--space-3);margin:0 0 14px}
 .who{font-size:18px;font-weight:700;margin:0;line-height:1.25;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;letter-spacing:-0.01em}
 .who .sep{color:var(--text-muted);font-weight:400}
-.who .pos{display:inline-flex;align-items:center;background:var(--primary);color:var(--primary-on);border-radius:5px;padding:2px 9px;font-size:12px;font-weight:600;letter-spacing:0}
+/* 분류 배지 — 중립 톤 (정보성 · Phase 13). primary는 사용자 조작 표시에만 씀 */
+.who .pos{display:inline-flex;align-items:center;background:var(--bg-tertiary);color:var(--text-normal);border:1px solid var(--border);border-radius:5px;padding:2px 9px;font-size:12px;font-weight:600;letter-spacing:0}
 .who small{font-size:12px;font-weight:500;color:var(--text-muted)}
 .basics{color:var(--text-muted);font-size:12px;margin:0}
 .roleline{margin:2px 0 0;font-size:12px;color:var(--text-muted)}
 .roleline b{font-weight:700;font-size:14px;color:var(--text-normal)}
-.roleline .pos{display:inline-flex;align-items:center;background:var(--primary);color:var(--primary-on);border-radius:5px;padding:2px 9px;font-weight:600;margin-left:6px;font-size:12px}
+.roleline .pos{display:inline-flex;align-items:center;background:var(--bg-tertiary);color:var(--text-normal);border:1px solid var(--border);border-radius:5px;padding:2px 9px;font-weight:600;margin-left:6px;font-size:12px}
 .roleline small{color:var(--text-muted);font-size:11px;margin-left:6px}
 .face{width:100%;max-width:240px;aspect-ratio:200/172;border-radius:8px;background:transparent;overflow:visible;border:0;margin:0}
 .facehint{font-size:10px;color:var(--text-muted);margin:var(--space-1) 0 0;text-align:left;letter-spacing:.02em}
@@ -331,7 +332,7 @@ table.t-data td.lo { color: var(--rating-terrible-text); font-weight: 600 }
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = '0163ab3 2026-09-09';
+  const BUILD = '09e6443 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   // rating 5구간 (#90): 판정 앱의 모든 능력값 색은 이 함수 하나로 통일 (Phase 12).
