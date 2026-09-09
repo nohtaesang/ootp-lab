@@ -116,7 +116,9 @@ button:focus-visible,input:focus-visible,summary:focus-visible,svg:focus-visible
 .labels{display:flex;flex-direction:column;gap:5px;margin-top:10px;font-size:14px}
 .labels .lrow{display:flex;gap:8px;align-items:flex-start}
 .labels .lab{flex:0 0 auto;display:inline-block;border-radius:4px;padding:1px 8px;font-size:12px;font-weight:600;letter-spacing:.02em;line-height:1.5}
-.labels .lab.hi{background:var(--hi);color:#fff}.labels .lab.lo{background:var(--lo);color:#fff}.labels .lab.odd{background:var(--warn);color:#fff}
+.labels .lab.hi{background:var(--success-tint);color:var(--success-text);border:1px solid var(--success-border)}
+.labels .lab.lo{background:var(--danger-tint);color:var(--danger-text);border:1px solid var(--danger-border)}
+.labels .lab.odd{background:var(--warning-tint);color:var(--warning-text);border:1px solid var(--warning-border)}
 .labels span.v{margin-right:6px}
 .talcols h4,.group h4{font-size:12px;color:var(--muted);margin:0 0 2px;font-weight:600;letter-spacing:.04em}
 .list{display:grid;grid-template-columns:1fr auto;column-gap:10px}
@@ -356,7 +358,7 @@ th:first-child,td:first-child{text-align:left;font-family:inherit}
   const groupOrder = [['bat','타격'],['run','주루'],['field','수비'],['pitch','투구']];
   const TAGS = [['growth','성장'],['aging','노화'],['velocity','구속'],['vs_talent','재능 대비'],['pitches','구종'],['fielding','수비'],['other','기타']];
   const VERDICTS = {normal: [['natural','자연스러워요'],['odd','이상해요'],['fine','문제없어요']], recheck: [['fixed','고쳐졌어요'],['odd','아직 이상해요'],['odd_other','다른 게 이상해요']]};
-  const BUILD = 'dbbb141 2026-09-09';
+  const BUILD = 'cdc2842 2026-09-09';
   // 표시 규칙은 풀 JSON(display_rules, 생성 설정 [display])에서 온다. 없으면 예전 값
   const DR = Object.assign({z_center: 10.5, z_per_sd: 3, ability_hi: 14, ability_lo: 7, talent_hi: 16, talent_lo: 10, fastball_hi_kmh: 150, fastball_lo_kmh: 140}, pool.display_rules || {});
   const abCls = v => v >= DR.ability_hi ? 'hi' : v <= DR.ability_lo ? 'lo' : '';
