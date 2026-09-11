@@ -191,6 +191,26 @@
     --color-accent-hue: 235;
     --color-accent:     var(--c-indigo-60);
     --color-accent-2:   var(--c-indigo-40);
+
+    /* ─ ROLE ─ elevation / shadow · 팝오버·모달·드롭다운 */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,.3);
+    --shadow-md: 0 8px 16px rgba(0,0,0,.4);
+    --shadow-lg: 0 10px 24px rgba(0,0,0,.5);
+
+    /* ─ ROLE ─ scrollbar */
+    --scrollbar-thumb:       rgba(255,255,255,.18);
+    --scrollbar-thumb-hover: rgba(255,255,255,.32);
+
+    /* ─ ROLE ─ accent 별칭 (기존 fallback 하드코딩 대체) */
+    --accent-soft:      var(--primary-tint);
+    --danger-bg:        var(--danger-tint);
+
+    /* ─ ROLE ─ stat 강조 색 (야구 스탯 4단계) · 능력 rating과 분리 */
+    --stat-elite: var(--c-green-60);   /* 원본 #4ade80 */
+    --stat-good:  #a3e6b3;             /* 연초록 · 밝은 pastel */
+    --stat-ok:    var(--text-normal);
+    --stat-poor:  var(--c-red-60);     /* 원본 #f87171 */
+
     --size-2:  2px;
     --size-4:  var(--space-1);
     --size-6:  6px;
@@ -237,6 +257,20 @@
     --rating-average-on: var(--c-n-100);
     --rating-poor-on:  var(--c-n-0);
     --rating-terrible-on: var(--c-n-0);
+
+    /* elevation · 라이트 배경엔 옅게 */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.08);
+    --shadow-md: 0 4px 10px rgba(0,0,0,.1);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,.14);
+
+    /* scrollbar · 라이트에선 어두운 톤 */
+    --scrollbar-thumb:       rgba(0,0,0,.18);
+    --scrollbar-thumb-hover: rgba(0,0,0,.32);
+
+    /* stat 강조 · 라이트에선 진한 톤 */
+    --stat-elite: var(--c-green-40);
+    --stat-good:  #43a75f;
+    --stat-poor:  var(--c-red-40);
 
     --success-text:   var(--c-green-40);
     --success-tint:   rgba(21,128,61,.10);
