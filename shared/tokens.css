@@ -127,6 +127,15 @@
     --chip-text:   var(--primary);
     --chip-border: transparent;
 
+    /* ─ COMPONENT ─ overlay (팝오버/드롭다운/컨텍스트메뉴 elevation)
+     *   다크 UI 정석 · 3-요소:
+     *     1) 아래 배경보다 밝은 surface (명도차로 "떠있음" 시그널)
+     *     2) 얇은 흰 border (겹침에도 층 구분)
+     *     3) 레이어드 shadow (깊이감) */
+    --overlay-bg:      var(--c-n-70);            /* #3f3f46 · panel/sidebar 보다 확실히 밝음 */
+    --overlay-border:  rgba(255,255,255,.10);
+    --overlay-shadow:  0 4px 12px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.35);
+
     /* ─ ROLE ─ rating 4구간 (능력값) ──────────────────── */
     --rating-elite-text:    var(--c-green-60);  /* 17-20 */
     --rating-elite-tint:    transparent;
@@ -268,6 +277,11 @@
     --shadow-sm: 0 1px 2px rgba(0,0,0,.08);
     --shadow-md: 0 4px 10px rgba(0,0,0,.1);
     --shadow-lg: 0 8px 16px rgba(0,0,0,.14);
+
+    /* overlay · 라이트에선 흰 카드 위에 살짝 밝은 흰 + 옅은 검정 border */
+    --overlay-bg:     var(--c-n-0);
+    --overlay-border: rgba(0,0,0,.10);
+    --overlay-shadow: 0 4px 12px rgba(0,0,0,.10), 0 16px 40px rgba(0,0,0,.10);
 
     /* scrollbar · 라이트에선 어두운 톤 */
     --scrollbar-thumb:       rgba(0,0,0,.18);
