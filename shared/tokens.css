@@ -205,11 +205,12 @@
     --accent-soft:      var(--primary-tint);
     --danger-bg:        var(--danger-tint);
 
-    /* ─ ROLE ─ stat 강조 색 (야구 스탯 4단계) · 능력 rating과 분리 */
-    --stat-elite: var(--c-green-60);   /* 원본 #4ade80 */
-    --stat-good:  #a3e6b3;             /* 연초록 · 밝은 pastel */
-    --stat-ok:    var(--text-normal);
-    --stat-poor:  var(--c-red-60);     /* 원본 #f87171 */
+    /* ─ ROLE ─ stat 강조 색 (야구 스탯 4단계) · rating 시맨틱과 통일 · positive 그라디언트만 사용
+     *  elite=초록  good=노랑  ok=흰  poor=회색 (danger red 아님 · 안 좋음은 무채색으로) */
+    --stat-elite: var(--rating-elite-text);
+    --stat-good:  var(--rating-good-text);
+    --stat-ok:    var(--rating-average-text);
+    --stat-poor:  var(--rating-poor-text);
 
     --size-2:  2px;
     --size-4:  var(--space-1);
@@ -267,10 +268,7 @@
     --scrollbar-thumb:       rgba(0,0,0,.18);
     --scrollbar-thumb-hover: rgba(0,0,0,.32);
 
-    /* stat 강조 · 라이트에선 진한 톤 */
-    --stat-elite: var(--c-green-40);
-    --stat-good:  #43a75f;
-    --stat-poor:  var(--c-red-40);
+    /* stat 강조 · 라이트에서도 rating 시맨틱 상속 (별도 재지정 불필요) */
 
     --success-text:   var(--c-green-40);
     --success-tint:   rgba(21,128,61,.10);
