@@ -122,6 +122,11 @@
     --primary-on:   var(--c-n-0);
     --primary-tint: rgba(99,102,241,.14);
 
+    /* ─ COMPONENT ─ chip (필터/태그/뱃지 · Linear 스타일 · primary 잔상) ─ */
+    --chip-bg:     var(--primary-tint);
+    --chip-text:   var(--primary);
+    --chip-border: transparent;
+
     /* ─ ROLE ─ rating 4구간 (능력값) ──────────────────── */
     --rating-elite-text:    var(--c-green-60);  /* 17-20 */
     --rating-elite-tint:    transparent;
