@@ -136,9 +136,10 @@
      *   1) 아래 배경보다 밝은 surface (명도차로 "떠있음" 시그널)
      *   2) 얇은 흰 border (겹침에도 층 구분)
      *   3) 레이어드 shadow (깊이감) */
-    --overlay-bg:      var(--c-n-70);            /* #3f3f46 · panel/sidebar 보다 확실히 밝음 */
-    --overlay-border:  rgba(255,255,255,.10);
-    --overlay-shadow:  0 4px 12px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.35);
+    /* Linear/Notion 2-tier · 밝기로 elevation 안 만들고 border+shadow 로 · 촌스러운 회색 회피 */
+    --overlay-bg:      var(--c-n-80);            /* panel 과 동일 톤 · #27272a */
+    --overlay-border:  rgba(255,255,255,.14);    /* 강한 halo 로 층 구분 */
+    --overlay-shadow:  0 6px 16px rgba(0,0,0,.55), 0 20px 44px rgba(0,0,0,.45);
 
     /* ─ COMPONENT ─ input (Input · Select trigger · Combo trigger · Textarea)
      * 어떤 표면 위에 얹혀도 일관된 "눌린" 인상 · rgba 검정 tint 로 적응 */
