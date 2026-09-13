@@ -105,9 +105,13 @@
     --ease:     cubic-bezier(.2,.7,.3,1);
 
     /* ─ ROLE ─ surface & text ─────────────────────────── */
-    --bg-primary:    var(--c-n-90);
-    --bg-secondary:  var(--c-n-80);
-    --bg-tertiary:   var(--c-n-95);
+    /* 정석 · docs/design-system.md 참고
+     *   app     · 기본 콘텐츠 배경 (테이블·리스트)
+     *   panel   · 정적 표면 (사이드바·카드)
+     *   overlay · 모든 floating 컨테이너 (Dialog/Popover/Sheet/Dropdown/Menu) 통일 */
+    --bg-primary:    var(--c-n-90);   /* 별칭 · bg-app */
+    --bg-secondary:  var(--c-n-80);   /* 별칭 · bg-panel */
+    --bg-tertiary:   var(--c-n-95);   /* 특수 · topbar 톤 (더 어두움) */
     --bg-hover:      rgba(255,255,255,.05);
     --bg-active:     rgba(255,255,255,.08);
     --bg-selected:   rgba(255,255,255,.06);
@@ -127,14 +131,40 @@
     --chip-text:   var(--primary);
     --chip-border: transparent;
 
-    /* ─ COMPONENT ─ overlay (팝오버/드롭다운/컨텍스트메뉴 elevation)
-     *   다크 UI 정석 · 3-요소:
-     *     1) 아래 배경보다 밝은 surface (명도차로 "떠있음" 시그널)
-     *     2) 얇은 흰 border (겹침에도 층 구분)
-     *     3) 레이어드 shadow (깊이감) */
+    /* ─ COMPONENT ─ overlay (Dialog/Popover/Sheet/Dropdown/Menu 통일) ─
+     * 다크 UI 정석 · 3-요소:
+     *   1) 아래 배경보다 밝은 surface (명도차로 "떠있음" 시그널)
+     *   2) 얇은 흰 border (겹침에도 층 구분)
+     *   3) 레이어드 shadow (깊이감) */
     --overlay-bg:      var(--c-n-70);            /* #3f3f46 · panel/sidebar 보다 확실히 밝음 */
     --overlay-border:  rgba(255,255,255,.10);
     --overlay-shadow:  0 4px 12px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.35);
+
+    /* ─ COMPONENT ─ input (Input · Select trigger · Combo trigger · Textarea)
+     * 어떤 표면 위에 얹혀도 일관된 "눌린" 인상 · rgba 검정 tint 로 적응 */
+    --input-bg:          rgba(0,0,0,.20);
+    --input-bg-hover:    rgba(0,0,0,.28);
+    --input-border:      var(--border);
+    --input-border-hover:var(--border-strong);
+    --input-border-focus:var(--primary);
+    --input-text:        var(--text-normal);
+    --input-placeholder: var(--text-faint);
+
+    /* ─ COMPONENT ─ focus ring (모든 인터랙티브 컨트롤) ─ */
+    --focus-ring: var(--primary);
+
+    /* ─ COMPONENT ─ divider ─ */
+    --divider: var(--border);
+
+    /* ─ ROLE ─ control size (4단계 · 임의 h-* 대신 이 스케일만) ─ */
+    --control-h-xs: 24px;
+    --control-h-sm: 28px;
+    --control-h-md: 32px;
+    --control-h-lg: 36px;
+
+    /* ─ ROLE ─ layer sizes ─ */
+    --topbar-brand-w: 220px;
+    --topbar-brand-w-collapsed: 48px;
 
     /* ─ ROLE ─ rating 4구간 (능력값) ──────────────────── */
     --rating-elite-text:    var(--c-green-60);  /* 17-20 */
@@ -282,6 +312,10 @@
     --overlay-bg:     var(--c-n-0);
     --overlay-border: rgba(0,0,0,.10);
     --overlay-shadow: 0 4px 12px rgba(0,0,0,.10), 0 16px 40px rgba(0,0,0,.10);
+
+    /* input · 라이트에선 살짝 어두워지는 tint */
+    --input-bg:          rgba(0,0,0,.03);
+    --input-bg-hover:    rgba(0,0,0,.05);
 
     /* scrollbar · 라이트에선 어두운 톤 */
     --scrollbar-thumb:       rgba(0,0,0,.18);
