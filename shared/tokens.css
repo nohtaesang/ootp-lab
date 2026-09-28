@@ -105,13 +105,9 @@
     --ease:     cubic-bezier(.2,.7,.3,1);
 
     /* ─ ROLE ─ surface & text ─────────────────────────── */
-    /* 정석 · docs/design-system.md 참고
-     *   app     · 기본 콘텐츠 배경 (테이블·리스트)
-     *   panel   · 정적 표면 (사이드바·카드)
-     *   overlay · 모든 floating 컨테이너 (Dialog/Popover/Sheet/Dropdown/Menu) 통일 */
-    --bg-primary:    var(--c-n-90);   /* 별칭 · bg-app */
-    --bg-secondary:  var(--c-n-80);   /* 별칭 · bg-panel */
-    --bg-tertiary:   var(--c-n-95);   /* 특수 · topbar 톤 (더 어두움) */
+    --bg-primary:    var(--c-n-90);
+    --bg-secondary:  var(--c-n-80);
+    --bg-tertiary:   var(--c-n-95);
     --bg-hover:      rgba(255,255,255,.05);
     --bg-active:     rgba(255,255,255,.08);
     --bg-selected:   rgba(255,255,255,.06);
@@ -125,47 +121,6 @@
     --primary:      var(--c-indigo-60);
     --primary-on:   var(--c-n-0);
     --primary-tint: rgba(99,102,241,.14);
-
-    /* ─ COMPONENT ─ chip (필터/태그/뱃지 · Linear 스타일 · primary 잔상) ─ */
-    --chip-bg:     var(--primary-tint);
-    --chip-text:   var(--primary);
-    --chip-border: transparent;
-
-    /* ─ COMPONENT ─ overlay (Dialog/Popover/Sheet/Dropdown/Menu 통일) ─
-     * 다크 UI 정석 · 3-요소:
-     *   1) 아래 배경보다 밝은 surface (명도차로 "떠있음" 시그널)
-     *   2) 얇은 흰 border (겹침에도 층 구분)
-     *   3) 레이어드 shadow (깊이감) */
-    /* Linear/Notion 2-tier · 밝기로 elevation 안 만들고 border+shadow 로 · 촌스러운 회색 회피 */
-    --overlay-bg:      var(--c-n-80);            /* panel 과 동일 톤 · #27272a */
-    --overlay-border:  rgba(255,255,255,.14);    /* 강한 halo 로 층 구분 */
-    --overlay-shadow:  0 6px 16px rgba(0,0,0,.55), 0 20px 44px rgba(0,0,0,.45);
-
-    /* ─ COMPONENT ─ input (Input · Select trigger · Combo trigger · Textarea)
-     * 어떤 표면 위에 얹혀도 일관된 "눌린" 인상 · rgba 검정 tint 로 적응 */
-    --input-bg:          rgba(0,0,0,.20);
-    --input-bg-hover:    rgba(0,0,0,.28);
-    --input-border:      var(--border);
-    --input-border-hover:var(--border-strong);
-    --input-border-focus:var(--primary);
-    --input-text:        var(--text-normal);
-    --input-placeholder: var(--text-faint);
-
-    /* ─ COMPONENT ─ focus ring (모든 인터랙티브 컨트롤) ─ */
-    --focus-ring: var(--primary);
-
-    /* ─ COMPONENT ─ divider ─ */
-    --divider: var(--border);
-
-    /* ─ ROLE ─ control size (4단계 · 임의 h-* 대신 이 스케일만) ─ */
-    --control-h-xs: 24px;
-    --control-h-sm: 28px;
-    --control-h-md: 32px;
-    --control-h-lg: 36px;
-
-    /* ─ ROLE ─ layer sizes ─ */
-    --topbar-brand-w: 220px;
-    --topbar-brand-w-collapsed: 48px;
 
     /* ─ ROLE ─ rating 4구간 (능력값) ──────────────────── */
     --rating-elite-text:    var(--c-green-60);  /* 17-20 */
@@ -236,27 +191,6 @@
     --color-accent-hue: 235;
     --color-accent:     var(--c-indigo-60);
     --color-accent-2:   var(--c-indigo-40);
-
-    /* ─ ROLE ─ elevation / shadow · 팝오버·모달·드롭다운 */
-    --shadow-sm: 0 2px 4px rgba(0,0,0,.3);
-    --shadow-md: 0 8px 16px rgba(0,0,0,.4);
-    --shadow-lg: 0 10px 24px rgba(0,0,0,.5);
-
-    /* ─ ROLE ─ scrollbar */
-    --scrollbar-thumb:       rgba(255,255,255,.18);
-    --scrollbar-thumb-hover: rgba(255,255,255,.32);
-
-    /* ─ ROLE ─ accent 별칭 (기존 fallback 하드코딩 대체) */
-    --accent-soft:      var(--primary-tint);
-    --danger-bg:        var(--danger-tint);
-
-    /* ─ ROLE ─ stat 강조 색 (야구 스탯 4단계) · rating 시맨틱과 통일 · positive 그라디언트만 사용
-     *  elite=초록  good=노랑  ok=흰  poor=회색 (danger red 아님 · 안 좋음은 무채색으로) */
-    --stat-elite: var(--rating-elite-text);
-    --stat-good:  var(--rating-good-text);
-    --stat-ok:    var(--rating-average-text);
-    --stat-poor:  var(--rating-poor-text);
-
     --size-2:  2px;
     --size-4:  var(--space-1);
     --size-6:  6px;
@@ -303,26 +237,6 @@
     --rating-average-on: var(--c-n-100);
     --rating-poor-on:  var(--c-n-0);
     --rating-terrible-on: var(--c-n-0);
-
-    /* elevation · 라이트 배경엔 옅게 */
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.08);
-    --shadow-md: 0 4px 10px rgba(0,0,0,.1);
-    --shadow-lg: 0 8px 16px rgba(0,0,0,.14);
-
-    /* overlay · 라이트에선 흰 카드 위에 살짝 밝은 흰 + 옅은 검정 border */
-    --overlay-bg:     var(--c-n-0);
-    --overlay-border: rgba(0,0,0,.10);
-    --overlay-shadow: 0 4px 12px rgba(0,0,0,.10), 0 16px 40px rgba(0,0,0,.10);
-
-    /* input · 라이트에선 살짝 어두워지는 tint */
-    --input-bg:          rgba(0,0,0,.03);
-    --input-bg-hover:    rgba(0,0,0,.05);
-
-    /* scrollbar · 라이트에선 어두운 톤 */
-    --scrollbar-thumb:       rgba(0,0,0,.18);
-    --scrollbar-thumb-hover: rgba(0,0,0,.32);
-
-    /* stat 강조 · 라이트에서도 rating 시맨틱 상속 (별도 재지정 불필요) */
 
     --success-text:   var(--c-green-40);
     --success-tint:   rgba(21,128,61,.10);
