@@ -70,6 +70,7 @@
     --radius-s: 4px;
     --radius-m: 6px;
     --radius-l: 10px;
+    --radius-pill: 999px;   /* 칩 · 주소창 · 알약(#609) */
 
     /* ─ PRIMITIVE ─ typography ────────────────────────── */
     --font-sans: "Pretendard","Inter","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
@@ -98,11 +99,26 @@
     --header-h: 40px;
     --tabbar-h: 36px;
     --navbar-h: 32px;
+    /* 게임 앱(#609) — 조작 높이 셋 · 표 행 · 레일 · 검사 칸. 두 곳 이상에서 쓰는 크기만 둔다 */
+    --control-h-sm: 24px;
+    --control-h-md: 28px;
+    --control-h-lg: 36px;
+    --row-h:        32px;
+    --rail-w:       184px;
+    --inspector-w:  272px;
+    --popover-w:    280px;
+    --hairline:     1px;
 
     /* ─ PRIMITIVE ─ motion ────────────────────────────── */
     --dur-fast: 100ms;
     --dur-med:  180ms;
     --ease:     cubic-bezier(.2,.7,.3,1);
+
+    /* ─ ROLE ─ elevation · layer (#609) — 밝기가 아니라 경계선 + 그림자로 띄운다(#308) */
+    --shadow-popover: 0 12px 32px rgba(0,0,0,.40), 0 0 0 1px rgba(0,0,0,.20);
+    --z-sticky:  2;
+    --z-popover: 30;
+    --z-toast:   50;
 
     /* ─ ROLE ─ surface & text ─────────────────────────── */
     --bg-primary:    var(--c-n-90);
@@ -211,6 +227,7 @@
    * 시스템 prefers-color-scheme는 무시 (다크 강제 기본).
    * ────────────────────────────────────────────────────── */
   :root[data-theme="light"] {
+    --shadow-popover: 0 12px 32px rgba(0,0,0,.14), 0 0 0 1px rgba(0,0,0,.06);
     --bg-primary:    var(--c-n-05);
     --bg-secondary:  var(--c-n-0);
     --bg-tertiary:   var(--c-n-10);
