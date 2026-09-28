@@ -106,6 +106,8 @@
     --row-h:        32px;
     --inspector-w:  272px;
     --popover-w:    280px;
+    --side-w:       200px;
+    --modal-w:      720px;
     --hairline:     1px;
 
     /* ─ PRIMITIVE ─ motion ────────────────────────────── */
@@ -117,6 +119,7 @@
     --shadow-popover: 0 12px 32px rgba(0,0,0,.40), 0 0 0 1px rgba(0,0,0,.20);
     --z-sticky:  2;
     --z-popover: 30;
+    --z-modal:   25;   /* 팝오버(30)가 모달 위에 떠야 한다 */
     --z-toast:   50;
 
     /* ─ ROLE ─ surface & text ─────────────────────────── */
