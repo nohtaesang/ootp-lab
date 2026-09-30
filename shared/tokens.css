@@ -109,10 +109,22 @@
     --side-w:       200px;
     --modal-w:      720px;
     --hairline:     1px;
+    /* 데이터 표(UI-RULES 5절 · 옛 표 수치) — 행 38 · 칸 6/10 · 정렬 번호 9 · 열 관리자 창 */
+    --table-row-h:      38px;
+    --table-cell-py:    6px;
+    --table-cell-px:    10px;
+    --table-sort-fs:    9px;
+    --table-rs-w:       10px;   /* 열 너비 손잡이(경계 안쪽) */
+    --tracking-caps:    0.025em;
+    --column-manager-w: 880px;
+    --column-manager-h: 720px;
+    --column-manager-rail-w: 148px;
 
     /* ─ PRIMITIVE ─ motion ────────────────────────────── */
     --dur-fast: 100ms;
     --dur-med:  180ms;
+    --hover-card-delay: 300ms;   /* 선수 이름 위에 머물면 카드가 뜨기까지(#645) */
+    --long-press: 500ms;         /* 터치로 길게 누르면 카드(#645) */
     --ease:     cubic-bezier(.2,.7,.3,1);
 
     /* ─ ROLE ─ elevation · layer (#609) — 밝기가 아니라 경계선 + 그림자로 띄운다(#308) */
@@ -121,6 +133,9 @@
     --z-popover: 30;
     --z-modal:   25;   /* 팝오버(30)가 모달 위에 떠야 한다 */
     --z-toast:   50;
+    /* 떠 있는 판(표 메뉴 · 끌기 이름표) — 그림자 두 겹 + 밝은 테 */
+    --shadow-overlay: 0 10px 38px -10px rgba(0,0,0,.55), 0 10px 20px -15px rgba(0,0,0,.40);
+    --border-overlay: rgba(255,255,255,.14);
 
     /* ─ ROLE ─ surface & text ─────────────────────────── */
     --bg-primary:    var(--c-n-90);
@@ -162,6 +177,17 @@
     --rating-terrible-tint: transparent;
     --rating-terrible-border:transparent;
     --rating-terrible-on:   var(--c-n-05);
+
+    /* ─ ROLE ─ stat 4구간 (기록 · 표 칸 글자색) — 능력 색과 같은 축 */
+    --stat-elite: var(--rating-elite-text);
+    --stat-good:  var(--rating-good-text);
+    --stat-ok:    var(--rating-average-text);
+    --stat-poor:  var(--rating-poor-text);
+
+    /* ─ ROLE ─ table surface — 머리는 한 단 어둡게 · 줄무늬는 불투명(고정 열이 비치지 않게) */
+    --table-head-bg: var(--bg-tertiary);
+    --table-row-bg:  var(--bg-secondary);
+    --table-row-alt: color-mix(in srgb, var(--bg-secondary) 95%, var(--text-normal));
 
     /* ─ ROLE ─ semantic ──────────────────────────────── */
     /* success 강점·성공·완료 */
@@ -230,6 +256,9 @@
    * ────────────────────────────────────────────────────── */
   :root[data-theme="light"] {
     --shadow-popover: 0 12px 32px rgba(0,0,0,.14), 0 0 0 1px rgba(0,0,0,.06);
+    --shadow-overlay: 0 10px 38px -10px rgba(0,0,0,.22), 0 10px 20px -15px rgba(0,0,0,.14);
+    --border-overlay: rgba(0,0,0,.12);
+    --table-row-alt:  color-mix(in srgb, var(--bg-secondary) 96.5%, var(--text-normal));
     --bg-primary:    var(--c-n-05);
     --bg-secondary:  var(--c-n-0);
     --bg-tertiary:   var(--c-n-10);
