@@ -125,6 +125,7 @@
     --dur-med:  180ms;
     --hover-card-delay: 300ms;   /* 선수 이름 위에 머물면 카드가 뜨기까지(#645) */
     --long-press: 500ms;         /* 터치로 길게 누르면 카드(#645) */
+    --toast-duration: 1600ms;    /* 저장 확인 문구가 보이는 시간(#684) */
     --ease:     cubic-bezier(.2,.7,.3,1);
 
     /* ─ ROLE ─ elevation · layer (#609) — 밝기가 아니라 경계선 + 그림자로 띄운다(#308) */
