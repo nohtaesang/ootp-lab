@@ -14,6 +14,11 @@ export function constrain(a, b, square = false) {
   const angle = Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) * Math.PI / 4;
   return [a[0] + Math.sign(Math.round(Math.cos(angle) * 10)) * n, a[1] + Math.sign(Math.round(Math.sin(angle) * 10)) * n];
 }
+export function shapeCorners(anchor, pointer, square = false, centered = false) {
+  const end = square ? constrain(anchor, pointer, true) : pointer;
+  const start = centered ? [2 * anchor[0] - end[0], 2 * anchor[1] - end[1]] : anchor;
+  return [start, end];
+}
 export function line(a, b) {
   let [x, y] = a;
   const dx = Math.abs(b[0] - x), dy = -Math.abs(b[1] - y);

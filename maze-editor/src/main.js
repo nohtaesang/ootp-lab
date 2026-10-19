@@ -1,12 +1,12 @@
 // Web map editor (#1280). Flat editing only; every game rule (entrances,
 // stronghold, connection, spawn analysis, file format) comes from the WASM
 // bridge, which is the game's own maze3-map crate.
-import { loadBridge } from "./bridge.js?v=c888d992";
-import * as store from "./store.js?v=c888d992";
-import { bounds, contains, constrain, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=c888d992";
-import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=c888d992";
-import { resizeMap, resizeOffset } from "./resize.js?v=c888d992";
-import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=c888d992";
+import { loadBridge } from "./bridge.js?v=fb761205";
+import * as store from "./store.js?v=fb761205";
+import { bounds, contains, constrain, shapeCorners, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=fb761205";
+import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=fb761205";
+import { resizeMap, resizeOffset } from "./resize.js?v=fb761205";
+import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=fb761205";
 
 const $ = (s, root = document) => root.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -22,7 +22,7 @@ const h = (tag, attrs = {}, ...kids) => {
 };
 const fill = (el, ...kids) => el.replaceChildren(...kids.flat().filter((k) => k != null && k !== false));
 
-const B = await loadBridge(await fetch(new URL("../map.wasm?v=c888d992", import.meta.url)).then((r) => r.arrayBuffer()));
+const B = await loadBridge(await fetch(new URL("../map.wasm?v=fb761205", import.meta.url)).then((r) => r.arrayBuffer()));
 const C = B.config();
 for (const [name, [r, g, b, a]] of Object.entries(C.colors)) {
   document.documentElement.style.setProperty(`--t-${name.replaceAll(".", "-").replaceAll("_", "-")}`, `rgba(${r * 255}, ${g * 255}, ${b * 255}, ${a})`);
@@ -79,6 +79,7 @@ const S = {
   filled: true,
   thickness: 1,
   shift: false,
+  alt: false,
   lastPaint: null,
   selection: null,
   floating: null,
@@ -244,20 +245,21 @@ function footprint(x, y, size) {
   return cells;
 }
 const shapeMode = () => ["line", "rect", "ellipse"].includes(S.mode);
-function shapeEnd() {
+function shapePoints() {
   const end = S.hover ?? S.anchor;
-  return S.shift ? constrain(S.anchor, end, S.mode !== "line" && !S.lineGesture) : end;
+  if (S.mode === "line" || S.lineGesture) return [S.anchor, S.shift ? constrain(S.anchor, end) : end];
+  return shapeCorners(S.anchor, end, S.shift, S.alt);
 }
 function gestureCells() {
   if (!S.anchor) return [];
   if (!S.filled && !S.thicknessValid && ["rect", "ellipse"].includes(S.mode)) return [];
-  const end = shapeEnd();
+  const [start, end] = shapePoints();
   if (S.mode === "line" || S.lineGesture) {
     const cells = new Map();
     for (const p of line(S.anchor, end)) for (const c of footprint(...p, S.brush)) cells.set(String(c), c);
     return [...cells.values()];
   }
-  return shapeCells(S.mode, S.anchor, end, S.filled, S.thickness).filter((p) => inside(...p));
+  return shapeCells(S.mode, start, end, S.filled, S.thickness).filter((p) => inside(...p));
 }
 function flood([sx, sy]) {
   const start = index(sx, sy), code = S.doc.codes[start], seen = new Set([start]), stack = [start], out = [];
@@ -622,7 +624,7 @@ function drawHover(X, Y) {
   if (cells) {
     let ok = () => true;
     if (S.tool === "ramp") {
-      const key = `${S.revision}:${S.mode}:${S.filled}:${S.thickness}:${S.brush}:${S.shift}:${S.anchor}:${S.hover}`;
+      const key = `${S.revision}:${S.mode}:${S.filled}:${S.thickness}:${S.brush}:${S.shift}:${S.alt}:${S.anchor}:${S.hover}`;
       if (!S.hoverRamp || S.hoverRamp.key !== key) S.hoverRamp = { key, ok: new Set(B.ramp(store.wire(S.doc), cells).map(String)) };
       const set = S.hoverRamp.ok;
       ok = (x, y) => set.has(`${x},${y}`);
@@ -647,8 +649,8 @@ function status() {
     text = S.floating ? "놓으면 덮어쓰기 · Esc 취소" : S.offsetPreview ? `금색 띠를 평평한 산으로 덮어쓰기 · ${S.offset.outward ? "바깥" : "안쪽"} ${S.offset.amount}칸 · 띠 적용 / Esc 취소` : r ? `${r.w} × ${r.h} 선택 · 드래그로 이동 · Ctrl+C / Ctrl+V · Esc 해제` : S.selectKind === "region" ? "같은 지형 덩어리 클릭 · 드래그로 이동" : "드래그로 지형 선택 · Ctrl+V 붙여넣기";
   }
   if (!text && S.anchor && S.hover) {
-    const r = bounds(S.anchor, shapeEnd());
-    text = `${r.w} × ${r.h} · 끝점 클릭 / 드래그 · Shift ${S.mode === "line" || S.lineGesture ? "방향 고정" : "정비율"} · Esc 취소`;
+    const r = bounds(...shapePoints());
+    text = `${r.w} × ${r.h} · 끝점 클릭 / 드래그 · Shift ${S.mode === "line" || S.lineGesture ? "방향 고정" : "정비율 · Alt 중심"} · Esc 취소`;
   } else if (!text && S.hover && S.doc && inside(...S.hover)) {
     const [x, y] = S.hover, code = S.doc.codes[index(x, y)];
     text = `${x}, ${y} · ${tileName(code)} · ${ROLES[category(code)]}`;
@@ -674,7 +676,7 @@ stage.addEventListener("pointerdown", (e) => {
   if (e.button !== 0) return;
   const c = cellAt(mx, my);
   if (!inside(...c)) return;
-  S.hover = c; S.shift = e.shiftKey;
+  S.hover = c; S.shift = e.shiftKey; S.alt = e.altKey;
   S.message = "";
   if (S.mode === "select") {
     if (S.floating?.paste) return dropSelection();
@@ -705,6 +707,7 @@ stage.addEventListener("pointerdown", (e) => {
     S.lineGesture = S.mode === "brush";
     if (S.lineGesture) { S.anchor = S.lastPaint ?? c; S.secondPoint = true; }
     if (!S.anchor) S.anchor = c;
+    status();
     return draw();
   }
   S.stroke = { before: new Map(), last: c };
@@ -719,12 +722,12 @@ stage.addEventListener("pointermove", (e) => {
   }
   const c = cellAt(mx, my);
   const changed = !S.hover || S.hover[0] !== c[0] || S.hover[1] !== c[1];
-  S.shift = e.shiftKey;
+  S.shift = e.shiftKey; S.alt = e.altKey;
   if (S.floating) {
     S.floating.to = { x: c[0] - S.floating.grab[0], y: c[1] - S.floating.grab[1] };
     status(); draw(); return;
   }
-  if (!changed) { draw(); return; }
+  if (!changed) { status(); draw(); return; }
   const clamped = [Math.max(0, Math.min(S.doc.width - 1, c[0])), Math.max(0, Math.min(S.doc.height - 1, c[1]))];
   S.hover = inside(...c) || S.anchor || S.stroke ? clamped : null;
   S.hoverBase = S.tool === "base" && S.hover ? { reason: B.base(store.wire(S.doc), S.hover) } : null;
@@ -743,6 +746,7 @@ stage.addEventListener("pointerup", (e) => {
     return;
   }
   if (e.button !== 0) return;
+  S.shift = e.shiftKey; S.alt = e.altKey;
   if (S.mode === "select") {
     if (S.floating && !S.floating.paste) {
       if (!dropSelection()) { S.floating = null; refresh(); }
@@ -758,7 +762,7 @@ stage.addEventListener("pointerup", (e) => {
     pushEdit(edit);
     if (!edit) touch(false);
   } else if ((shapeMode() || S.lineGesture) && S.anchor && S.press) {
-    const end = shapeEnd();
+    const [, end] = shapePoints();
     const second = S.dragged || S.secondPoint;
     S.press = null;
     if (second) {
@@ -795,7 +799,11 @@ window.addEventListener("keydown", (e) => {
   const k = e.key.toLowerCase();
   if ((e.ctrlKey || e.metaKey) && k === "s") { e.preventDefault(); save(); return; }
   if (typing()) { if (e.key === "Escape") document.activeElement.blur(); return; }
-  if (e.key === "Shift") { S.shift = true; draw(); }
+  if (e.key === "Shift" || e.key === "Alt") {
+    S.shift = e.shiftKey; S.alt = e.altKey;
+    if (e.key === "Alt" && ["rect", "ellipse"].includes(S.mode) && S.tool !== "base") e.preventDefault();
+    status(); draw(); return;
+  }
   if ((e.ctrlKey || e.metaKey) && (k === "c" || k === "v")) {
     e.preventDefault(); return k === "c" ? copySelection() : pasteSelection();
   }
@@ -820,8 +828,15 @@ window.addEventListener("keydown", (e) => {
   if (k === "f") return fit();
   if (k === "v") return toggleMarks();
 });
-window.addEventListener("keyup", (e) => { S.keys.delete(e.key === " " ? " " : e.key.toLowerCase()); if (e.key === "Shift") { S.shift = false; draw(); } });
-window.addEventListener("blur", () => { S.keys.clear(); S.shift = false; pan = null; stage.classList.remove("pan"); if (S.stroke || S.press || (S.floating && !S.floating.paste)) { cancel(); refresh(); } });
+window.addEventListener("keyup", (e) => {
+  S.keys.delete(e.key === " " ? " " : e.key.toLowerCase());
+  if (e.key === "Shift" || e.key === "Alt") {
+    S.shift = e.shiftKey; S.alt = e.altKey;
+    if (e.key === "Alt" && ["rect", "ellipse"].includes(S.mode) && S.tool !== "base" && !typing()) e.preventDefault();
+    status(); draw();
+  }
+});
+window.addEventListener("blur", () => { S.keys.clear(); S.shift = false; S.alt = false; pan = null; stage.classList.remove("pan"); if (S.stroke || S.press || (S.floating && !S.floating.paste)) { cancel(); refresh(); } });
 stage.addEventListener("pointercancel", () => { pan = null; stage.classList.remove("pan"); cancel(); refresh(); });
 let panLoop = 0;
 function startPanLoop() {
@@ -1093,7 +1108,7 @@ function recalc() {
   worker.postMessage({ job, doc: store.wire(S.doc) });
   renderSpawn();
 }
-const worker = new Worker(new URL("./worker.js?v=c888d992", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=fb761205", import.meta.url), { type: "module" });
 function refreshRecommendation() {
   const value = $("#recommendation-value");
   if (!value || S.pane !== "spawn") return;
