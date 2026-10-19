@@ -1,11 +1,11 @@
 // Web map editor (#1280). Flat editing only; every game rule (entrances,
 // stronghold, connection, spawn analysis, file format) comes from the WASM
 // bridge, which is the game's own maze3-map crate.
-import { loadBridge } from "./bridge.js";
-import * as store from "./store.js";
-import { bounds, contains, constrain, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js";
-import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js";
-import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js";
+import { loadBridge } from "./bridge.js?v=a440311d";
+import * as store from "./store.js?v=a440311d";
+import { bounds, contains, constrain, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=a440311d";
+import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=a440311d";
+import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=a440311d";
 
 const $ = (s, root = document) => root.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -21,7 +21,7 @@ const h = (tag, attrs = {}, ...kids) => {
 };
 const fill = (el, ...kids) => el.replaceChildren(...kids.flat().filter((k) => k != null && k !== false));
 
-const B = await loadBridge(await fetch(new URL("../map.wasm", import.meta.url)).then((r) => r.arrayBuffer()));
+const B = await loadBridge(await fetch(new URL("../map.wasm?v=a440311d", import.meta.url)).then((r) => r.arrayBuffer()));
 const C = B.config();
 for (const [name, [r, g, b, a]] of Object.entries(C.colors)) {
   document.documentElement.style.setProperty(`--t-${name.replaceAll(".", "-").replaceAll("_", "-")}`, `rgba(${r * 255}, ${g * 255}, ${b * 255}, ${a})`);
@@ -1059,7 +1059,7 @@ function recalc() {
   worker.postMessage({ job, doc: store.wire(S.doc) });
   renderSpawn();
 }
-const worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=a440311d", import.meta.url), { type: "module" });
 function renderSpawn() {
   if (S.pane !== "spawn") return;
   const a = S.analysis, bt = battle();
