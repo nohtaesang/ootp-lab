@@ -1,12 +1,12 @@
 // Web map editor (#1280). Flat editing only; every game rule (entrances,
 // stronghold, connection, spawn analysis, file format) comes from the WASM
 // bridge, which is the game's own maze3-map crate.
-import { loadBridge } from "./bridge.js?v=fb761205";
-import * as store from "./store.js?v=fb761205";
-import { bounds, contains, constrain, shapeCorners, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=fb761205";
-import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=fb761205";
-import { resizeMap, resizeOffset } from "./resize.js?v=fb761205";
-import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=fb761205";
+import { loadBridge } from "./bridge.js?v=eea32584";
+import * as store from "./store.js?v=eea32584";
+import { bounds, contains, constrain, shapeCorners, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=eea32584";
+import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=eea32584";
+import { resizeMap, resizeOffset } from "./resize.js?v=eea32584";
+import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=eea32584";
 
 const $ = (s, root = document) => root.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -22,7 +22,7 @@ const h = (tag, attrs = {}, ...kids) => {
 };
 const fill = (el, ...kids) => el.replaceChildren(...kids.flat().filter((k) => k != null && k !== false));
 
-const B = await loadBridge(await fetch(new URL("../map.wasm?v=fb761205", import.meta.url)).then((r) => r.arrayBuffer()));
+const B = await loadBridge(await fetch(new URL("../map.wasm?v=eea32584", import.meta.url)).then((r) => r.arrayBuffer()));
 const C = B.config();
 for (const [name, [r, g, b, a]] of Object.entries(C.colors)) {
   document.documentElement.style.setProperty(`--t-${name.replaceAll(".", "-").replaceAll("_", "-")}`, `rgba(${r * 255}, ${g * 255}, ${b * 255}, ${a})`);
@@ -1083,15 +1083,27 @@ function applyResize(candidate) {
 function battle() {
   return S.doc.battle ?? { rounds: C.profile.rounds, full_sight_round: C.profile.full_sight_round };
 }
+// #1321: the first night's sight in cells; unset keeps the profile's.
+const SIGHT_MSG = "첫 시야는 1~512칸이어야 합니다.";
+const startSight = (b) => b.start_sight ?? C.profile.start_sight ?? 12;
+const validSight = (n) => Number.isInteger(n) && n >= 1 && n <= 512;
+function withSight(b, sight) {
+  const next = { rounds: b.rounds, full_sight_round: b.full_sight_round };
+  if (battle().start_sight != null || sight !== startSight({})) next.start_sight = sight;
+  return next;
+}
 function recalc() {
   // Read the pending fields too: a click can precede their change/blur event.
   const rounds = Number(paneEl.querySelector('[data-field="rounds"]').value);
   const full = Number(paneEl.querySelector('[data-field="full"]').value);
+  const sight = Number(paneEl.querySelector('[data-field="sight"]').value);
   if (!Number.isInteger(rounds) || rounds < 1 || rounds > 256 || !Number.isInteger(full) || full < 1 || full > rounds)
     return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
+  if (!validSight(sight)) return say(SIGHT_MSG);
   const current = battle();
-  if (current.rounds !== rounds || current.full_sight_round !== full) {
-    S.doc.battle = { rounds, full_sight_round: full };
+  const next = withSight({ rounds, full_sight_round: full }, sight);
+  if (JSON.stringify(next) !== JSON.stringify(current)) {
+    S.doc.battle = next;
     S.message = ""; touch(true, false);
   }
   const a = S.analysis, job = ++a.job;
@@ -1108,7 +1120,7 @@ function recalc() {
   worker.postMessage({ job, doc: store.wire(S.doc) });
   renderSpawn();
 }
-const worker = new Worker(new URL("./worker.js?v=fb761205", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=eea32584", import.meta.url), { type: "module" });
 function refreshRecommendation() {
   const value = $("#recommendation-value");
   if (!value || S.pane !== "spawn") return;
@@ -1133,9 +1145,11 @@ function applyRecommendation(setRounds) {
   // the inputs. Native click/blur ordering must not restore its older value.
   const pendingRounds = Number(paneEl.querySelector('[data-field="rounds"]').value);
   const pendingFull = Number(paneEl.querySelector('[data-field="full"]').value);
+  const pendingSight = Number(paneEl.querySelector('[data-field="sight"]').value);
   if (!Number.isInteger(pendingRounds) || pendingRounds < 1 || pendingRounds > 256 || !Number.isInteger(pendingFull) || pendingFull < 1 || pendingFull > pendingRounds)
     return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
-  S.doc.battle = { rounds: pendingRounds, full_sight_round: pendingFull };
+  if (!validSight(pendingSight)) return say(SIGHT_MSG);
+  S.doc.battle = withSight({ rounds: pendingRounds, full_sight_round: pendingFull }, pendingSight);
   setRounds(round);
   recalc();
 }
@@ -1143,7 +1157,7 @@ function renderSpawn() {
   if (S.pane !== "spawn") return;
   const a = S.analysis, bt = battle();
   const setBattle = (key) => (n) => {
-    if (n == null) return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
+    if (n == null) return say(key === "start_sight" ? SIGHT_MSG : "라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
     const next = { ...battle(), [key]: n };
     if (key === "rounds") next.full_sight_round = Math.min(next.full_sight_round, n);
     if (next.full_sight_round > next.rounds) return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
@@ -1155,6 +1169,7 @@ function renderSpawn() {
     const rounds = paneEl.querySelector('[data-field="rounds"]');
     const full = paneEl.querySelector('[data-field="full"]');
     rounds.value = next.rounds; full.value = next.full_sight_round; full.max = next.rounds;
+    paneEl.querySelector('[data-field="sight"]').value = startSight(next);
     const state = $("#analysis-state");
     state.hidden = false; state.className = "note stale";
     state.textContent = "라운드 설정 변경 · 다시 계산 후 시야 표시";
@@ -1174,6 +1189,7 @@ function renderSpawn() {
   const focused = document.activeElement?.dataset?.field;
   const roundsInput = numberInput(bt.rounds, 1, 256, setBattle("rounds"), { live: false, field: "rounds" });
   const fullInput = numberInput(bt.full_sight_round, 1, bt.rounds, setBattle("full_sight_round"), { live: false, field: "full" });
+  const sightInput = numberInput(startSight(bt), 1, 512, setBattle("start_sight"), { live: false, field: "sight" });
   roundsInput.addEventListener("input", () => {
     const n = Number(roundsInput.value);
     if (Number.isInteger(n) && n >= 1 && n <= 256) fullInput.max = n;
@@ -1182,7 +1198,8 @@ function renderSpawn() {
     h("h2", {}, "시야·적 진입"),
     h("div", { class: "metrics" },
       h("span", {}, "최대 라운드"), roundsInput,
-      h("span", {}, "전체 시야 라운드"), fullInput),
+      h("span", {}, "전체 시야 라운드"), fullInput,
+      h("span", {}, "첫 시야(칸)"), sightInput),
     h("div", { class: "recommendation" },
       h("div", { class: "row" }, h("span", {}, "공간 기준 추천"), h("strong", { id: "recommendation-value" }, "확인 중…"),
         h("button", { class: "btn", id: "recommendation-apply", onclick: () => applyRecommendation(setBattle("rounds")) }, "추천 적용")),
