@@ -111,6 +111,10 @@ kbd { font: inherit; font-size: 12px; color: var(--faint); margin-left: 6px; }
 .metrics { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 13px; }
 .metrics span:nth-child(odd) { color: var(--muted); }
 .metrics span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }
+.recommendation { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--well); }
+.recommendation .row { justify-content: space-between; }
+.recommendation .row > .btn { flex: 0; padding: 0 10px; }
+.recommendation strong { color: var(--selected-line); font-variant-numeric: tabular-nums; }
 .sight-controls select { width: 156px; max-width: 100%; }
 .note { font-size: 12px; color: var(--faint); }
 .note.bad { color: var(--danger); }
