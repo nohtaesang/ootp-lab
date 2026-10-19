@@ -3,6 +3,8 @@
 // bridge, which is the game's own maze3-map crate.
 import { loadBridge } from "./bridge.js";
 import * as store from "./store.js";
+import { bounds, contains, constrain, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js";
+import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js";
 import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js";
 
 const $ = (s, root = document) => root.querySelector(s);
@@ -42,7 +44,10 @@ const TERRAIN = [
 ];
 const MODES = [
   { id: "brush", name: "브러시", key: "B" },
+  { id: "line", name: "직선", key: "L" },
   { id: "rect", name: "사각형", key: "R" },
+  { id: "ellipse", name: "원·타원", key: "O" },
+  { id: "select", name: "선택", key: "M" },
   { id: "fill", name: "채우기", key: "G" },
   { id: "picker", name: "스포이트", key: "I" },
 ];
@@ -70,6 +75,18 @@ const S = {
   mode: "brush",
   prevMode: "brush",
   brush: 1,
+  filled: true,
+  thickness: 1,
+  shift: false,
+  lastPaint: null,
+  selection: null,
+  floating: null,
+  clipboard: null,
+  selectKind: "box",
+  offset: { amount: 1, outward: false },
+  offsetPreview: false,
+  offsetValid: true,
+  thicknessValid: true,
   undo: [],
   redo: [],
   stroke: null,
@@ -83,7 +100,7 @@ const S = {
   check: null,
   labels: [],
   revision: 0,
-  analysis: { report: null, revision: -1, job: 0, running: false, error: "", round: 0, routes: true },
+  analysis: { report: null, revision: -1, job: 0, running: false, error: "", round: 0, routes: true, sight: true, sightKey: null },
   pane: null,
   resize: { w: 32, h: 32, anchor: 4, error: "" },
   message: "",
@@ -115,7 +132,7 @@ function open(doc, saved) {
   S.doc = cloneDoc(doc);
   S.saved = saved ? cloneDoc(saved) : null;
   S.undo = []; S.redo = [];
-  S.stroke = null; S.anchor = null;
+  S.stroke = null; S.anchor = null; S.selection = null; S.floating = null; S.lastPaint = null;
   S.analysis = { ...S.analysis, report: null, revision: -1, running: false, error: "", round: 0 };
   S.pane = null;
   layer.reset(S.doc);
@@ -127,7 +144,7 @@ function open(doc, saved) {
 
 // ---------------------------------------------------------------- changes
 let checkQueued = false, workTimer = 0;
-function touch(changed = true) {
+function touch(changed = true, rebuildPane = true) {
   S.revision++;
   if (changed) {
     updateDirty();
@@ -139,7 +156,7 @@ function touch(changed = true) {
     requestAnimationFrame(runCheck);
   }
   S.hoverRamp = null; S.hoverBase = null;
-  refresh();
+  refresh(rebuildPane);
 }
 function updateDirty() {
   const d = S.doc, s = S.saved;
@@ -221,15 +238,21 @@ function footprint(x, y, size) {
     for (let cx = Math.max(0, x - r); cx <= Math.min(S.doc.width - 1, x + Math.floor((size - 1) / 2)); cx++) cells.push([cx, cy]);
   return cells;
 }
-function line([ax, ay], [bx, by]) {
-  const dx = bx - ax, dy = by - ay, steps = Math.max(Math.abs(dx), Math.abs(dy), 1), out = [];
-  for (let n = 0; n <= steps; n++) out.push([ax + Math.trunc((dx * n) / steps), ay + Math.trunc((dy * n) / steps)]);
-  return out;
+const shapeMode = () => ["line", "rect", "ellipse"].includes(S.mode);
+function shapeEnd() {
+  const end = S.hover ?? S.anchor;
+  return S.shift ? constrain(S.anchor, end, S.mode !== "line" && !S.lineGesture) : end;
 }
-function rectCells([ax, ay], [bx, by]) {
-  const out = [];
-  for (let y = Math.min(ay, by); y <= Math.max(ay, by); y++) for (let x = Math.min(ax, bx); x <= Math.max(ax, bx); x++) out.push([x, y]);
-  return out;
+function gestureCells() {
+  if (!S.anchor) return [];
+  if (!S.filled && !S.thicknessValid && ["rect", "ellipse"].includes(S.mode)) return [];
+  const end = shapeEnd();
+  if (S.mode === "line" || S.lineGesture) {
+    const cells = new Map();
+    for (const p of line(S.anchor, end)) for (const c of footprint(...p, S.brush)) cells.set(String(c), c);
+    return [...cells.values()];
+  }
+  return shapeCells(S.mode, S.anchor, end, S.filled, S.thickness).filter((p) => inside(...p));
 }
 function flood([sx, sy]) {
   const start = index(sx, sy), code = S.doc.codes[start], seen = new Set([start]), stack = [start], out = [];
@@ -276,8 +299,59 @@ function cancel() {
     S.stroke = null;
     touch(false);
   }
-  S.anchor = null; S.press = null;
+  S.anchor = null; S.press = null; S.lineGesture = false;
+  S.selection = null; S.floating = null; S.offsetPreview = false;
+  S.message = "";
   draw();
+}
+function copySelection() {
+  if (!S.selection) return say("먼저 지형을 선택하세요.");
+  S.clipboard = capture(S.doc, S.selection);
+  say(`${S.selection.w} × ${S.selection.h} 지형 복사됨 · Ctrl+V 붙여넣기`);
+  refresh();
+}
+function pasteSelection() {
+  if (!S.clipboard) return say("복사한 지형이 없습니다.");
+  if (S.clipboard.w > S.doc.width || S.clipboard.h > S.doc.height) return say("맵보다 큰 선택 영역은 붙여넣을 수 없습니다.");
+  cancel();
+  S.mode = "select"; if (S.tool === "base") S.tool = "low";
+  const p = S.hover ?? [Math.floor(S.doc.width / 2), Math.floor(S.doc.height / 2)];
+  S.floating = { payload: S.clipboard, to: { x: p[0], y: p[1] }, from: null, grab: [0, 0], paste: true };
+  say("붙여넣을 곳 클릭 · Esc 취소"); refresh();
+}
+function dropSelection() {
+  const f = S.floating;
+  const codes = transfer(S.doc, f.payload, f.to, f.from);
+  if (!codes) { say("맵 밖으로 선택 영역이 잘립니다. 안쪽에 놓으세요."); return false; }
+  const before = new Map();
+  codes.forEach((code, i) => { if (code !== S.doc.codes[i]) { before.set(i, S.doc.codes[i]); S.doc.codes[i] = code; } });
+  layer.paint(before.keys());
+  S.selection = { ...f.to, w: f.payload.w, h: f.payload.h, mask: f.payload.mask?.slice() };
+  S.floating = null;
+  pushEdit(tilesEdit(before));
+  S.message = ""; refresh();
+  return true;
+}
+let offsetCache = null;
+function offsetPreviewCells() {
+  if (!S.selection) return [];
+  if (!offsetCache || offsetCache.selection !== S.selection || offsetCache.amount !== S.offset.amount || offsetCache.outward !== S.offset.outward)
+    offsetCache = { selection: S.selection, ...S.offset, cells: offsetCells(S.doc, S.selection, S.offset.amount, S.offset.outward) };
+  return offsetCache.cells;
+}
+function applyOffset() {
+  if (!S.selection || S.floating || !S.offsetValid) return;
+  const before = new Map();
+  const cells = offsetPreviewCells();
+  for (const [x, y] of cells) {
+    const i = index(x, y);
+    if (S.doc.codes[i] !== 1) { before.set(i, S.doc.codes[i]); S.doc.codes[i] = 1; }
+  }
+  layer.paint(before.keys());
+  pushEdit(tilesEdit(before));
+  if (S.offset.outward) S.selection = extendSelection(S.selection, cells);
+  S.offsetPreview = false;
+  say(`평평한 산 ${before.size}칸 적용됨 · Ctrl+Z 되돌리기`); refresh();
 }
 function placeBase([x, y]) {
   const reason = B.base(store.wire(S.doc), [x, y]);
@@ -364,7 +438,7 @@ function paintView() {
   }
 
   if (S.pane === "size") drawResize(X, Y);
-  if (showSpawn) drawSpawn(X, Y);
+  if (showSpawn) { drawSight(X, Y); drawSpawn(X, Y); }
   if (S.marks && S.check) drawMarks(X, Y);
   drawHover(X, Y);
 }
@@ -426,6 +500,26 @@ function drawSpawn(X, Y) {
   }
   ctx.globalAlpha = 1;
 }
+function drawSight(X, Y) {
+  if (!S.analysis.sight) return;
+  const preview = sightPreview(S.doc, S.analysis);
+  if (!preview) return;
+  const s = S.view.s, { width: w, height: h } = S.doc;
+  const [bx, by] = preview.base, radius = preview.radius;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(X(0), Y(0), w * s, h * s); ctx.clip();
+  const accent = C.colors["text.accent"] ?? [0.68, 0.72, 1, 1];
+  ctx.strokeStyle = `rgba(${accent.slice(0, 3).map((c) => c * 255).join(",")},1)`;
+  ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+  if (radius == null) ctx.strokeRect(X(0) + 1, Y(0) + 1, w * s - 2, h * s - 2);
+  else {
+    ctx.beginPath(); ctx.rect(X(0), Y(0), w * s, h * s);
+    ctx.moveTo(X(bx + radius), Y(by)); ctx.arc(X(bx), Y(by), radius * s, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,0,0,0.44)"; ctx.fill("evenodd");
+    ctx.beginPath(); ctx.arc(X(bx), Y(by), radius * s, 0, Math.PI * 2); ctx.stroke();
+  }
+  ctx.restore();
+}
 /** One large arrow per route, a third of the way from its spawn, pointing at the base. */
 function arrow(path, X, Y) {
   if (path.length < 2) return;
@@ -476,6 +570,36 @@ function drawResize(X, Y) {
 }
 function drawHover(X, Y) {
   const s = S.view.s;
+  if (S.mode === "select") {
+    const f = S.floating;
+    const r = f ? { ...f.to, w: f.payload.w, h: f.payload.h, mask: f.payload.mask } : S.anchor && S.hover ? bounds(S.anchor, S.hover) : S.selection;
+    if (!r) return;
+    const valid = !f || (r.x >= 0 && r.y >= 0 && r.x + r.w <= S.doc.width && r.y + r.h <= S.doc.height);
+    if (f) {
+      if (!f.image) {
+        const ghost = new TerrainLayer(PLAN); ghost.reset({ width: r.w, height: r.h, codes: f.payload.codes });
+        if (f.payload.mask) for (let i = 0; i < f.payload.mask.length; i++) if (!f.payload.mask[i]) ghost.ctx.clearRect((i % r.w) * ghost.px, Math.floor(i / r.w) * ghost.px, ghost.px, ghost.px);
+        f.image = ghost.canvas;
+      }
+      if (f.from) {
+        ctx.fillStyle = rgb(PLAN.categories[0]);
+        for (let y = 0; y < r.h; y++) for (let x = 0; x < r.w; x++) if (!f.payload.mask || f.payload.mask[y * r.w + x]) ctx.fillRect(X(f.from.x + x), Y(f.from.y + y), s, s);
+      }
+      ctx.globalAlpha = 0.8;
+      ctx.drawImage(f.image, X(r.x), Y(r.y), r.w * s, r.h * s);
+      ctx.globalAlpha = 1;
+    }
+    ctx.fillStyle = valid ? "rgba(173,184,255,0.10)" : "rgba(255,75,58,0.35)";
+    if (!r.mask) ctx.fillRect(X(r.x), Y(r.y), r.w * s, r.h * s);
+    else for (let i = 0; i < r.mask.length; i++) if (r.mask[i]) ctx.fillRect(X(r.x + i % r.w), Y(r.y + Math.floor(i / r.w)), s, s);
+    ctx.strokeStyle = valid ? "#adb8ff" : "#ff5a72"; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+    ctx.strokeRect(X(r.x) + 1, Y(r.y) + 1, r.w * s - 2, r.h * s - 2); ctx.setLineDash([]);
+    if (S.offsetPreview && S.selection && !f) {
+      ctx.fillStyle = "rgba(255,200,100,0.65)";
+      for (const [x, y] of offsetPreviewCells()) ctx.fillRect(X(x), Y(y), s, s);
+    }
+    return;
+  }
   const outline = (cells, ok) => {
     for (const [x, y] of cells) {
       ctx.fillStyle = ok(x, y) ? "rgba(61, 255, 162, 0.28)" : "rgba(255, 75, 58, 0.4)";
@@ -492,12 +616,12 @@ function drawHover(X, Y) {
     return;
   }
   let cells = null;
-  if (S.anchor && S.hover) cells = rectCells(S.anchor, S.hover).filter(([x, y]) => inside(x, y));
+  if (S.anchor && S.hover) cells = gestureCells();
   else if (S.hover && S.mode === "brush" && !S.stroke) cells = footprint(S.hover[0], S.hover[1], S.brush);
   if (cells) {
     let ok = () => true;
     if (S.tool === "ramp") {
-      const key = cells.length + ":" + cells[0] + ":" + cells[cells.length - 1];
+      const key = `${S.revision}:${S.mode}:${S.filled}:${S.thickness}:${S.brush}:${S.shift}:${S.anchor}:${S.hover}`;
       if (!S.hoverRamp || S.hoverRamp.key !== key) S.hoverRamp = { key, ok: new Set(B.ramp(store.wire(S.doc), cells).map(String)) };
       const set = S.hoverRamp.ok;
       ok = (x, y) => set.has(`${x},${y}`);
@@ -517,14 +641,19 @@ function say(text) {
 function status() {
   const el = $("#status");
   let text = S.message;
+  if (!text && S.mode === "select") {
+    const r = S.selection;
+    text = S.floating ? "놓으면 덮어쓰기 · Esc 취소" : S.offsetPreview ? `금색 띠를 평평한 산으로 덮어쓰기 · ${S.offset.outward ? "바깥" : "안쪽"} ${S.offset.amount}칸 · 띠 적용 / Esc 취소` : r ? `${r.w} × ${r.h} 선택 · 드래그로 이동 · Ctrl+C / Ctrl+V · Esc 해제` : S.selectKind === "region" ? "같은 지형 덩어리 클릭 · 드래그로 이동" : "드래그로 지형 선택 · Ctrl+V 붙여넣기";
+  }
   if (!text && S.anchor && S.hover) {
-    text = `사각형 ${Math.abs(S.anchor[0] - S.hover[0]) + 1} × ${Math.abs(S.anchor[1] - S.hover[1]) + 1} · 끝점 클릭 / 드래그 · Esc 취소`;
+    const r = bounds(S.anchor, shapeEnd());
+    text = `${r.w} × ${r.h} · 끝점 클릭 / 드래그 · Shift ${S.mode === "line" || S.lineGesture ? "방향 고정" : "정비율"} · Esc 취소`;
   } else if (!text && S.hover && S.doc && inside(...S.hover)) {
     const [x, y] = S.hover, code = S.doc.codes[index(x, y)];
     text = `${x}, ${y} · ${tileName(code)} · ${ROLES[category(code)]}`;
     if (S.tool === "base" && S.hoverBase?.reason) text += ` · ${S.hoverBase.reason}`;
   }
-  el.textContent = text;
+  el.textContent = text || "두 점 클릭 / 드래그 · 직선 L · 선택 M · Shift+클릭 직선 연결";
   el.classList.toggle("bad", !!S.message && /불가|없|않|실패|잘립|올바르지/.test(S.message));
 }
 
@@ -535,7 +664,7 @@ stage.addEventListener("pointerdown", (e) => {
   if (!S.doc) return;
   stage.setPointerCapture(e.pointerId);
   const r = stage.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
-  if (e.button === 2 && (S.stroke || S.anchor)) return cancel();
+  if (e.button === 2 && (S.stroke || S.anchor || S.floating)) return cancel();
   if (e.button === 1 || e.button === 2 || (e.button === 0 && S.keys.has(" "))) {
     pan = { mx, my, ox: S.view.ox, oy: S.view.oy };
     stage.classList.add("pan");
@@ -544,7 +673,18 @@ stage.addEventListener("pointerdown", (e) => {
   if (e.button !== 0) return;
   const c = cellAt(mx, my);
   if (!inside(...c)) return;
+  S.hover = c; S.shift = e.shiftKey;
   S.message = "";
+  if (S.mode === "select") {
+    if (S.floating?.paste) return dropSelection();
+    S.offsetPreview = false;
+    if (contains(S.selection, c)) {
+      const r = S.selection;
+      S.floating = { payload: capture(S.doc, r), from: { x: r.x, y: r.y }, to: { x: r.x, y: r.y }, grab: [c[0] - r.x, c[1] - r.y] };
+    } else if (S.selectKind === "region") S.selection = regionSelection(S.doc, c);
+    else { S.selection = null; S.anchor = c; S.press = c; S.dragged = false; }
+    return refresh();
+  }
   if (S.tool === "base") return placeBase(c);
   if (S.mode === "picker") {
     const code = S.doc.codes[index(...c)], cat = category(code);
@@ -558,8 +698,11 @@ stage.addEventListener("pointerdown", (e) => {
     paintCells(flood(c), before);
     return pushEdit(tilesEdit(before));
   }
-  if (S.mode === "rect") {
+  if (shapeMode() || (S.mode === "brush" && e.shiftKey)) {
+    S.secondPoint = !!S.anchor;
     S.press = c; S.dragged = false;
+    S.lineGesture = S.mode === "brush";
+    if (S.lineGesture) { S.anchor = S.lastPaint ?? c; S.secondPoint = true; }
     if (!S.anchor) S.anchor = c;
     return draw();
   }
@@ -575,7 +718,12 @@ stage.addEventListener("pointermove", (e) => {
   }
   const c = cellAt(mx, my);
   const changed = !S.hover || S.hover[0] !== c[0] || S.hover[1] !== c[1];
-  if (!changed) return;
+  S.shift = e.shiftKey;
+  if (S.floating) {
+    S.floating.to = { x: c[0] - S.floating.grab[0], y: c[1] - S.floating.grab[1] };
+    status(); draw(); return;
+  }
+  if (!changed) { draw(); return; }
   const clamped = [Math.max(0, Math.min(S.doc.width - 1, c[0])), Math.max(0, Math.min(S.doc.height - 1, c[1]))];
   S.hover = inside(...c) || S.anchor || S.stroke ? clamped : null;
   S.hoverBase = S.tool === "base" && S.hover ? { reason: B.base(store.wire(S.doc), S.hover) } : null;
@@ -594,26 +742,37 @@ stage.addEventListener("pointerup", (e) => {
     return;
   }
   if (e.button !== 0) return;
+  if (S.mode === "select") {
+    if (S.floating && !S.floating.paste) {
+      if (!dropSelection()) { S.floating = null; refresh(); }
+    } else if (S.anchor && S.hover) {
+      S.selection = S.dragged ? bounds(S.anchor, S.hover) : null; S.anchor = null; S.press = null; refresh();
+    }
+    return;
+  }
   if (S.stroke) {
     const edit = tilesEdit(S.stroke.before);
+    S.lastPaint = S.stroke.last;
     S.stroke = null;
     pushEdit(edit);
     if (!edit) touch(false);
-  } else if (S.mode === "rect" && S.anchor && S.press) {
-    const end = S.hover ?? S.press;
-    const second = S.dragged || S.anchor[0] !== S.press[0] || S.anchor[1] !== S.press[1];
+  } else if ((shapeMode() || S.lineGesture) && S.anchor && S.press) {
+    const end = shapeEnd();
+    const second = S.dragged || S.secondPoint;
     S.press = null;
     if (second) {
       const before = new Map();
-      paintCells(rectCells(S.anchor, end).filter(([x, y]) => inside(x, y)), before);
+      paintCells(gestureCells(), before);
+      S.lastPaint = end;
       S.anchor = null;
+      S.lineGesture = false;
       pushEdit(tilesEdit(before));
     }
     draw();
   }
 });
 stage.addEventListener("pointerleave", () => {
-  if (S.stroke || S.anchor || pan) return;
+  if (S.stroke || S.anchor || S.floating || pan) return;
   S.hover = null; status(); draw();
 });
 stage.addEventListener("wheel", (e) => {
@@ -635,13 +794,18 @@ window.addEventListener("keydown", (e) => {
   const k = e.key.toLowerCase();
   if ((e.ctrlKey || e.metaKey) && k === "s") { e.preventDefault(); save(); return; }
   if (typing()) { if (e.key === "Escape") document.activeElement.blur(); return; }
+  if (e.key === "Shift") { S.shift = true; draw(); }
+  if ((e.ctrlKey || e.metaKey) && (k === "c" || k === "v")) {
+    e.preventDefault(); return k === "c" ? copySelection() : pasteSelection();
+  }
   if ((e.ctrlKey || e.metaKey) && (k === "z" || k === "y")) {
     e.preventDefault();
     return e.shiftKey || k === "y" ? redo() : undo();
   }
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (e.key === "Escape") {
-    if (S.stroke || S.anchor) return cancel();
+    if (S.offsetPreview) { S.offsetPreview = false; S.message = ""; refresh(); return; }
+    if (S.stroke || S.anchor || S.selection || S.floating) { cancel(); refresh(); return; }
     if (S.pane) return setPane(null);
     return toLibrary();
   }
@@ -655,8 +819,9 @@ window.addEventListener("keydown", (e) => {
   if (k === "f") return fit();
   if (k === "v") return toggleMarks();
 });
-window.addEventListener("keyup", (e) => S.keys.delete(e.key === " " ? " " : e.key.toLowerCase()));
-window.addEventListener("blur", () => S.keys.clear());
+window.addEventListener("keyup", (e) => { S.keys.delete(e.key === " " ? " " : e.key.toLowerCase()); if (e.key === "Shift") { S.shift = false; draw(); } });
+window.addEventListener("blur", () => { S.keys.clear(); S.shift = false; pan = null; stage.classList.remove("pan"); if (S.stroke || S.press || (S.floating && !S.floating.paste)) { cancel(); refresh(); } });
+stage.addEventListener("pointercancel", () => { pan = null; stage.classList.remove("pan"); cancel(); refresh(); });
 let panLoop = 0;
 function startPanLoop() {
   if (panLoop) return;
@@ -681,6 +846,7 @@ new ResizeObserver(() => draw()).observe(stage);
 function pickTool(id) {
   cancel();
   S.tool = id;
+  if (id === "base" && S.mode === "select") S.mode = "brush";
   if (id !== "base" && S.mode === "picker") S.mode = S.prevMode;
   refresh();
 }
@@ -713,6 +879,25 @@ brushEl.addEventListener("change", () => {
   draw();
 });
 brushEl.addEventListener("keydown", (e) => { if (e.key === "Enter") brushEl.blur(); });
+$("#shape-solid").addEventListener("click", () => { S.filled = true; refresh(); });
+$("#shape-outline").addEventListener("click", () => { S.filled = false; refresh(); });
+for (const kind of ["box", "region"]) $("#select-" + kind).addEventListener("click", () => { cancel(); S.selectKind = kind; refresh(); });
+for (const [id, outward] of [["in", false], ["out", true]]) $("#offset-" + id).addEventListener("click", () => { S.offset.outward = outward; S.message = ""; refresh(); });
+$("#offset-amount").max = C.max_size;
+$("#offset-amount").addEventListener("input", (e) => {
+  const n = Number(e.target.value), valid = Number.isInteger(n) && n >= 1 && n <= C.max_size;
+  S.offsetValid = valid;
+  e.target.classList.toggle("bad", !valid);
+  if (valid) { S.offset.amount = n; S.message = ""; } else say(`폭은 1~${C.max_size} 정수입니다.`);
+  refresh();
+});
+$("#thickness").max = C.max_size;
+$("#thickness").addEventListener("input", (e) => {
+  const n = Number(e.target.value), valid = Number.isInteger(n) && n >= 1 && n <= C.max_size;
+  S.thicknessValid = valid;
+  e.target.classList.toggle("bad", !valid);
+  if (valid) { S.thickness = n; draw(); } else say(`두께는 1~${C.max_size} 정수입니다.`);
+});
 document.addEventListener("click", (e) => {
   const cmd = e.target.closest("[data-cmd]")?.dataset.cmd;
   const pane = e.target.closest(".top [data-pane]")?.dataset.pane;
@@ -720,20 +905,39 @@ document.addEventListener("click", (e) => {
   if (!cmd || e.target.closest("#modal-root")) return;
   ({
     library: toLibrary, save, undo, redo, fit, marks: toggleMarks, skin: cycleSkin, "base-remove": removeBase,
+    copy: copySelection, paste: pasteSelection, deselect: () => { cancel(); refresh(); },
+    offset: () => { S.offsetPreview = true; S.message = ""; refresh(); }, "offset-apply": applyOffset,
   })[cmd]?.();
 });
 
-function refresh() {
+function refresh(rebuildPane = true) {
   if (!S.doc) return;
   for (const b of modesEl.children) b.classList.toggle("on", S.tool !== "base" && b.dataset.mode === S.mode);
   for (const b of terrainEl.children) b.classList.toggle("on", b.dataset.tool === S.tool);
   $("#base-tool").classList.toggle("on", S.tool === "base");
   $("#base-remove").hidden = !(S.tool === "base" && S.doc.base);
-  $("#brush-field").hidden = S.mode !== "brush" || S.tool === "base";
+  $("#brush-field").hidden = !["brush", "line"].includes(S.mode) || S.tool === "base";
+  $("#shape-options").hidden = !["rect", "ellipse"].includes(S.mode) || S.tool === "base";
+  $("#selection-options").hidden = S.mode !== "select";
+  terrainEl.hidden = S.mode === "select";
+  $("#terrain-caption").hidden = S.mode === "select";
+  $("#thickness-field").hidden = S.filled;
+  $("#shape-solid").classList.toggle("on", S.filled);
+  $("#shape-outline").classList.toggle("on", !S.filled);
+  $("[data-cmd=copy]").disabled = !S.selection || !!S.floating;
+  $("[data-cmd=paste]").disabled = !S.clipboard;
+  $("#offset-options").hidden = !S.selection || !!S.floating;
+  $("[data-cmd=offset-apply]").hidden = !S.offsetPreview;
+  $("[data-cmd=offset-apply]").disabled = !S.offsetValid;
+  $("[data-cmd=offset]").disabled = !S.offsetValid;
+  $("#select-box").classList.toggle("on", S.selectKind === "box");
+  $("#select-region").classList.toggle("on", S.selectKind === "region");
+  $("#offset-in").classList.toggle("on", !S.offset.outward);
+  $("#offset-out").classList.toggle("on", S.offset.outward);
   $("#marks-btn").classList.toggle("on", S.marks);
   for (const b of document.querySelectorAll(".top [data-pane]")) b.classList.toggle("on", b.dataset.pane === S.pane);
   $("#skin-name").textContent = C.themes.find((t) => t.landscape === S.doc.landscape)?.name ?? S.doc.landscape;
-  if (S.pane === "spawn") renderSpawn();
+  if (S.pane === "spawn" && rebuildPane) renderSpawn();
   status();
   draw();
 }
@@ -766,7 +970,7 @@ function numberInput(value, min, max, onset, { live = true, field = null } = {})
   const el = h("input", { class: "input", type: "number", min, max, value, inputmode: "numeric", "data-field": field });
   const commit = () => {
     const n = Number(el.value);
-    const ok = Number.isInteger(n) && n >= min && n <= max;
+    const ok = Number.isInteger(n) && n >= Number(el.min) && n <= Number(el.max);
     el.classList.toggle("bad", !ok);
     onset(ok ? n : null);
   };
@@ -831,14 +1035,25 @@ function battle() {
   return S.doc.battle ?? { rounds: C.profile.rounds, full_sight_round: C.profile.full_sight_round };
 }
 function recalc() {
+  // Read the pending fields too: a click can precede their change/blur event.
+  const rounds = Number(paneEl.querySelector('[data-field="rounds"]').value);
+  const full = Number(paneEl.querySelector('[data-field="full"]').value);
+  if (!Number.isInteger(rounds) || rounds < 1 || rounds > 256 || !Number.isInteger(full) || full < 1 || full > rounds)
+    return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
+  const current = battle();
+  if (current.rounds !== rounds || current.full_sight_round !== full) {
+    S.doc.battle = { rounds, full_sight_round: full };
+    S.message = ""; touch(true, false);
+  }
   const a = S.analysis, job = ++a.job;
   a.running = true; a.error = "";
   const revision = S.revision;
+  const vision = sightKey(S.doc);
   worker.onmessage = ({ data }) => {
     if (data.job !== S.analysis.job) return;
     a.running = false;
     if (data.error) { a.error = data.error; a.report = null; }
-    else { a.report = data.report; a.revision = revision; a.round = Math.min(a.round, data.report.rounds.length - 1); }
+    else { a.report = data.report; a.revision = revision; a.sightKey = vision; a.round = Math.min(a.round, data.report.rounds.length - 1); }
     renderSpawn(); draw();
   };
   worker.postMessage({ job, doc: store.wire(S.doc) });
@@ -850,32 +1065,54 @@ function renderSpawn() {
   const a = S.analysis, bt = battle();
   const setBattle = (key) => (n) => {
     if (n == null) return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
-    const next = { ...bt, [key]: n };
+    const next = { ...battle(), [key]: n };
     if (key === "rounds") next.full_sight_round = Math.min(next.full_sight_round, n);
     if (next.full_sight_round > next.rounds) return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
     S.doc.battle = next;
-    touch();
+    S.message = "";
+    // Keep the inputs and the clicked button mounted on change/blur.
+    // Replacing the panel here would swallow the click on "다시 계산".
+    touch(true, false);
+    const rounds = paneEl.querySelector('[data-field="rounds"]');
+    const full = paneEl.querySelector('[data-field="full"]');
+    rounds.value = next.rounds; full.value = next.full_sight_round; full.max = next.rounds;
+    const state = $("#analysis-state");
+    state.hidden = false; state.className = "note stale";
+    state.textContent = "라운드 설정 변경 · 다시 계산 후 시야 표시";
+    if ($("#sight-range")) $("#sight-range").textContent = "재계산 필요";
   };
   const r = a.report?.rounds[a.round];
   const stale = a.report && a.revision !== S.revision;
+  const vision = sightPreview(S.doc, a);
   const state = a.running ? h("div", { class: "note" }, "계산 중…")
     : a.error ? h("div", { class: "note bad" }, a.error)
-    : !a.report ? h("div", { class: "note" }, "다시 계산을 누르면 실제 스폰 경계와 경로를 그립니다.")
-    : stale ? h("div", { class: "note stale" }, "수정 후 오래된 결과입니다.") : null;
+    : !a.report ? h("div", { class: "note" }, "기지 배치 후 다시 계산을 누르면 라운드별 시야·스폰·경로를 표시합니다.")
+    : stale ? h("div", { class: "note stale" }, vision ? "지형 변경 · 시야는 유지, 스폰·경로는 재계산 필요" : "기지·크기·라운드 변경 · 다시 계산 후 시야 표시") : null;
   const rows = a.report?.rounds.map((row, i) =>
     h("tr", { class: "pick" + (i === a.round ? " on" : ""), onclick: () => { a.round = i; renderSpawn(); draw(); } },
       h("td", {}, String(row.number)), h("td", {}, row.count.toLocaleString()), h("td", {}, row.candidates.length.toLocaleString()),
       h("td", {}, row.visible_places.toLocaleString()))) ?? [];
   const focused = document.activeElement?.dataset?.field;
+  const roundsInput = numberInput(bt.rounds, 1, 256, setBattle("rounds"), { live: false, field: "rounds" });
+  const fullInput = numberInput(bt.full_sight_round, 1, bt.rounds, setBattle("full_sight_round"), { live: false, field: "full" });
+  roundsInput.addEventListener("input", () => {
+    const n = Number(roundsInput.value);
+    if (Number.isInteger(n) && n >= 1 && n <= 256) fullInput.max = n;
+  });
   fill(paneEl, 
-    h("h2", {}, "적 진입"),
+    h("h2", {}, "시야·적 진입"),
     h("div", { class: "metrics" },
-      h("span", {}, "최대 라운드"), numberInput(bt.rounds, 1, 256, setBattle("rounds"), { live: false, field: "rounds" }),
-      h("span", {}, "전체 시야 라운드"), numberInput(bt.full_sight_round, 1, bt.rounds, setBattle("full_sight_round"), { live: false, field: "full" })),
+      h("span", {}, "최대 라운드"), roundsInput,
+      h("span", {}, "전체 시야 라운드"), fullInput),
     h("div", { class: "row" },
       h("button", { class: "btn primary", onclick: recalc, disabled: a.running }, "다시 계산"),
+      h("button", { class: "btn" + (a.sight ? " on" : ""), onclick: () => { a.sight = !a.sight; renderSpawn(); draw(); } }, a.sight ? "시야 켜짐" : "시야 꺼짐"),
       h("button", { class: "btn" + (a.routes ? " on" : ""), onclick: () => { a.routes = !a.routes; renderSpawn(); draw(); } }, a.routes ? "경로 켜짐" : "경로 꺼짐")),
-    state,
+    h("div", { id: "analysis-state", hidden: !state }, state),
+    a.report && h("div", { class: "metrics sight-controls" }, h("span", {}, "미리볼 라운드"),
+      h("select", { class: "input", "aria-label": "미리볼 라운드", onchange: (e) => { a.round = Number(e.target.value); renderSpawn(); draw(); } },
+        a.report.rounds.map((row, i) => h("option", { value: i, selected: i === a.round }, roundSightLabel(row)))),
+      h("span", {}, "시야 범위"), h("span", { id: "sight-range" }, vision ? sightLabel(vision.radius) : "재계산 필요")),
     r && h("div", { class: "metrics" },
       h("span", {}, "스폰 위치"), h("span", {}, `${r.candidates.length.toLocaleString()}곳`),
       h("span", {}, "구역 · 경로"), h("span", {}, `${r.regions} · ${r.routes.length}`),

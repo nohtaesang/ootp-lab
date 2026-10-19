@@ -86,6 +86,8 @@ kbd { font: inherit; font-size: 12px; color: var(--faint); margin-left: 6px; }
 }
 .input.text { text-align: left; }
 .field.bad input, .input.bad { border-color: var(--danger); }
+#shape-options, #selection-options, #offset-options { display: grid; gap: 8px; }
+.tool-note { font-size: 12px; line-height: 1.5; }
 .check { margin-top: 8px; padding: 10px; border-radius: var(--radius); background: var(--well); font-size: 13px; line-height: 1.5; white-space: pre-line; }
 .check.ok { color: var(--good); }
 .check.bad { color: var(--danger); }
@@ -109,6 +111,7 @@ kbd { font: inherit; font-size: 12px; color: var(--faint); margin-left: 6px; }
 .metrics { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 13px; }
 .metrics span:nth-child(odd) { color: var(--muted); }
 .metrics span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }
+.sight-controls select { width: 156px; max-width: 100%; }
 .note { font-size: 12px; color: var(--faint); }
 .note.bad { color: var(--danger); }
 .note.stale { color: var(--accent); }
