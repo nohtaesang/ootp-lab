@@ -1,7 +1,7 @@
 // The ingress analysis runs here so a big map never freezes the editor.
-import { loadBridge } from "./bridge.js?v=a440311d";
+import { loadBridge } from "./bridge.js?v=69290bf5";
 
-const bridge = fetch(new URL("../map.wasm?v=a440311d", import.meta.url))
+const bridge = fetch(new URL("../map.wasm?v=69290bf5", import.meta.url))
   .then((r) => r.arrayBuffer())
   .then(loadBridge);
 

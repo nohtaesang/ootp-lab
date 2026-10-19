@@ -1,11 +1,12 @@
 // Web map editor (#1280). Flat editing only; every game rule (entrances,
 // stronghold, connection, spawn analysis, file format) comes from the WASM
 // bridge, which is the game's own maze3-map crate.
-import { loadBridge } from "./bridge.js?v=a440311d";
-import * as store from "./store.js?v=a440311d";
-import { bounds, contains, constrain, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=a440311d";
-import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=a440311d";
-import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=a440311d";
+import { loadBridge } from "./bridge.js?v=69290bf5";
+import * as store from "./store.js?v=69290bf5";
+import { bounds, contains, constrain, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=69290bf5";
+import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=69290bf5";
+import { resizeMap, resizeOffset } from "./resize.js?v=69290bf5";
+import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=69290bf5";
 
 const $ = (s, root = document) => root.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -21,7 +22,7 @@ const h = (tag, attrs = {}, ...kids) => {
 };
 const fill = (el, ...kids) => el.replaceChildren(...kids.flat().filter((k) => k != null && k !== false));
 
-const B = await loadBridge(await fetch(new URL("../map.wasm?v=a440311d", import.meta.url)).then((r) => r.arrayBuffer()));
+const B = await loadBridge(await fetch(new URL("../map.wasm?v=69290bf5", import.meta.url)).then((r) => r.arrayBuffer()));
 const C = B.config();
 for (const [name, [r, g, b, a]] of Object.entries(C.colors)) {
   document.documentElement.style.setProperty(`--t-${name.replaceAll(".", "-").replaceAll("_", "-")}`, `rgba(${r * 255}, ${g * 255}, ${b * 255}, ${a})`);
@@ -102,7 +103,7 @@ const S = {
   revision: 0,
   analysis: { report: null, revision: -1, job: 0, running: false, error: "", round: 0, routes: true, sight: true, sightKey: null },
   pane: null,
-  resize: { w: 32, h: 32, anchor: 4, error: "" },
+  resize: { w: 32, h: 32, anchor: 4, mode: "extent", error: "" },
   message: "",
   keys: new Set(),
 };
@@ -157,6 +158,7 @@ function touch(changed = true, rebuildPane = true) {
   }
   S.hoverRamp = null; S.hoverBase = null;
   refresh(rebuildPane);
+  if (S.pane === "size" && rebuildPane) renderSize();
 }
 function updateDirty() {
   const d = S.doc, s = S.saved;
@@ -537,14 +539,10 @@ function arrow(path, X, Y) {
   ctx.fill(); ctx.stroke();
   ctx.restore();
 }
-function resizeOffset() {
-  const r = S.resize;
-  return [Math.trunc(((r.w - S.doc.width) * (r.anchor % 3)) / 2), Math.trunc(((r.h - S.doc.height) * Math.floor(r.anchor / 3)) / 2)];
-}
 function drawResize(X, Y) {
   const r = S.resize;
-  if (!valid(r.w) || !valid(r.h)) return;
-  const [dx, dy] = resizeOffset(), s = S.view.s, { width: w, height: hgt } = S.doc;
+  if (r.mode !== "extent" || !valid(r.w) || !valid(r.h)) return;
+  const [dx, dy] = resizeOffset(S.doc, r.w, r.h, r.anchor), s = S.view.s, { width: w, height: hgt } = S.doc;
   // New bounds in old coordinates.
   const nx0 = -dx, ny0 = -dy, nx1 = nx0 + r.w, ny1 = ny0 + r.h;
   ctx.fillStyle = "rgba(255, 75, 58, 0.45)";
@@ -958,7 +956,7 @@ function setPane(p) {
   paneEl.hidden = !p;
   paneEl.replaceChildren();
   if (p === "size") {
-    S.resize = { w: S.doc.width, h: S.doc.height, anchor: 4, error: "" };
+    S.resize = { w: S.doc.width, h: S.doc.height, anchor: 4, mode: "extent", error: "" };
     renderSize();
   } else if (p === "spawn") renderSpawn();
   else if (p === "menu") renderMenu();
@@ -981,9 +979,11 @@ function numberInput(value, min, max, onset, { live = true, field = null } = {})
 function renderSize() {
   const r = S.resize;
   const note = h("div", { class: "note" });
+  const preview = h("button", { class: "btn primary", onclick: previewResize }, "미리보기");
   const showNote = () => {
     note.className = "note" + (r.error ? " bad" : "");
-    note.textContent = r.error || `각 변 ${C.min_size}~${C.max_size}칸 · 빨강은 잘리는 땅, 파랑은 새 평지`;
+    note.textContent = r.error || (r.mode === "extent" ? "빨강은 잘리는 땅, 파랑은 새 평지" : "길·산·물의 배치와 폭을 함께 조절합니다. 기지는 위치만 바뀝니다.");
+    preview.disabled = !valid(r.w) || !valid(r.h) || (r.w === S.doc.width && r.h === S.doc.height);
   };
   const anchors = h("div", { class: "anchors" });
   for (let i = 0; i < 9; i++) {
@@ -992,39 +992,70 @@ function renderSize() {
   const set = (key) => (n) => { r[key] = n ?? NaN; r.error = n == null ? `각 변 ${C.min_size}~${C.max_size} 정수를 입력하세요.` : ""; showNote(); draw(); };
   fill(paneEl, 
     h("h2", {}, "크기", h("span", { class: "faint" }, `${S.doc.width} × ${S.doc.height}`)),
+    h("div", { class: "grid2", "aria-label": "크기 변경 방식" }, [["extent", "여백·잘라내기"], ["scale", "전체 비례"]].map(([mode, label]) =>
+      h("button", { class: "btn" + (r.mode === mode ? " on" : ""), "aria-pressed": String(r.mode === mode), onclick: () => { r.mode = mode; r.error = ""; renderSize(); draw(); } }, label))),
     h("div", { class: "metrics" },
-      h("span", {}, "가로"), numberInput(r.w, C.min_size, C.max_size, set("w")),
-      h("span", {}, "세로"), numberInput(r.h, C.min_size, C.max_size, set("h"))),
-    h("div", { class: "caption" }, "기준점"),
-    anchors,
+      h("span", {}, "가로"), numberInput(r.w, C.min_size, C.max_size, set("w"), { field: "resize-w" }),
+      h("span", {}, "세로"), numberInput(r.h, C.min_size, C.max_size, set("h"), { field: "resize-h" })),
+    h("div", { class: "note" }, `각 변 ${C.min_size}~${C.max_size}칸`),
+    r.mode === "extent" && h("div", { class: "caption" }, "기준점"),
+    r.mode === "extent" && anchors,
     note,
     h("div", { class: "row" },
       h("button", { class: "btn", onclick: () => setPane(null) }, "취소"),
-      h("button", { class: "btn primary", onclick: applyResize }, "적용")),
+      preview),
   );
   showNote();
 }
-function applyResize() {
+function previewResize() {
   const r = S.resize;
   if (!valid(r.w) || !valid(r.h)) { r.error = `각 변 ${C.min_size}~${C.max_size} 정수를 입력하세요.`; return renderSize(); }
-  if (r.w === S.doc.width && r.h === S.doc.height) return setPane(null);
-  const [dx, dy] = resizeOffset(), d = S.doc;
-  let base = null;
-  if (d.base) {
-    const [x, y] = [d.base[0] + dx, d.base[1] + dy];
-    if (x < 2 || y < 2 || x + 2 >= r.w || y + 2 >= r.h) {
-      r.error = "기지의 5×5 영역이 잘립니다. 크기나 기준점을 바꾸세요.";
-      return renderSize();
-    }
-    base = [x, y];
+  const candidate = resizeMap(S.doc, r.w, r.h, r.mode, r.anchor);
+  const clipped = candidate.base && candidate.base.some((v, axis) => v < 2 || v + 2 >= [r.w, r.h][axis]);
+  // A crop can move the centre outside even the unsigned WASM coordinate
+  // domain. Refuse that transform before passing it to the common checker.
+  if (candidate.base?.some((v) => v < 0)) {
+    r.error = "기지의 5×5 영역이 잘립니다. 크기나 기준점을 바꾸세요.";
+    return renderSize();
   }
-  const codes = new Uint8Array(r.w * r.h);
-  for (let y = 0; y < d.height; y++) for (let x = 0; x < d.width; x++) {
-    const nx = x + dx, ny = y + dy;
-    if (nx >= 0 && ny >= 0 && nx < r.w && ny < r.h) codes[ny * r.w + nx] = d.codes[y * d.width + x];
+  let report;
+  try { report = B.check(store.wire(candidate)); }
+  catch (e) { r.error = String(e.message); return renderSize(); }
+  const ratio = [r.w / S.doc.width, r.h / S.doc.height];
+  const notes = [];
+  if (clipped) notes.push("기지의 5×5 영역이 잘립니다. 크기나 기준점을 바꾸세요.");
+  if (r.mode === "scale") {
+    notes.push(`가로 ${ratio[0].toFixed(2)}배 · 세로 ${ratio[1].toFixed(2)}배`);
+    if (ratio[0] !== ratio[1]) notes.push("가로·세로 배율이 달라 모양 비율도 바뀝니다.");
+    notes.push("입구는 확대 후 다시 다듬어야 할 수 있습니다. 축소하면 좁은 길이나 작은 지형이 사라질 수 있습니다.");
   }
+  S.keys.clear();
+  const dialog = modal("resize-preview", "크기 변경 미리보기", h("div", { class: "body" },
+    h("div", { class: "resize-compare" }, resizePicture(S.doc, S.check, "현재"), resizePicture(candidate, report, r.mode === "scale" ? "전체 비례" : "여백·잘라내기")),
+    h("div", { class: "note" + (clipped ? " bad" : "") }, notes.join("\n")),
+    h("div", { class: "check " + (report.issues.length ? "bad" : "ok") }, report.summary),
+    h("div", { class: "note" }, "적용 전에는 원본이 바뀌지 않습니다. 지형 연결 검사는 라운드 적합성 판정과 별개입니다.")),
+    h("footer", {}, h("button", { class: "btn", onclick: () => closeModal() }, "취소"),
+      h("button", { class: "btn primary", disabled: clipped, onclick: () => { closeModal(); applyResize(candidate); } }, "적용")));
+  dialog.querySelector("footer button").focus();
+}
+function resizePicture(doc, report, title) {
+  const picture = new TerrainLayer(PLAN);
+  picture.reset(doc);
+  if (report) { picture.setShapes(report.ramps, report.invalid); picture.paintAll(); }
+  if (doc.base) {
+    const [x, y] = doc.base, p = picture.px, c = picture.ctx;
+    c.strokeStyle = rgb(PLAN.base); c.lineWidth = Math.max(2, p / 4);
+    c.strokeRect((x - 1) * p, (y - 1) * p, 3 * p, 3 * p);
+    c.setLineDash([p / 2, p / 2]);
+    c.strokeRect((x - 2) * p, (y - 2) * p, 5 * p, 5 * p);
+  }
+  picture.canvas.setAttribute("aria-label", `${title} ${doc.width} × ${doc.height} 지형`);
+  return h("figure", {}, h("figcaption", {}, title, h("span", { class: "faint" }, `${doc.width} × ${doc.height}`)), h("div", { class: "resize-map" }, picture.canvas));
+}
+function applyResize(candidate) {
   const a = snapshot();
-  const b = { width: r.w, height: r.h, landscape: d.landscape, codes, base };
+  const b = { width: candidate.width, height: candidate.height, landscape: candidate.landscape, codes: candidate.codes, base: candidate.base };
   const edit = { type: "state", a, b };
   apply(edit, true);
   S.pane = null; paneEl.hidden = true;
@@ -1059,7 +1090,7 @@ function recalc() {
   worker.postMessage({ job, doc: store.wire(S.doc) });
   renderSpawn();
 }
-const worker = new Worker(new URL("./worker.js?v=a440311d", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=69290bf5", import.meta.url), { type: "module" });
 function renderSpawn() {
   if (S.pane !== "spawn") return;
   const a = S.analysis, bt = battle();

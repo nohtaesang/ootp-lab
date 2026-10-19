@@ -143,6 +143,13 @@ table.rounds tr.on td { background: var(--selected); }
 .dialog > footer { padding: 12px 20px 18px; display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid var(--line); }
 .dialog .msg { color: var(--muted); line-height: 1.6; white-space: pre-line; }
 .dialog .err { color: var(--danger); font-size: 13px; min-height: 18px; }
+.resize-preview { width: 1120px; }
+.resize-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.resize-compare figure { margin: 0; min-width: 0; }
+.resize-compare figcaption { display: flex; justify-content: space-between; gap: 8px; padding-bottom: 10px; font-size: 14px; }
+.resize-map { height: min(48vh, 480px); background: var(--well); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; }
+.resize-map canvas { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.resize-preview .note { white-space: pre-line; line-height: 1.5; }
 .form { display: grid; grid-template-columns: 64px 1fr; gap: 10px 12px; align-items: center; min-width: 380px; }
 .form > span { color: var(--muted); }
 .stepper { display: grid; grid-template-columns: 34px 1fr 34px; gap: 4px; }
