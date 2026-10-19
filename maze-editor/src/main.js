@@ -1,12 +1,12 @@
 // Web map editor (#1280). Flat editing only; every game rule (entrances,
 // stronghold, connection, spawn analysis, file format) comes from the WASM
 // bridge, which is the game's own maze3-map crate.
-import { loadBridge } from "./bridge.js?v=eea32584";
-import * as store from "./store.js?v=eea32584";
-import { bounds, contains, constrain, shapeCorners, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=eea32584";
-import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=eea32584";
-import { resizeMap, resizeOffset } from "./resize.js?v=eea32584";
-import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=eea32584";
+import { loadBridge } from "./bridge.js?v=ab729b03";
+import * as store from "./store.js?v=ab729b03";
+import { bounds, contains, constrain, shapeCorners, line, shapeCells, capture, transfer, regionSelection, offsetCells, extendSelection } from "./drawing.js?v=ab729b03";
+import { sightKey, sightPreview, sightLabel, roundSightLabel } from "./sight.js?v=ab729b03";
+import { resizeMap, resizeOffset } from "./resize.js?v=ab729b03";
+import { FULL, NAMES, TerrainLayer, category, heightOf, isRamp, kindOf, regions, thumbnail } from "./render.js?v=ab729b03";
 
 const $ = (s, root = document) => root.querySelector(s);
 const h = (tag, attrs = {}, ...kids) => {
@@ -22,7 +22,7 @@ const h = (tag, attrs = {}, ...kids) => {
 };
 const fill = (el, ...kids) => el.replaceChildren(...kids.flat().filter((k) => k != null && k !== false));
 
-const B = await loadBridge(await fetch(new URL("../map.wasm?v=eea32584", import.meta.url)).then((r) => r.arrayBuffer()));
+const B = await loadBridge(await fetch(new URL("../map.wasm?v=ab729b03", import.meta.url)).then((r) => r.arrayBuffer()));
 const C = B.config();
 for (const [name, [r, g, b, a]] of Object.entries(C.colors)) {
   document.documentElement.style.setProperty(`--t-${name.replaceAll(".", "-").replaceAll("_", "-")}`, `rgba(${r * 255}, ${g * 255}, ${b * 255}, ${a})`);
@@ -191,7 +191,6 @@ function runCheck() {
   el.textContent = S.check.summary;
   el.className = "check " + (S.check.issues.length ? "bad" : "ok");
   S.checkRevision = S.revision;
-  refreshRecommendation();
   draw();
 }
 
@@ -1083,13 +1082,14 @@ function applyResize(candidate) {
 function battle() {
   return S.doc.battle ?? { rounds: C.profile.rounds, full_sight_round: C.profile.full_sight_round };
 }
-// #1321: the first night's sight in cells; unset keeps the profile's.
-const SIGHT_MSG = "첫 시야는 1~512칸이어야 합니다.";
-const startSight = (b) => b.start_sight ?? C.profile.start_sight ?? 12;
-const validSight = (n) => Number.isInteger(n) && n >= 1 && n <= 512;
+// #1321: the first night's sight in cells. 0 leaves it unset: the profile's
+// half of the farthest corner (2026-10-20).
+const SIGHT_MSG = "첫 시야는 0~512칸이어야 합니다(0은 절반).";
+const startSight = (b) => b.start_sight ?? 0;
+const validSight = (n) => Number.isInteger(n) && n >= 0 && n <= 512;
 function withSight(b, sight) {
   const next = { rounds: b.rounds, full_sight_round: b.full_sight_round };
-  if (battle().start_sight != null || sight !== startSight({})) next.start_sight = sight;
+  if (sight > 0) next.start_sight = sight;
   return next;
 }
 function recalc() {
@@ -1120,45 +1120,14 @@ function recalc() {
   worker.postMessage({ job, doc: store.wire(S.doc) });
   renderSpawn();
 }
-const worker = new Worker(new URL("./worker.js?v=eea32584", import.meta.url), { type: "module" });
-function refreshRecommendation() {
-  const value = $("#recommendation-value");
-  if (!value || S.pane !== "spawn") return;
-  const check = S.check, fresh = S.checkRevision === S.revision;
-  const round = fresh ? check?.recommended_rounds : null;
-  value.textContent = Number.isInteger(round) ? `${round}R` : fresh ? "추천 없음" : "확인 중…";
-  $("#recommendation-apply").disabled = !Number.isInteger(round) || S.analysis.running;
-  $("#recommendation-area").textContent = fresh && check?.connected != null
-    ? `${check.connected.toLocaleString()}칸 · 전체 맵의 ${(100 * check.connected / (S.doc.width * S.doc.height)).toFixed(1)}%` : "—";
-  const note = $("#recommendation-note");
-  note.textContent = !fresh ? "현재 지형 확인 중" : check?.recommendation_error
-    || (check?.issues.length ? check.summary : `기준 ${C.recommendation.reference_connected_cells.toLocaleString()}칸 → ${C.recommendation.reference_rounds}R · 길목·화력 미반영`);
-  note.className = "note" + (fresh && (check?.issues.length || check?.recommendation_error) ? " bad" : "");
-}
-function applyRecommendation(setRounds) {
-  // A field's blur or the last paint may precede its scheduled frame check.
-  // Read current geometry now rather than applying an earlier recommendation.
-  if (S.checkRevision !== S.revision) runCheck();
-  const round = S.check?.recommended_rounds;
-  if (!Number.isInteger(round) || S.check.issues.length) return say(S.check?.summary || "현재 지형의 추천을 확인해 주세요.");
-  // Preserve a valid reveal value still being typed before setRounds writes
-  // the inputs. Native click/blur ordering must not restore its older value.
-  const pendingRounds = Number(paneEl.querySelector('[data-field="rounds"]').value);
-  const pendingFull = Number(paneEl.querySelector('[data-field="full"]').value);
-  const pendingSight = Number(paneEl.querySelector('[data-field="sight"]').value);
-  if (!Number.isInteger(pendingRounds) || pendingRounds < 1 || pendingRounds > 256 || !Number.isInteger(pendingFull) || pendingFull < 1 || pendingFull > pendingRounds)
-    return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
-  if (!validSight(pendingSight)) return say(SIGHT_MSG);
-  S.doc.battle = withSight({ rounds: pendingRounds, full_sight_round: pendingFull }, pendingSight);
-  setRounds(round);
-  recalc();
-}
+const worker = new Worker(new URL("./worker.js?v=ab729b03", import.meta.url), { type: "module" });
 function renderSpawn() {
   if (S.pane !== "spawn") return;
   const a = S.analysis, bt = battle();
   const setBattle = (key) => (n) => {
     if (n == null) return say(key === "start_sight" ? SIGHT_MSG : "라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
     const next = { ...battle(), [key]: n };
+    if (key === "start_sight" && !n) delete next.start_sight;
     if (key === "rounds") next.full_sight_round = Math.min(next.full_sight_round, n);
     if (next.full_sight_round > next.rounds) return say("라운드는 1~256, 전체 시야 라운드는 최대 라운드 이하여야 합니다.");
     S.doc.battle = next;
@@ -1189,7 +1158,7 @@ function renderSpawn() {
   const focused = document.activeElement?.dataset?.field;
   const roundsInput = numberInput(bt.rounds, 1, 256, setBattle("rounds"), { live: false, field: "rounds" });
   const fullInput = numberInput(bt.full_sight_round, 1, bt.rounds, setBattle("full_sight_round"), { live: false, field: "full" });
-  const sightInput = numberInput(startSight(bt), 1, 512, setBattle("start_sight"), { live: false, field: "sight" });
+  const sightInput = numberInput(startSight(bt), 0, 512, setBattle("start_sight"), { live: false, field: "sight" });
   roundsInput.addEventListener("input", () => {
     const n = Number(roundsInput.value);
     if (Number.isInteger(n) && n >= 1 && n <= 256) fullInput.max = n;
@@ -1199,13 +1168,7 @@ function renderSpawn() {
     h("div", { class: "metrics" },
       h("span", {}, "최대 라운드"), roundsInput,
       h("span", {}, "전체 시야 라운드"), fullInput,
-      h("span", {}, "첫 시야(칸)"), sightInput),
-    h("div", { class: "recommendation" },
-      h("div", { class: "row" }, h("span", {}, "공간 기준 추천"), h("strong", { id: "recommendation-value" }, "확인 중…"),
-        h("button", { class: "btn", id: "recommendation-apply", onclick: () => applyRecommendation(setBattle("rounds")) }, "추천 적용")),
-      h("div", { class: "metrics" }, h("span", {}, "연결 땅"), h("span", { id: "recommendation-area" }, "—")),
-      h("div", { class: "note", id: "recommendation-note" }),
-      h("div", { class: "note" }, "제작용 시작값 · 전투 난이도 보장 아님")),
+      h("span", {}, "첫 시야(칸, 0=절반)"), sightInput),
     h("div", { class: "row" },
       h("button", { class: "btn primary", onclick: recalc, disabled: a.running }, "다시 계산"),
       h("button", { class: "btn" + (a.sight ? " on" : ""), onclick: () => { a.sight = !a.sight; renderSpawn(); draw(); } }, a.sight ? "시야 켜짐" : "시야 꺼짐"),
@@ -1225,7 +1188,6 @@ function renderSpawn() {
       h("tbody", {}, rows)),
     a.report && h("div", { class: "note" }, `${C.profile.id} r${C.profile.revision} · 정적 추정 · 성능 최대치 아님`),
   );
-  refreshRecommendation();
   if (focused) paneEl.querySelector(`[data-field="${focused}"]`)?.focus();
 }
 function renderMenu() {
