@@ -1,0 +1,22 @@
+{
+  "format": "spatial-scene-display-manifest-v1",
+  "title": "외야 지원 수비 · 수정 부분 재검토",
+  "source": {
+    "inputs_sha256": "d230b9f4f2486fec8864dfc8f86561f8076d27749dcc2cf0c07cb6b35afd406a",
+    "native_binary_sha256": "f4c5999d2df4b4e58fcfd1f31ae6d501c9e2975a7a2dd7bd9a4af53a4423a6a0"
+  },
+  "scenes": [
+    {
+      "file": "scene-ss-throw-wide.json",
+      "sha256": "6f71ce77a6a5aaffbee29a54fa88402dc5116cc807fda7382ff6981affceff65",
+      "bytes": 1239384,
+      "identity": {
+        "model_id": "spatial-delivery-1",
+        "scene_id": "ss-throw-wide",
+        "source_digest": "65f5477023a0c095",
+        "trace_hash": "fnv1a64:d39fcf58b96e0adc"
+      },
+      "label": "유격수 송구와 회수"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "format": "spatial-scene-review-guide-v1",
+  "manifest_sha256": "b9d090646b92b54722fef9074a7a5930e7a3843ff28911aaa4f9b72dfd43bd87",
+  "scenes": {
+    "6f71ce77a6a5aaffbee29a54fa88402dc5116cc807fda7382ff6981affceff65": {
+      "scope": "이번 재검토는 좌익수·중견수의 접근과 멈춤이에요. 주루는 1루 통과까지만 실행해요.",
+      "question": "좌익수·중견수의 움직임이 자연스러운가요?",
+      "focus_at_us": "1650000"
+    }
+  }
+}

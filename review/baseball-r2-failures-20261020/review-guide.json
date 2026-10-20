@@ -1,0 +1,9 @@
+{
+  "format": "spatial-scene-review-guide-v1",
+  "manifest_sha256": "eedeaa779ff0f4ac7d169ea2288d6bc34f4a24b78224572a664ba2b83e3e1d64",
+  "scenes": {
+    "c1242884ec92fb7e895e68a55f9b37b7a43a0e5878fb05682d7a88b95b80c814": {
+      "scope": "야수 움직임 검토예요. 주루는 1루 통과까지만 실행하며, 추가 진루 판단은 포함하지 않아요."
+    }
+  }
+}
