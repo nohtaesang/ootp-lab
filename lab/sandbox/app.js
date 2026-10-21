@@ -263,9 +263,9 @@ function show(input) {
   refreshV();
 }
 
-// 친구 판정(#1873) — 「이 장면」: 괜찮다 / 이상하다를 누르는 순간 이 브라우저에 저장된다(다시 누르면 지움 · 한 줄은 쓰는 대로 저장).
+// 친구 판정(#1873) — 「이 장면」: 괜찮다 / 어색하다를 누르는 순간 이 브라우저에 저장된다(다시 누르면 지움 · 한 줄은 쓰는 대로 저장).
 // 저장 값 = 판정 · 한 줄 · 누른 순간의 재생 시각 · 장면 지문. 「전체 복사」가 모든 장면 판정을 글로 낸다(서버 없음 — 친구가 그 글을 보낸다).
-// 엔진이 바뀌어 지문이 달라지면 그 장면에 「옛 장면」이 붙는다. 변형 단추 · 장면 목록에 판정 표시(✓ 괜찮다 · ✗ 이상하다).
+// 엔진이 바뀌어 지문이 달라지면 그 장면에 「옛 장면」이 붙는다. 변형 단추 · 장면 목록에 판정 표시(✓ 괜찮다 · ✗ 어색하다).
 const VKEY = 'playfield-verdicts-v1';
 let pick = null;
 function loadV() { try { return JSON.parse(localStorage.getItem(VKEY) || '{}'); } catch { return {}; } }
@@ -317,7 +317,7 @@ function verdicts() {
     const vname = { normal: '보통', borderline: '경계', error: '실책' };
     const text = Object.entries(VERD)
       .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10))
-      .map(([k, v]) => { const [rank, vv] = k.split('-'); return `${rank} ${name(rank)} · ${vname[vv]} · ${v.j === 'ok' ? '괜찮다' : '이상하다'} · ${v.at}초${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
+      .map(([k, v]) => { const [rank, vv] = k.split('-'); return `${rank} ${name(rank)} · ${vname[vv]} · ${v.j === 'ok' ? '괜찮다' : '어색하다'} · ${v.at}초${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
       .join('\n');
     try { await navigator.clipboard.writeText(text); } catch { prompt('', text); return; }
     $('#vcopy').textContent = '복사됨';
@@ -344,7 +344,7 @@ function runScene() {
   if (!s) return;
   const seq = sequence();
   $('#pos').textContent = `${seq.indexOf(s) + 1} / ${seq.length}`;
-  $('#title').textContent = `${s.rank}. ${s.family}`;
+  $('#title').textContent = `${s.rank}. ${s.family} · ${VLABEL[s.variant]}`;
   const b = s.input.ball;
   mark = b.aim ? [b.aim.x, b.aim.y] : null;
   show(s.input);
@@ -407,8 +407,8 @@ async function boot() {
     show({ ball: { ev: Number($('#ev').value), aim: { kind, x, y } }, runners, outs: Number($('#outs').value), seed: Number($('#seed').value) });
   });
   window.addEventListener('resize', draw);
-  // 친구 화면에는 개발 도구(부품 번호 · 놓기)가 없다 — 주소 끝에 ?dev 를 붙이면 보인다.
-  if (new URLSearchParams(location.search).has('dev')) $('#tools').classList.remove('hide');
+  // 친구 화면은 장면 · 이전/다음 · 판정 · 재생바 · 전체 복사뿐이다. 변형 단추 · 목록 · 배속 · 부품 번호 · 놓기는 주소 끝에 ?dev 를 붙이면 보인다.
+  if (new URLSearchParams(location.search).has('dev')) document.querySelectorAll('#tools, .dev').forEach((x) => x.classList.remove('hide'));
   $('#prev').addEventListener('click', () => step(-1));
   $('#next').addEventListener('click', () => step(1));
   window.addEventListener('keydown', (e) => {

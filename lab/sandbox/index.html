@@ -43,6 +43,7 @@
   input[type=text] { font: inherit; color: var(--lab-text); background: var(--lab-bg); border: 1px solid var(--lab-line); border-radius: 8px; padding: 8px 10px; min-height: 36px; }
   .card { background: var(--lab-card); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
   .card.quiet { background: transparent; padding: 0 2px; }
+  .h:empty { display: none; }
   .h { color: var(--lab-muted); font-size: var(--text-sm, 12px); font-weight: 600; }
   .nav { display: flex; align-items: center; gap: 8px; }
   .nav .pos { flex: 1; text-align: center; color: var(--lab-muted); font-variant-numeric: tabular-nums; }
@@ -72,29 +73,28 @@
         <button id="next" class="ghost" aria-label="다음">다음 ›</button>
       </div>
       <div class="title" id="title"></div>
-      <div class="seg" id="variant">
+      <div class="seg dev hide" id="variant">
         <button data-v="normal" class="on">보통</button>
         <button data-v="borderline">경계</button>
         <button data-v="error">실책</button>
       </div>
-      <select id="scene" aria-label="장면"></select>
+      <select id="scene" class="dev hide" aria-label="장면"></select>
     </section>
     <section class="card" id="verdictBox">
-      <div class="h">판정 <span id="vstale"></span></div>
+      <div class="h" id="vstale"></div>
       <div class="seg big" id="verdict">
         <button data-j="ok">괜찮다</button>
-        <button data-j="odd">이상하다</button>
+        <button data-j="odd">어색하다</button>
       </div>
       <input type="text" id="vnote" placeholder="누가 · 언제 · 무엇">
     </section>
     <section class="card">
-      <div class="h">재생</div>
-      <div class="row">
+            <div class="row">
         <button id="play">▶</button>
         <input type="range" id="scrub" min="0" max="1000" value="0" style="flex:1">
         <span class="time" id="clock">0.0</span>
       </div>
-      <div class="seg small" id="rate">
+      <div class="seg small dev hide" id="rate">
         <button data-r="0.25">0.25×</button>
         <button data-r="0.5">0.5×</button>
         <button data-r="1" class="on">1×</button>
