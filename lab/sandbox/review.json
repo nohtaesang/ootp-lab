@@ -7,6 +7,7 @@
    "items": [
     {
      "key": "9-normal",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "아주 깊은 타구라 중계플레이(유격수, 2루수)가 더 앞으로 나가주면 좋을듯"
@@ -23,6 +24,7 @@
     },
     {
      "key": "9-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "중견수가 한번 튕기는게 무슨의미인지"
@@ -38,6 +40,7 @@
     },
     {
      "key": "11-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "유격수가 좀 더 공잡은 좌익수 쪾으로 나갔으면 좋겠음"
@@ -53,6 +56,7 @@
     },
     {
      "key": "17-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "2루수가 우익수 쪽으로 더 나갔으면 좋겠음"
@@ -66,6 +70,7 @@
     },
     {
      "key": "17-error",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "우익수 쪽으로 공기가면 2루수가 중계플레이하러 나가고 유격수가  2루로 들어간다. 그리고 1루수는 1루커버 할게 아니라 1루 안쪽으로 좀 들어오는게 자연스럽지 다음 상황 대비해서 외야안타상황에서는 1루주자가 트롤 짓하지 않는이상 아웃시키기 힘드니까"
@@ -81,6 +86,7 @@
     },
     {
      "key": "23-error",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "외야 안타 확인한 순간 1루수는 좀더 앞으로 나와서 넓은 범위 커버하러 가야지 그리고 타자도 2루쪽으로 움직려는 움직임도 필요하고 1자로 1루를 그대로 지나치는게 아니라 약간 호를 그리며 2루 갈까 말까한 움직임 필요"
@@ -97,6 +103,7 @@
     },
     {
      "key": "24-normal",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "중견수가 잡고 격수한테 던졌는데 여기서 2루수한테 던져도됨"
@@ -110,6 +117,7 @@
     },
     {
      "key": "24-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "2루한테 던져도됨"
@@ -122,6 +130,7 @@
     },
     {
      "key": "25-normal",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "2루수는 2루 베이스 지키고 유격수 위치는 적당한데 1루수는 2루에서 공이 빠질걸 대비해야지"
@@ -136,6 +145,7 @@
     },
     {
      "key": "25-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "2루수 유격수가 왜 둘다 뛰어감"
@@ -149,6 +159,7 @@
     },
     {
      "key": "25-error",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "또 똑같은 문제 2루수 유격수 어디가냐고"
@@ -162,6 +173,7 @@
     },
     {
      "key": "27-error",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "외야수가 잡고 홈승부 늦은건 보통 가까운 내야수한테 던지는게 안전하다"
@@ -172,6 +184,7 @@
     },
     {
      "key": "28-error",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "이것도 똑같다 홈승부 늦었으면 보통 가까운 내야수한테 던지는게 그나마 안전하다. 다면 과감하게 송구하는 선수들도 있다."
@@ -182,6 +195,7 @@
     },
     {
      "key": "29-normal",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "1루수가 왜 뛰어가냐 중계플레이로 왜 두명이가고 완전 잘못됨"
@@ -194,6 +208,7 @@
     },
     {
      "key": "29-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "2루는 대체 어디가냐 1루는 왜 2루까지 뛰어가고 2루수가 병신짓해서 1루수가 커버가는건 잘하네 억지칭찬 2루 1루 다 병신같다"
@@ -207,6 +222,7 @@
     },
     {
      "key": "29-error",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "2루수 어디가냐"
@@ -219,6 +235,7 @@
     },
     {
      "key": "31-normal",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "전체적으로 외야수는 송구 딜레이가 좀 긴듯? 아닌가?"
@@ -229,6 +246,7 @@
     },
     {
      "key": "31-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "투수가 3루가고 3루수는 대체뭐함? 2루에 주자가 있는데 3루로 안감? 이건 존나 애매하다 2루가 1루커버를 가고 1루가 가운데서 중계플레이를 하는건 맞겠지?"
@@ -244,6 +262,7 @@
     },
     {
      "key": "31-error",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "투수가 왜 3루로 가냐  1루수는 1루쪽에 붙어있고 2루수가 2루쪽 유격수가 안쪽으로 와야지 엉망이다"
@@ -266,6 +285,7 @@
    "items": [
     {
      "key": "1-error",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "2루수가 2루 베이스 까지 들어올 필요가있나? 2루수는 제 위치 지키는게 좋을지도 빠져서 2루로 뛸때 커버해야하니까?"
@@ -278,6 +298,7 @@
     },
     {
      "key": "3-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "왜 x표랑 잡는 위치가 안맞는지? 실제 경기에도 x표가 나옴?"
@@ -288,6 +309,7 @@
     },
     {
      "key": "4-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "보기엔 담장맞고 나온거같은데 타자 아웃? 보는게 틀린건지 아웃이 틀린건지"
@@ -298,6 +320,7 @@
     },
     {
      "key": "5-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "이것도 담장맞는 느낌 화면이 잘못된건가"
@@ -308,6 +331,7 @@
     },
     {
      "key": "6-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "야수가 공을 잡기전 한번 튕기는게 어떤의미?"
@@ -318,6 +342,7 @@
     },
     {
      "key": "7-normal",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "평범한 유격수 플라이지만 포수나 외야수 우익수 1루 쪽으로 좀 접근하면 좋을듯 외야수들도 좀 앞으로 오고"
@@ -333,6 +358,7 @@
     },
     {
      "key": "8-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "설명과 다르다. 설명이 중계의 반영됨?"
@@ -343,6 +369,7 @@
     },
     {
      "key": "14-normal",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "주자 없는 상황에서 투수가 베이스까지 들어올필요는 없을듯"
@@ -355,6 +382,7 @@
     },
     {
      "key": "14-error",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "주자 없는 상황에서 포수가 공 못잡을수 있으니 투수가 붙는건 맞다.근데 너무 홈베이스가 아니라 살짝 더 포수 쪽으로 붙어주는게 좋을듯"
@@ -368,6 +396,7 @@
     },
     {
      "key": "15-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "공잡은 3루수 앞으로 유격수가 뛰어가는게 말이안됨 뒤로 돌아가던가 그리고 유격수는 좀 천천히 3루수 뒤로 돌아가는게 정석 어차피 공빠져서 2루주자가 3루로 뛰어도 유격수가 더 여유롭기 때문에"
@@ -382,6 +411,7 @@
     },
     {
      "key": "15-error",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "중견수 너무 많이 뛰어옴 2루로 공들어갈때 멈춰야함."
@@ -395,6 +425,7 @@
     },
     {
      "key": "16-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "땅볼타구로 빠져나가는 그림인데 땅볼은 땅볼만의 표시가 있었으면 좋겠다.  직관적으로 땅볼이네 알기 힘듬"
@@ -405,6 +436,7 @@
     },
     {
      "key": "18-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "투수 앞 타구일때 2루수도 1루 쪽으로 뛰어주면 좋겠다"
@@ -419,6 +451,7 @@
     },
     {
      "key": "19-borderline",
+     "must": false,
      "prev": {
       "j": "odd",
       "note": "유격수가 그렇게 빨리 3루 베이스 커버 들어갈 필요가없음 주자 보다 훨씬 빠르게 커버할수있기 때문에 좀 천천히 여유롭게 움직였으면 좋겠음"
@@ -432,6 +465,7 @@
     },
     {
      "key": "20-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "땅볼타구를 알기힘듬. 3루수도 너무 3루에 박혀있음 자연스럽게 움직였으면 좋겠음"
@@ -444,6 +478,7 @@
     },
     {
      "key": "20-error",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "포수가 너무 빨리 뛸 필요없다 더크게 돌아뛰면 좋을듯 1루 뒤쪽으로"
@@ -457,6 +492,7 @@
     },
     {
      "key": "22-borderline",
+     "must": false,
      "prev": {
       "j": "ask",
       "note": "투수가 너무 유격수 완전 뒤에서 2루 커버할 필요는 없음 좀 여유로운 모습도 필요 우익수는 2루수한테 던져도됨 더 안전한 선택임 가깝고 2루에서 다른 야수들도 가깝기 때문에"
@@ -478,6 +514,7 @@
    "items": [
     {
      "key": "30-borderline",
+     "must": true,
      "prev": {
       "j": "ok",
       "note": ""
@@ -499,43 +536,8 @@
      "mention": []
     },
     {
-     "key": "8-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      1,
-      3,
-      4,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
      "key": "8-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      1,
-      3,
-      4,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "10-error",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -554,6 +556,7 @@
     },
     {
      "key": "11-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -572,6 +575,7 @@
     },
     {
      "key": "27-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -590,6 +594,7 @@
     },
     {
      "key": "28-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -608,6 +613,7 @@
     },
     {
      "key": "24-error",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -628,6 +634,7 @@
     },
     {
      "key": "23-borderline",
+     "must": true,
      "prev": {
       "j": "ok",
       "note": ""
@@ -649,6 +656,7 @@
     },
     {
      "key": "27-borderline",
+     "must": true,
      "prev": {
       "j": "ok",
       "note": "우익수가 공을잡고 던지는 선택지가 좀 늘어나면 어떨까?"
@@ -671,6 +679,7 @@
     },
     {
      "key": "28-borderline",
+     "must": true,
      "prev": {
       "j": "ok",
       "note": ""
@@ -691,6 +700,7 @@
     },
     {
      "key": "10-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -701,55 +711,6 @@
       4,
       7,
       8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "11-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      1,
-      3,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "1-borderline",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      6,
-      7,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "21-borderline",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      6,
-      7,
       9
      ],
      "runners": [],
@@ -757,6 +718,7 @@
     },
     {
      "key": "21-error",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -766,173 +728,6 @@
       4,
       6,
       7,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "18-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      6,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "18-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "21-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "26-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      7,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "26-borderline",
-     "prev": {
-      "j": "ok",
-      "note": "왜 못던진거임 완전 역동작? 어떤 액션을 넣어주는게 어떨까 잡기위해 슬라이딩할때 모션추가?"
-     },
-     "changed": [
-      2,
-      4,
-      7,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "26-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      7,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "16-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "16-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "1-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      4,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "19-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      5,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "19-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      5,
-      7,
-      8,
       9
      ],
      "runners": [],
@@ -940,6 +735,7 @@
     },
     {
      "key": "15-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -955,6 +751,7 @@
     },
     {
      "key": "20-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -969,93 +766,8 @@
      "mention": []
     },
     {
-     "key": "2-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "2-borderline",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "2-error",
-     "prev": {
-      "j": "ok",
-      "note": "지금껏 보면 포수들이 너무 빨리 뜀 살짝 천천히 뛰어도 될 듯"
-     },
-     "changed": [
-      2,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": [
-      2
-     ]
-    },
-    {
-     "key": "13-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "13-borderline",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "13-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      6,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
      "key": "17-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -1075,6 +787,7 @@
     },
     {
      "key": "23-normal",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -1092,6 +805,7 @@
     },
     {
      "key": "30-error",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -1105,41 +819,11 @@
      "runners": [
       0
      ],
-     "mention": []
-    },
-    {
-     "key": "10-borderline",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      4,
-      6,
-      8,
-      9
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "22-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      4,
-      8,
-      9
-     ],
-     "runners": [],
      "mention": []
     },
     {
      "key": "22-error",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
@@ -1148,70 +832,13 @@
       4,
       8,
       9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "3-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      4,
-      8
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "3-error",
-     "prev": {
-      "j": "ok",
-      "note": "실책하면 느낌표 띄우는건 어떤지 어떤 표시를 넣자"
-     },
-     "changed": [
-      4,
-      8
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "4-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      6,
-      7,
-      8
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "4-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      6,
-      7,
-      8
      ],
      "runners": [],
      "mention": []
     },
     {
      "key": "9-error",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": "깊은 타구에는 중계 선수(유격수 혹은 2루수)가 더 붙어줬으면 좋겠다"
@@ -1228,106 +855,8 @@
      ]
     },
     {
-     "key": "30-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      6,
-      7,
-      8
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "6-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      6,
-      7
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "6-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      6,
-      7
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "5-normal",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      6,
-      8
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "5-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      6,
-      8
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "12-error",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      7,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "7-borderline",
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      8
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
      "key": "7-error",
+     "must": false,
      "prev": {
       "j": "ok",
       "note": ""
