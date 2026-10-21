@@ -239,6 +239,7 @@
   --icon-stroke-sm: 2;
   --icon-stroke-md: 1.75;
   --icon-stroke-lg: 1.5;
+  --icon-lift: -0.1em;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -351,7 +352,6 @@
   --board-side-w: 560px;
   --page-head-h: 48px;
   --board-bar-h: 48px;
-  --board-table-row-h: 44px;
   --subs-dialog-h: 840px;
   --dialog-w-2xl: 1160px;
   --advance-list-w: 280px;

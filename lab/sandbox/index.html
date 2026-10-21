@@ -44,6 +44,7 @@
   .card { background: var(--lab-card); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
   .card.quiet { background: transparent; padding: 0 2px; }
   .h:empty { display: none; }
+  .prev { font-size: var(--text-sm, 12px); color: var(--lab-muted); line-height: 1.5; }
   .h { color: var(--lab-muted); font-size: var(--text-sm, 12px); font-weight: 600; }
   .nav { display: flex; align-items: center; gap: 8px; }
   .nav .pos { flex: 1; text-align: center; color: var(--lab-muted); font-variant-numeric: tabular-nums; }
@@ -73,6 +74,8 @@
         <button id="next" class="ghost" aria-label="다음">다음 ›</button>
       </div>
       <div class="title" id="title"></div>
+      <div class="h" id="changed"></div>
+      <div class="prev hide" id="prevBox"><span class="h">지난번</span> <span id="prevNote"></span></div>
       <div class="seg dev hide" id="variant">
         <button data-v="normal" class="on">보통</button>
         <button data-v="borderline">경계</button>

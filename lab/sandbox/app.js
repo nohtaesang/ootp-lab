@@ -3,6 +3,7 @@
 'use strict';
 
 const NAMES = ['투', '포', '1', '2', '3', '유', '좌', '중', '우'];
+const POSNAME = ['투수', '포수', '1루수', '2루수', '3루수', '유격수', '좌익수', '중견수', '우익수'];
 const RUNNER = ['타', '1', '2', '3'];
 const $ = (s) => document.querySelector(s);
 const canvas = $('#field');
@@ -22,6 +23,10 @@ let placing = false;
 let showParts = false;
 let kind = 'ground';
 let SCENE = null;
+// 판정 판(review.json · ?round=r2-1) — 판 안의 장면만 돈다 · 장면마다 지난번 판정과 메모 · 바뀐 선수 · 메모에 나온 선수
+let ROUND = null;
+let ITEM = null;
+let WHO = [];
 // 친구 화면은 판정에 필요한 것만 — ?dev 면 개발 도구(낙하점 X · 부품 번호 · 놓기 · 목록 · 배속)도 보인다
 const DEV = new URLSearchParams(location.search).has('dev');
 
@@ -205,6 +210,9 @@ function draw() {
   TL.fielders.forEach((f, i) => {
     const [x, y] = at(f.pts, t);
     token(x, y, C.fielder, NAMES[i], 1);
+    const ring = (color, w) => { ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(sx(x), sy(y), Math.max(7, LOOK.token * S.k) + w + 2, 0, Math.PI * 2); ctx.stroke(); };
+    if (ITEM && ITEM.changed.includes(i + 1)) ring(C.chalk, 2);
+    if (WHO.includes(i + 1)) ring(C.error, 3);
     if (showParts && plan) {
       ctx.fillStyle = C.text;
       ctx.font = `600 ${Math.max(10, Math.round(0.9 * S.k))}px sans-serif`;
@@ -307,7 +315,9 @@ let pick = null;
 function loadV() { try { return JSON.parse(localStorage.getItem(VKEY) || '{}'); } catch { return {}; } }
 function saveV(v) { try { localStorage.setItem(VKEY, JSON.stringify(v)); } catch { /* 저장 못 해도 복사는 된다 */ } }
 let VERD = loadV();
-function sceneKey() { return placing || !TL ? null : `${$('#scene').value}-${variant}`; }
+function sceneKey() { return placing || !TL ? null : `${ROUND ? ROUND.id + ':' : ''}${$('#scene').value}-${variant}`; }
+const bare = (k) => k.replace(/^[^:]*:/, '');
+const inRound = (k) => (ROUND ? k.startsWith(ROUND.id + ':') : !k.includes(':'));
 function fingerprint() {
   // 사건 + 움직임(0.5m · 0.1초로 반올림) — 움직임만 바뀌어도 「옛 장면」이 된다
   if (!TL) return '';
@@ -328,7 +338,8 @@ function refreshV() {
   if (document.activeElement !== $('#vnote')) $('#vnote').value = v ? v.note : '';
   $('#vnote').placeholder = pick === 'ask' ? '질문' : '누가 · 언제 · 무엇';
   $('#vstale').textContent = v && v.fp !== fingerprint() ? '옛 장면' : '';
-  $('#vcount').textContent = `${Object.keys(VERD).length} / ${SCENES.length}`;
+  const pool = ROUND ? ROUND.items.map((it) => it.key) : SCENES.map((x) => `${x.rank}-${x.variant}`);
+  $('#vcount').textContent = `${pool.filter((kk) => VERD[(ROUND ? ROUND.id + ':' : '') + kk]).length} / ${pool.length}`;
   $('#verdictBox').classList.toggle('hide', !k);
   const rank = $('#scene').value;
   $('#variant').querySelectorAll('button').forEach((b) => { const w = VERD[`${rank}-${b.dataset.v}`]; b.textContent = VLABEL[b.dataset.v] + (w ? MARK[w.j] : ''); });
@@ -344,7 +355,7 @@ function verdicts() {
     const k = sceneKey();
     if (!btn || !k) return;
     if (VERD[k] && VERD[k].j === btn.dataset.j) delete VERD[k];
-    else VERD[k] = { j: btn.dataset.j, note: $('#vnote').value.trim(), at: Number(t.toFixed(1)), fp: fingerprint() };
+    else VERD[k] = { j: btn.dataset.j, note: $('#vnote').value.trim(), at: Number(t.toFixed(1)), fp: fingerprint(), who: [...WHO] };
     saveV(VERD);
     refreshV();
   });
@@ -358,10 +369,13 @@ function verdicts() {
     const name = (rank) => (SCENES.find((s) => String(s.rank) === rank) || {}).family || '';
     const vname = { normal: '보통', borderline: '경계', error: '실책' };
     const text = Object.entries(VERD)
+      .filter(([k]) => inRound(k))
+      .map(([k, v]) => [bare(k), v])
       .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10))
-      .map(([k, v]) => { const [rank, vv] = k.split('-'); return `${rank} ${name(rank)} · ${vname[vv]} · ${JLABEL[v.j]} · ${v.at}초${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
+      .map(([k, v]) => { const [rank, vv] = k.split('-'); const who = v.who && v.who.length ? ' · 누구 ' + v.who.map((p) => POSNAME[p - 1]).join('·') : ''; return `${rank} ${name(rank)} · ${vname[vv]} · ${JLABEL[v.j]} · ${v.at}초${who}${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
       .join('\n');
-    try { await navigator.clipboard.writeText(text); } catch { prompt('', text); return; }
+    const out = (ROUND ? `판 ${ROUND.id}\n` : '') + text;
+    try { await navigator.clipboard.writeText(out); } catch { prompt('', out); return; }
     $('#vcopy').textContent = '복사됨';
     setTimeout(() => { $('#vcopy').textContent = '전체 복사'; }, 1500);
   });
@@ -369,7 +383,10 @@ function verdicts() {
 
 // 이전 · 다음 순서 = 변형 먼저(보통 1~31 → 경계 1~31 → 실책 1~31) — 친구가 보통부터 훑게 한다.
 const ORDER = ['normal', 'borderline', 'error'];
-function sequence() { return ORDER.flatMap((v) => SCENES.filter((s) => s.variant === v).sort((a, b) => a.rank - b.rank)); }
+function sequence() {
+  if (ROUND) return ROUND.items.map((it) => { const [rank, v] = it.key.split('-'); return SCENES.find((s) => String(s.rank) === rank && s.variant === v); }).filter(Boolean);
+  return ORDER.flatMap((v) => SCENES.filter((s) => s.variant === v).sort((a, b) => a.rank - b.rank));
+}
 function step(d) {
   const seq = sequence();
   const i = seq.findIndex((s) => String(s.rank) === $('#scene').value && s.variant === variant);
@@ -392,8 +409,15 @@ function runScene() {
   const s = SCENES.find((x) => x.rank === rank && x.variant === variant);
   if (!s) return;
   const seq = sequence();
-  $('#pos').textContent = `${seq.indexOf(s) + 1} / ${seq.length}`;
+  $('#pos').textContent = `${ROUND ? ROUND.name + ' · ' : ''}${seq.indexOf(s) + 1} / ${seq.length}`;
   SCENE = s;
+  ITEM = ROUND ? ROUND.items.find((it) => it.key === `${s.rank}-${s.variant}`) || null : null;
+  const sv = VERD[`${ROUND ? ROUND.id + ':' : ''}${s.rank}-${s.variant}`];
+  WHO = sv && sv.who ? [...sv.who] : [];
+  $('#prevBox').classList.toggle('hide', !(ITEM && ITEM.prev));
+  if (ITEM && ITEM.prev) $('#prevNote').textContent = `${JLABEL[ITEM.prev.j]}${ITEM.prev.note ? ' · ' + ITEM.prev.note : ''}`;
+  const ch = ITEM ? ITEM.changed.map((p) => POSNAME[p - 1]) : [];
+  $('#changed').textContent = ch.length ? `바뀐 선수 ${ch.join(' · ')}` : '';
   const b = s.input.ball;
   mark = b.aim ? [b.aim.x, b.aim.y] : null;
   show(s.input);
@@ -447,7 +471,20 @@ async function boot() {
     refreshV();
   });
   canvas.addEventListener('click', (e) => {
-    if (!placing) return;
+    if (!placing) {
+      // 선수 점을 누르면 「누구」 표시(다시 누르면 지움) — 판정과 함께 저장된다
+      if (!TL) return;
+      const rc = canvas.getBoundingClientRect();
+      const px = (e.clientX - rc.left) * S.dpr, py = (e.clientY - rc.top) * S.dpr;
+      const rad = Math.max(7, LOOK.token * S.k) * 1.6;
+      let best = null;
+      TL.fielders.forEach((f, i) => { const [x, y] = at(f.pts, t); const d = Math.hypot(sx(x) - px, sy(y) - py); if (d < rad && (!best || d < best.d)) best = { d, pos: i + 1 }; });
+      if (!best) return;
+      WHO = WHO.includes(best.pos) ? WHO.filter((p) => p !== best.pos) : [...WHO, best.pos].sort((a, b) => a - b);
+      const k = sceneKey();
+      if (k && VERD[k]) { VERD[k].who = [...WHO]; saveV(VERD); }
+      return;
+    }
     const r = canvas.getBoundingClientRect();
     const x = wx((e.clientX - r.left) * S.dpr);
     const y = wy((e.clientY - r.top) * S.dpr);
@@ -465,7 +502,16 @@ async function boot() {
     if (e.key === 'ArrowLeft') step(-1);
     else if (e.key === 'ArrowRight') step(1);
     else if (e.key === ' ') { e.preventDefault(); $('#play').click(); }
+    else if (['1', '2', '3'].includes(e.key)) $('#verdict').querySelectorAll('button')[Number(e.key) - 1].click();
   });
+  try {
+    const id = new URLSearchParams(location.search).get('round');
+    if (id) {
+      const rv = await (await fetch('review.json')).json();
+      ROUND = rv.rounds.find((x) => x.id === id) || null;
+      if (ROUND && ROUND.items.length) { const [rank, v] = ROUND.items[0].key.split('-'); $('#scene').value = rank; variant = v; }
+    }
+  } catch { ROUND = null; }
   verdicts();
   runScene();
   requestAnimationFrame((now) => { last = now; tick(now); });
