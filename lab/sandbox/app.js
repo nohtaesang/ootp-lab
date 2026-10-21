@@ -263,9 +263,9 @@ function show(input) {
   refreshV();
 }
 
-// 친구 판정(#1873) — 「이 장면」: 괜찮다 / 어색하다를 누르는 순간 이 브라우저에 저장된다(다시 누르면 지움 · 한 줄은 쓰는 대로 저장).
+// 친구 판정(#1873) — 「이 장면」: 괜찮다 / 애매하다(질문) / 어색하다를 누르는 순간 이 브라우저에 저장된다(다시 누르면 지움 · 한 줄은 쓰는 대로 저장).
 // 저장 값 = 판정 · 한 줄 · 누른 순간의 재생 시각 · 장면 지문. 「전체 복사」가 모든 장면 판정을 글로 낸다(서버 없음 — 친구가 그 글을 보낸다).
-// 엔진이 바뀌어 지문이 달라지면 그 장면에 「옛 장면」이 붙는다. 변형 단추 · 장면 목록에 판정 표시(✓ 괜찮다 · ✗ 어색하다).
+// 엔진이 바뀌어 지문이 달라지면 그 장면에 「옛 장면」이 붙는다. 변형 단추 · 장면 목록에 판정 표시(✓ 괜찮다 · ? 애매하다 · ✗ 어색하다).
 const VKEY = 'playfield-verdicts-v1';
 let pick = null;
 function loadV() { try { return JSON.parse(localStorage.getItem(VKEY) || '{}'); } catch { return {}; } }
@@ -277,7 +277,8 @@ function fingerprint() {
   for (const c of JSON.stringify(TL ? TL.events || TL : '')) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
   return h.toString(16);
 }
-const MARK = { ok: ' ✓', odd: ' ✗' };
+const MARK = { ok: ' ✓', ask: ' ?', odd: ' ✗' };
+const JLABEL = { ok: '괜찮다', ask: '애매하다(질문)', odd: '어색하다' };
 const VLABEL = { normal: '보통', borderline: '경계', error: '실책' };
 function refreshV() {
   const k = sceneKey();
@@ -285,6 +286,7 @@ function refreshV() {
   pick = v ? v.j : null;
   $('#verdict').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.j === pick));
   if (document.activeElement !== $('#vnote')) $('#vnote').value = v ? v.note : '';
+  $('#vnote').placeholder = pick === 'ask' ? '질문' : '누가 · 언제 · 무엇';
   $('#vstale').textContent = v && v.fp !== fingerprint() ? '옛 장면' : '';
   $('#vcount').textContent = `${Object.keys(VERD).length} / ${SCENES.length}`;
   $('#verdictBox').classList.toggle('hide', !k);
@@ -317,7 +319,7 @@ function verdicts() {
     const vname = { normal: '보통', borderline: '경계', error: '실책' };
     const text = Object.entries(VERD)
       .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10))
-      .map(([k, v]) => { const [rank, vv] = k.split('-'); return `${rank} ${name(rank)} · ${vname[vv]} · ${v.j === 'ok' ? '괜찮다' : '어색하다'} · ${v.at}초${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
+      .map(([k, v]) => { const [rank, vv] = k.split('-'); return `${rank} ${name(rank)} · ${vname[vv]} · ${JLABEL[v.j]} · ${v.at}초${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
       .join('\n');
     try { await navigator.clipboard.writeText(text); } catch { prompt('', text); return; }
     $('#vcopy').textContent = '복사됨';
