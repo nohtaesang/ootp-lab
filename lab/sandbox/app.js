@@ -21,6 +21,9 @@ let variant = 'normal';
 let placing = false;
 let showParts = false;
 let kind = 'ground';
+let SCENE = null;
+// 친구 화면은 판정에 필요한 것만 — ?dev 면 개발 도구(낙하점 X · 부품 번호 · 놓기 · 목록 · 배속)도 보인다
+const DEV = new URLSearchParams(location.search).has('dev');
 
 // ── wasm 맨 ABI(app-wasm 과 같다) ──────────────────────────
 function call(fn, input) {
@@ -54,12 +57,13 @@ const C = {
   fielder: tok('--primary', '#5b5bd6'),
   runner: tok('--attention-solid', '#e0a030'),
   on: tok('--primary-on', '#ffffff'),
+  error: tok('--danger-text', '#ff6b6b'),
 };
 
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
 const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
-const LOOK = { skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, lift: 0.5 };
+const LOOK = { skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, halo: 0.12, groundZ: 0.3, trailStep: 0.06, errorS: 1.2 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -179,7 +183,7 @@ function draw() {
   fit();
   if (!FIELD) return;
   drawField();
-  if (mark) {
+  if (mark && DEV) {
     const r = Math.max(6, 1.2 * S.k);
     ctx.strokeStyle = C.chalk;
     ctx.lineWidth = 2;
@@ -217,10 +221,46 @@ function draw() {
   ctx.fillStyle = '#000';
   ctx.fill();
   ctx.globalAlpha = 1;
+  // 공은 실제 자리에 그린다 — 높이를 화면 위쪽으로 올려 그리면 중견수 쪽 뜬공이 담장을 넘었다 돌아오는 것처럼 보였다(친구 판정 r1 4 · 5 · 6 · 9 경계).
+  // 높이는 공 크기와 둘레 고리로만 보인다. 땅에 붙어 굴러가면 지나온 자국을 짧게 남긴다(16 · 20 경계 「땅볼인지 알기 힘듦」).
+  const tb = Math.min(t, TL.ball.length ? TL.ball[TL.ball.length - 1][0] : 0);
+  if (bz < LOOK.groundZ) {
+    ctx.strokeStyle = C.chalk;
+    ctx.globalAlpha = 0.45;
+    ctx.lineWidth = Math.max(1.5, 0.18 * S.k);
+    ctx.beginPath();
+    let first = true;
+    for (let k = 6; k >= 0; k--) {
+      const tt = tb - k * LOOK.trailStep;
+      if (tt < 0) continue;
+      const [qx, qy, qz] = at(TL.ball, tt);
+      if (qz > LOOK.groundZ) { first = true; continue; }
+      if (first) { ctx.moveTo(sx(qx), sy(qy)); first = false; } else ctx.lineTo(sx(qx), sy(qy));
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  } else {
+    ctx.strokeStyle = C.chalk;
+    ctx.globalAlpha = 0.35;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(sx(bx), sy(by), rr + bz * S.k * LOOK.halo, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
   ctx.beginPath();
-  ctx.arc(sx(bx), sy(by) - bz * S.k * LOOK.lift, rr, 0, Math.PI * 2);
+  ctx.arc(sx(bx), sy(by), rr, 0, Math.PI * 2);
   ctx.fillStyle = C.chalk;
   ctx.fill();
+  // 실책 순간 표시(3 실책 「느낌표」) — 공이 있던 자리에 잠깐
+  for (const e of TL.events) {
+    if (e.kind !== 'miss' || t < e.t || t > e.t + LOOK.errorS) continue;
+    const [ex, ey] = at(TL.ball, e.t);
+    ctx.fillStyle = C.error;
+    ctx.font = `700 ${Math.max(16, Math.round(2.2 * S.k))}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('!', sx(ex), sy(ey) - Math.max(14, 2 * S.k));
+  }
   // 결과는 플레이가 끝난 뒤에만
   const box = $('#result');
   if (t >= TL.end_t) {
@@ -232,6 +272,7 @@ function draw() {
   } else {
     box.classList.add('hide');
   }
+  if (SCENE) $('#title').textContent = t >= TL.end_t ? `${SCENE.rank}. ${SCENE.family} · ${VLABEL[SCENE.variant]}` : situation(SCENE);
   $('#clock').textContent = t.toFixed(1);
   $('#scrub').value = String(Math.round((t / TL.duration) * 1000));
 }
@@ -273,8 +314,12 @@ function saveV(v) { try { localStorage.setItem(VKEY, JSON.stringify(v)); } catch
 let VERD = loadV();
 function sceneKey() { return placing || !TL ? null : `${$('#scene').value}-${variant}`; }
 function fingerprint() {
+  // 사건 + 움직임(0.5m · 0.1초로 반올림) — 움직임만 바뀌어도 「옛 장면」이 된다
+  if (!TL) return '';
+  const q = (v, s) => Math.round(v / s);
+  const body = JSON.stringify([TL.events, [...TL.fielders, ...TL.runners].map((k) => k.pts.map((p) => [q(p[0], 0.1), q(p[1], 0.5), q(p[2], 0.5)]))]);
   let h = 2166136261;
-  for (const c of JSON.stringify(TL ? TL.events || TL : '')) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  for (const c of body) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
   return h.toString(16);
 }
 const MARK = { ok: ' ✓', ask: ' ?', odd: ' ✗' };
@@ -340,13 +385,20 @@ function step(d) {
   runScene();
 }
 
+// 재생 중 제목은 상황만(주자 · 아웃 · 변형) — 결과를 미리 말하지 않는다(8 경계 「설명과 다르다」 · 결과는 끝난 뒤 제목과 칩으로)
+function situation(s) {
+  const r = (s.input.runners || []).map((x) => x.base).sort();
+  const on = r.length ? `주자 ${r.join('·')}루` : '주자 없음';
+  return `${s.rank}. ${on} · ${s.input.outs || 0}아웃 · ${VLABEL[s.variant]}`;
+}
+
 function runScene() {
   const rank = Number($('#scene').value);
   const s = SCENES.find((x) => x.rank === rank && x.variant === variant);
   if (!s) return;
   const seq = sequence();
   $('#pos').textContent = `${seq.indexOf(s) + 1} / ${seq.length}`;
-  $('#title').textContent = `${s.rank}. ${s.family} · ${VLABEL[s.variant]}`;
+  SCENE = s;
   const b = s.input.ball;
   mark = b.aim ? [b.aim.x, b.aim.y] : null;
   show(s.input);
