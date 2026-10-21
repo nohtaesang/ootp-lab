@@ -325,10 +325,26 @@ function verdicts() {
   });
 }
 
+// 이전 · 다음 순서 = 변형 먼저(보통 1~31 → 경계 1~31 → 실책 1~31) — 친구가 보통부터 훑게 한다.
+const ORDER = ['normal', 'borderline', 'error'];
+function sequence() { return ORDER.flatMap((v) => SCENES.filter((s) => s.variant === v).sort((a, b) => a.rank - b.rank)); }
+function step(d) {
+  const seq = sequence();
+  const i = seq.findIndex((s) => String(s.rank) === $('#scene').value && s.variant === variant);
+  const n = seq[(i + d + seq.length) % seq.length];
+  $('#scene').value = String(n.rank);
+  variant = n.variant;
+  $('#variant').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.v === variant));
+  runScene();
+}
+
 function runScene() {
   const rank = Number($('#scene').value);
   const s = SCENES.find((x) => x.rank === rank && x.variant === variant);
   if (!s) return;
+  const seq = sequence();
+  $('#pos').textContent = `${seq.indexOf(s) + 1} / ${seq.length}`;
+  $('#title').textContent = `${s.rank}. ${s.family}`;
   const b = s.input.ball;
   mark = b.aim ? [b.aim.x, b.aim.y] : null;
   show(s.input);
@@ -391,6 +407,14 @@ async function boot() {
     show({ ball: { ev: Number($('#ev').value), aim: { kind, x, y } }, runners, outs: Number($('#outs').value), seed: Number($('#seed').value) });
   });
   window.addEventListener('resize', draw);
+  $('#prev').addEventListener('click', () => step(-1));
+  $('#next').addEventListener('click', () => step(1));
+  window.addEventListener('keydown', (e) => {
+    if (e.target.matches('input, select')) return;
+    if (e.key === 'ArrowLeft') step(-1);
+    else if (e.key === 'ArrowRight') step(1);
+    else if (e.key === ' ') { e.preventDefault(); $('#play').click(); }
+  });
   verdicts();
   runScene();
   requestAnimationFrame((now) => { last = now; tick(now); });

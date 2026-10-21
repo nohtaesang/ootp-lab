@@ -10,6 +10,7 @@
   :root {
     --lab-bg: var(--bg-canvas, #1d1d1f);
     --lab-panel: var(--bg-surface, #262628);
+    --lab-card: var(--bg-raised, #303033);
     --lab-line: var(--border, #4a4a4c);
     --lab-text: var(--text-normal, #f5f5f5);
     --lab-muted: var(--text-muted, #bdbdbd);
@@ -18,13 +19,13 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--lab-bg); color: var(--lab-text); font-family: var(--font-sans, system-ui, sans-serif); font-size: var(--text-md, 14px); }
-  .app { display: grid; grid-template-columns: 1fr 300px; height: 100%; }
+  .app { display: grid; grid-template-columns: 1fr 320px; height: 100%; }
   .stage { position: relative; min-height: 0; }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: manipulation; }
   .stage.placing canvas { cursor: crosshair; }
   .result { position: absolute; left: 16px; top: 16px; display: flex; gap: 8px; pointer-events: none; }
   .result span { background: var(--lab-panel); border-radius: 8px; padding: 6px 10px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .panel { background: var(--lab-panel); padding: 16px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+  .panel { background: var(--lab-panel); padding: 16px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
   .group { display: flex; flex-direction: column; gap: 8px; }
   .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   label { color: var(--lab-muted); font-size: var(--text-sm, 12px); }
@@ -40,7 +41,17 @@
   .time { font-variant-numeric: tabular-nums; color: var(--lab-muted); min-width: 64px; text-align: right; }
   .hide { display: none !important; }
   input[type=text] { font: inherit; color: var(--lab-text); background: var(--lab-bg); border: 1px solid var(--lab-line); border-radius: 8px; padding: 8px 10px; min-height: 36px; }
-  .all { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--lab-line); }
+  .card { background: var(--lab-card); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .card.quiet { background: transparent; padding: 0 2px; }
+  .h { color: var(--lab-muted); font-size: var(--text-sm, 12px); font-weight: 600; }
+  .nav { display: flex; align-items: center; gap: 8px; }
+  .nav .pos { flex: 1; text-align: center; color: var(--lab-muted); font-variant-numeric: tabular-nums; }
+  .title { font-size: var(--text-lg, 16px); font-weight: 600; line-height: 1.4; min-height: 2.8em; }
+  button.ghost { background: transparent; }
+  .seg.big button { min-height: 48px; font-weight: 600; }
+  .seg.small button { min-height: 32px; padding: 4px 6px; font-size: var(--text-sm, 12px); }
+  #scene { color: var(--lab-muted); font-size: var(--text-sm, 12px); min-height: 32px; padding: 4px 8px; }
+  .all { margin-top: auto; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   @media (max-width: 720px) {
     .app { grid-template-columns: 1fr; grid-template-rows: 62vh auto; height: auto; }
     .panel { padding: 16px; }
@@ -54,32 +65,46 @@
     <div class="result hide" id="result"></div>
   </div>
   <div class="panel">
-    <div class="group">
-      <label for="scene">장면</label>
-      <select id="scene"></select>
+    <section class="card">
+      <div class="nav">
+        <button id="prev" class="ghost" aria-label="이전">‹ 이전</button>
+        <span class="pos" id="pos"></span>
+        <button id="next" class="ghost" aria-label="다음">다음 ›</button>
+      </div>
+      <div class="title" id="title"></div>
       <div class="seg" id="variant">
         <button data-v="normal" class="on">보통</button>
         <button data-v="borderline">경계</button>
         <button data-v="error">실책</button>
       </div>
-    </div>
-    <div class="group">
+      <select id="scene" aria-label="장면"></select>
+    </section>
+    <section class="card" id="verdictBox">
+      <div class="h">판정 <span id="vstale"></span></div>
+      <div class="seg big" id="verdict">
+        <button data-j="ok">괜찮다</button>
+        <button data-j="odd">이상하다</button>
+      </div>
+      <input type="text" id="vnote" placeholder="누가 · 언제 · 무엇">
+    </section>
+    <section class="card">
+      <div class="h">재생</div>
       <div class="row">
         <button id="play">▶</button>
         <input type="range" id="scrub" min="0" max="1000" value="0" style="flex:1">
         <span class="time" id="clock">0.0</span>
       </div>
-      <div class="seg" id="rate">
+      <div class="seg small" id="rate">
         <button data-r="0.25">0.25×</button>
         <button data-r="0.5">0.5×</button>
         <button data-r="1" class="on">1×</button>
       </div>
-      <div class="row"><button id="parts">부품</button></div>
-    </div>
-    <div class="group">
-      <button id="place">놓기</button>
+    </section>
+    <section class="card quiet">
+      <div class="h">도구</div>
+      <div class="row"><button id="parts" class="ghost">부품</button><button id="place" class="ghost">놓기</button></div>
       <div class="group hide" id="placeBox">
-        <div class="seg" id="kind">
+        <div class="seg small" id="kind">
           <button data-k="ground" class="on">땅볼</button>
           <button data-k="liner">직선</button>
           <button data-k="fly">뜬공</button>
@@ -97,19 +122,11 @@
           <label for="seed">시드</label><input type="number" id="seed" value="1">
         </div>
       </div>
-    </div>
-    <div class="group" id="verdictBox">
-      <label>이 장면 <span id="vstale"></span></label>
-      <div class="seg" id="verdict">
-        <button data-j="ok">괜찮다</button>
-        <button data-j="odd">이상하다</button>
-      </div>
-      <input type="text" id="vnote" placeholder="누가 · 언제 · 무엇">
-    </div>
-    <div class="group all">
-      <label>전체 <span id="vcount"></span></label>
+    </section>
+    <section class="all">
+      <span class="h">전체 <span id="vcount"></span></span>
       <button id="vcopy">전체 복사</button>
-    </div>
+    </section>
   </div>
 </div>
 <script src="app.js"></script>
