@@ -39,6 +39,8 @@
   .check { display: flex; gap: 4px; align-items: center; color: var(--lab-text); font-size: var(--text-md, 14px); }
   .time { font-variant-numeric: tabular-nums; color: var(--lab-muted); min-width: 64px; text-align: right; }
   .hide { display: none !important; }
+  input[type=text] { font: inherit; color: var(--lab-text); background: var(--lab-bg); border: 1px solid var(--lab-line); border-radius: 8px; padding: 8px 10px; min-height: 36px; }
+  .all { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--lab-line); }
   @media (max-width: 720px) {
     .app { grid-template-columns: 1fr; grid-template-rows: 62vh auto; height: auto; }
     .panel { padding: 16px; }
@@ -97,13 +99,16 @@
       </div>
     </div>
     <div class="group" id="verdictBox">
-      <label>판정 <span id="vcount"></span></label>
+      <label>이 장면 <span id="vstale"></span></label>
       <div class="seg" id="verdict">
         <button data-j="ok">괜찮다</button>
         <button data-j="odd">이상하다</button>
       </div>
       <input type="text" id="vnote" placeholder="누가 · 언제 · 무엇">
-      <div class="row"><button id="vsave" style="flex:1">저장</button><button id="vcopy" style="flex:1">복사</button></div>
+    </div>
+    <div class="group all">
+      <label>전체 <span id="vcount"></span></label>
+      <button id="vcopy">전체 복사</button>
     </div>
   </div>
 </div>

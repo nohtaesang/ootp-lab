@@ -263,8 +263,9 @@ function show(input) {
   refreshV();
 }
 
-// 친구 판정(#1873) — 장면(묶음 순위 · 변형)마다 「괜찮다 / 이상하다 + 한 줄」과 저장한 순간의 재생 시각을 이 브라우저에 모은다.
-// 「복사」가 전부를 글로 낸다(서버 없음 — 친구가 그 글을 보낸다). 엔진이 바뀌어 장면 지문이 달라지면 「옛 장면」으로 보인다.
+// 친구 판정(#1873) — 「이 장면」: 괜찮다 / 이상하다를 누르는 순간 이 브라우저에 저장된다(다시 누르면 지움 · 한 줄은 쓰는 대로 저장).
+// 저장 값 = 판정 · 한 줄 · 누른 순간의 재생 시각 · 장면 지문. 「전체 복사」가 모든 장면 판정을 글로 낸다(서버 없음 — 친구가 그 글을 보낸다).
+// 엔진이 바뀌어 지문이 달라지면 그 장면에 「옛 장면」이 붙는다. 변형 단추 · 장면 목록에 판정 표시(✓ 괜찮다 · ✗ 이상하다).
 const VKEY = 'playfield-verdicts-v1';
 let pick = null;
 function loadV() { try { return JSON.parse(localStorage.getItem(VKEY) || '{}'); } catch { return {}; } }
@@ -276,23 +277,40 @@ function fingerprint() {
   for (const c of JSON.stringify(TL ? TL.events || TL : '')) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
   return h.toString(16);
 }
+const MARK = { ok: ' ✓', odd: ' ✗' };
+const VLABEL = { normal: '보통', borderline: '경계', error: '실책' };
 function refreshV() {
   const k = sceneKey();
   const v = k ? VERD[k] : null;
   pick = v ? v.j : null;
   $('#verdict').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.j === pick));
-  $('#vnote').value = v ? v.note : '';
-  $('#vcount').textContent = `${Object.keys(VERD).length} / ${SCENES.length}${v && v.fp !== fingerprint() ? ' · 옛 장면' : ''}`;
+  if (document.activeElement !== $('#vnote')) $('#vnote').value = v ? v.note : '';
+  $('#vstale').textContent = v && v.fp !== fingerprint() ? '옛 장면' : '';
+  $('#vcount').textContent = `${Object.keys(VERD).length} / ${SCENES.length}`;
   $('#verdictBox').classList.toggle('hide', !k);
+  const rank = $('#scene').value;
+  $('#variant').querySelectorAll('button').forEach((b) => { const w = VERD[`${rank}-${b.dataset.v}`]; b.textContent = VLABEL[b.dataset.v] + (w ? MARK[w.j] : ''); });
+  for (const o of $('#scene').options) {
+    const n = Object.keys(VLABEL).filter((vv) => VERD[`${o.value}-${vv}`]).length;
+    const base = o.dataset.name || (o.dataset.name = o.textContent);
+    o.textContent = n ? `${base} · ${n}/3` : base;
+  }
 }
 function verdicts() {
-  seg('#verdict', 'j', (j) => { pick = j; });
-  $('#vsave').addEventListener('click', () => {
+  $('#verdict').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
     const k = sceneKey();
-    if (!k || !pick) return;
-    VERD[k] = { j: pick, note: $('#vnote').value.trim(), at: Number(t.toFixed(1)), fp: fingerprint() };
+    if (!btn || !k) return;
+    if (VERD[k] && VERD[k].j === btn.dataset.j) delete VERD[k];
+    else VERD[k] = { j: btn.dataset.j, note: $('#vnote').value.trim(), at: Number(t.toFixed(1)), fp: fingerprint() };
     saveV(VERD);
     refreshV();
+  });
+  $('#vnote').addEventListener('input', () => {
+    const k = sceneKey();
+    if (!k || !VERD[k]) return;
+    VERD[k].note = $('#vnote').value.trim();
+    saveV(VERD);
   });
   $('#vcopy').addEventListener('click', async () => {
     const name = (rank) => (SCENES.find((s) => String(s.rank) === rank) || {}).family || '';
@@ -301,7 +319,9 @@ function verdicts() {
       .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10))
       .map(([k, v]) => { const [rank, vv] = k.split('-'); return `${rank} ${name(rank)} · ${vname[vv]} · ${v.j === 'ok' ? '괜찮다' : '이상하다'} · ${v.at}초${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
       .join('\n');
-    try { await navigator.clipboard.writeText(text); } catch { prompt('', text); }
+    try { await navigator.clipboard.writeText(text); } catch { prompt('', text); return; }
+    $('#vcopy').textContent = '복사됨';
+    setTimeout(() => { $('#vcopy').textContent = '전체 복사'; }, 1500);
   });
 }
 
