@@ -407,6 +407,8 @@ async function boot() {
     show({ ball: { ev: Number($('#ev').value), aim: { kind, x, y } }, runners, outs: Number($('#outs').value), seed: Number($('#seed').value) });
   });
   window.addEventListener('resize', draw);
+  // 친구 화면에는 개발 도구(부품 번호 · 놓기)가 없다 — 주소 끝에 ?dev 를 붙이면 보인다.
+  if (new URLSearchParams(location.search).has('dev')) $('#tools').classList.remove('hide');
   $('#prev').addEventListener('click', () => step(-1));
   $('#next').addEventListener('click', () => step(1));
   window.addEventListener('keydown', (e) => {
