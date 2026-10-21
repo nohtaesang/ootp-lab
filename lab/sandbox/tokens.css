@@ -119,8 +119,9 @@
   --text-faint: var(--neutral-9);
   --border: var(--neutral-6);
   --border-strong: var(--neutral-7);
-  --focus-outline: 2px solid var(--indigo-9);
+  --focus-outline: var(--line-mark) solid var(--indigo-9);
   --focus-offset: 2px;
+  --focus-offset-in: -2px;
   --primary: var(--indigo-9);
   --primary-hover: var(--indigo-10);
   --primary-on: #ffffff;
@@ -248,11 +249,13 @@
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
+  --radius-xs: 2px;
   --radius-s: 4px;
   --radius-m: 6px;
-  --radius-l: 10px;
-  --radius-xl: 14px;
+  --radius-l: 16px;
   --radius-pill: 999px;
+  --line-mark: 2px;
+  --line-bar: 3px;
   --dur-fast: 100ms;
   --dur-med: 180ms;
   --dur-slow: 320ms;
@@ -443,7 +446,7 @@
   --state-on: var(--bg-active);
   --state-current: var(--bg-active);
   --state-picked-row: var(--primary-tint);
-  --state-picked-row-bar: inset 3px 0 0 var(--primary);
+  --state-picked-row-bar: inset var(--line-bar) 0 0 var(--primary);
   --state-picked-cell: var(--bg-active);
   --state-picked-cell-ring: inset 0 0 0 1px var(--border-strong);
   --state-today: var(--primary-tint);
