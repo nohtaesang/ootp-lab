@@ -130,7 +130,342 @@
    "name": "2판",
    "items": [
     {
+     "key": "16-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "21-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "15-borderline",
+     "must": true,
+     "prev": {
+      "j": "ok",
+      "note": ""
+     },
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "1-borderline",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "2-borderline",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "21-borderline",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "26-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "26-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "15-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0,
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "19-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0,
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "19-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0,
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "19-borderline",
+     "must": true,
+     "prev": {
+      "j": "ok",
+      "note": ""
+     },
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0,
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "20-error",
+     "must": true,
+     "prev": {
+      "j": "ok",
+      "note": ""
+     },
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "8-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "8-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "9-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
      "key": "10-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "10-borderline",
      "must": true,
      "prev": null,
      "changed": [
@@ -167,6 +502,43 @@
      "key": "28-normal",
      "must": true,
      "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "9-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "8-borderline",
+     "must": true,
+     "prev": {
+      "j": "ok",
+      "note": ""
+     },
      "changed": [
       1,
       3,
@@ -218,247 +590,6 @@
       2
      ],
      "mention": []
-    },
-    {
-     "key": "2-borderline",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "21-error",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "15-borderline",
-     "must": true,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "1-borderline",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "26-normal",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "26-borderline",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "26-error",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "19-normal",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0,
-      1
-     ],
-     "mention": []
-    },
-    {
-     "key": "19-error",
-     "must": true,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0,
-      1
-     ],
-     "mention": []
-    },
-    {
-     "key": "19-borderline",
-     "must": true,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0,
-      1
-     ],
-     "mention": []
-    },
-    {
-     "key": "8-normal",
-     "must": true,
-     "prev": null,
-     "changed": [
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "8-error",
-     "must": true,
-     "prev": null,
-     "changed": [
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "10-borderline",
-     "must": true,
-     "prev": null,
-     "changed": [
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
     }
    ]
   },
@@ -467,7 +598,47 @@
    "name": "3판",
    "items": [
     {
+     "key": "20-borderline",
+     "must": false,
+     "prev": {
+      "j": "ok",
+      "note": ""
+     },
+     "changed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      1
+     ],
+     "mention": []
+    },
+    {
      "key": "7-borderline",
+     "must": false,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "22-error",
      "must": false,
      "prev": null,
      "changed": [
@@ -518,6 +689,42 @@
      "mention": []
     },
     {
+     "key": "23-error",
+     "must": false,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "3-normal",
+     "must": false,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
      "key": "11-error",
      "must": false,
      "prev": null,
@@ -537,75 +744,11 @@
      "mention": []
     },
     {
-     "key": "16-error",
-     "must": false,
-     "prev": null,
-     "changed": [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "9-error",
-     "must": false,
-     "prev": null,
-     "changed": [
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "22-error",
-     "must": false,
-     "prev": null,
-     "changed": [
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "23-error",
-     "must": false,
-     "prev": null,
-     "changed": [
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
      "key": "17-normal",
      "must": false,
      "prev": null,
      "changed": [
+      1,
       3,
       4,
       5,
@@ -624,6 +767,7 @@
      "must": false,
      "prev": null,
      "changed": [
+      1,
       3,
       4,
       5,
