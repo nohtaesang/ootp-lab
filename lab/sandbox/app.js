@@ -29,6 +29,11 @@ let ITEM = null;
 let WHO = [];
 // 친구 화면은 판정에 필요한 것만 — ?dev 면 개발 도구(낙하점 X · 부품 번호 · 놓기 · 목록 · 배속)도 보인다
 const DEV = new URLSearchParams(location.search).has('dev');
+// 라벨링(?blind) — 다른 사람 판정 · 메모 · 바뀐 선수를 숨긴다(앞 사람을 따라가지 않게 · 사용자 2026-10-22 판정표 고정 뒤 라벨링)
+const BLIND = new URLSearchParams(location.search).has('blind');
+// 판정자(?by=태훈) · 판본(배포 커밋 — deploy.sh 가 app.js?v= 로 붙임) — 「전체 복사」 첫 줄에 남아 어떤 엔진 · 장면으로 누가 판정했는지 안다
+const BY = new URLSearchParams(location.search).get('by') || '';
+const BUILD = ((document.currentScript && document.currentScript.getAttribute('src')) || '').match(/[?&]v=([\w-]+)/)?.[1] || '로컬';
 
 // ── wasm 맨 ABI(app-wasm 과 같다) ──────────────────────────
 function call(fn, input) {
@@ -70,7 +75,7 @@ const C = {
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
 const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
-const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2, headMinV: 1.0, headLen: 3.0, headDt: 0.1 };
+const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -217,9 +222,9 @@ function draw() {
     if (t > 0 && v > LOOK.headMinV) {
       const r = Math.max(7, LOOK.token * S.k);
       const ux = (x - px) / (v * LOOK.headDt), uy = (y - py) / (v * LOOK.headDt);
-      const len = r + Math.max(12, LOOK.headLen * S.k);
+      const len = r + Math.max(6, LOOK.headLen * S.k);
       ctx.strokeStyle = C.text;
-      ctx.lineWidth = Math.max(2, 0.22 * S.k);
+      ctx.lineWidth = Math.max(1.5, LOOK.headW * S.k);
       ctx.beginPath();
       ctx.moveTo(sx(x + ux * r / S.k), sy(y + uy * r / S.k));
       ctx.lineTo(sx(x + ux * len / S.k), sy(y + uy * len / S.k));
@@ -487,7 +492,8 @@ function verdicts() {
       .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10))
       .map(([k, v]) => { const [rank, vv] = k.split('-'); const who = v.who && v.who.length ? ' · 누구 ' + v.who.map((p) => POSNAME[p - 1]).join('·') : ''; return `${rank} ${name(rank)} · ${vname[vv]} · ${JLABEL[v.j]} · ${v.at}초${who}${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
       .join('\n');
-    const out = (ROUND ? `판 ${ROUND.id}\n` : '') + text;
+    const top = [ROUND ? `판 ${ROUND.id}` : '', BY ? `판정자 ${BY}` : '', `판본 ${BUILD}`].filter(Boolean).join(' · ');
+    const out = `${top}\n` + text;
     try { await navigator.clipboard.writeText(out); } catch { prompt('', out); return; }
     $('#vcopy').textContent = '복사됨';
     setTimeout(() => { $('#vcopy').textContent = '전체 복사'; }, 1500);
@@ -519,12 +525,19 @@ function situation(s) {
 
 function runScene() {
   const rank = Number($('#scene').value);
+  // 책임표 장면(순위 32~)은 보통만 — 없는 변형 단추는 꺼진 꼴로 두고 보통으로
+  $('#variant').querySelectorAll('button').forEach((b) => { b.disabled = !SCENES.some((x) => x.rank === rank && x.variant === b.dataset.v); });
+  if (!SCENES.some((x) => x.rank === rank && x.variant === variant)) {
+    variant = 'normal';
+    $('#variant').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.v === variant));
+  }
   const s = SCENES.find((x) => x.rank === rank && x.variant === variant);
   if (!s) return;
   const seq = sequence();
   $('#pos').textContent = `${ROUND ? ROUND.name + ' · ' : ''}${seq.indexOf(s) + 1} / ${seq.length}`;
   SCENE = s;
   ITEM = ROUND ? ROUND.items.find((it) => it.key === `${s.rank}-${s.variant}`) || null : null;
+  if (ITEM && BLIND) ITEM = { ...ITEM, prev: null, changed: [], runners: [], mention: [] };
   const sv = VERD[`${ROUND ? ROUND.id + ':' : ''}${s.rank}-${s.variant}`];
   WHO = sv && sv.who ? [...sv.who] : [];
   $('#prevBox').classList.toggle('hide', !(ITEM && ITEM.prev));
