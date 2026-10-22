@@ -68,7 +68,7 @@ const C = {
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
 const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
-const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, shadow: 0.35, shadowMax: 0.6, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2 };
+const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -221,7 +221,7 @@ function draw() {
     }
   });
   // 공: 실제 자리에 그린다(높이를 화면 위로 올리면 중견 쪽 뜬공이 담장을 넘었다 돌아오는 착시 — 친구 r1 4 · 5 · 6 · 9 경계).
-  // 높이 = 비스듬한 빛의 그림자가 공에서 떨어지는 거리 + 공 크기 · 속도 = 지나온 꼬리의 길이(친구 답 「높이와 그림자 · 속도에 따른 꼬리」).
+  // 높이 = 떨어질 자리 원이 줄어드는 정도 + 공 크기 · 속도 = 지나온 꼬리의 길이(친구 답 「높이와 그림자 · 속도에 따른 꼬리」 · 그림자는 탑다운에서 공 밑이라 뺐다).
   // 땅에 붙어 굴러가면 꼬리가 땅 자국처럼 남는다(16 · 20 경계 「땅볼인지 알기 힘듦」).
   const tb = Math.min(t, TL.ball.length ? TL.ball[TL.ball.length - 1][0] : 0);
   const [bx, by, bz] = at(TL.ball, tb);
@@ -246,15 +246,8 @@ function draw() {
     }
   }
   const rr = Math.max(3, (LOOK.ball + bz * LOOK.ballGrow) * S.k);
-  // 그림자는 공 바로 옆에 조금만 — 높이는 떨어질 자리 원이 보여 준다(사용자 2026-10-22 r3-1 7 「그림자 위치가 맞나」 · 34m 뜬공이면 12m 떨어져 엉뚱한 곳에 까만 점)
-  const off = Math.min(bz * LOOK.shadow, LOOK.shadowMax) * S.k;
-  const shx = sx(bx) + off, shy = sy(by) + off;
-  ctx.globalAlpha = Math.max(0.3, 0.6 - bz * 0.01);
-  ctx.beginPath();
-  ctx.ellipse(shx, shy, Math.max(3, 0.45 * S.k), Math.max(2, 0.3 * S.k), 0, 0, Math.PI * 2);
-  ctx.fillStyle = '#000';
-  ctx.fill();
-  ctx.globalAlpha = 1;
+  // 완전 탑다운 — 공 점이 곧 땅 위 자리라 따로 미는 그림자는 그리지 않는다. 높이는 떨어질 자리 원(줄어드는 정도)과 공 크기로 본다
+  // (사용자 2026-10-22 「그림자는 그라운드 어디에 투영되는지 알려고 쓰는 거 아니야? 너무 헷갈려」 — 비스듬한 그림자는 땅 위치가 아니라 높이 눈금이라 헷갈렸다)
   if (TL.ball.length && t < TL.ball[TL.ball.length - 1][0] + LOOK.trailStep) {
     const pts = [];
     for (let k = LOOK.trailN; k >= 0; k--) {
@@ -291,6 +284,22 @@ function draw() {
     ctx.arc(sx(fx), sy(fy), Math.max(9, LOOK.token * S.k) * (1.3 + 1.2 * k), 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
+  }
+  // 내야 다이빙 — 그 선수 아래에 「다이빙」(엔진이 몸을 던져 닿았다고 한 순간만 · 사용자 2026-10-22)
+  for (const e of TL.events) {
+    if (e.kind !== 'dive' || t < e.t || t > e.t + LOOK.errorS || e.fielder == null) continue;
+    const f = TL.fielders.find((x) => x.id === e.fielder);
+    if (!f) continue;
+    const [fx, fy] = at(f.pts, t);
+    const head = Math.max(9, LOOK.token * S.k);
+    ctx.fillStyle = C.chalk;
+    ctx.font = `800 ${Math.max(12, Math.round(1.6 * S.k))}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#000';
+    ctx.strokeText('다이빙', sx(fx), sy(fy) + head + 2);
+    ctx.fillText('다이빙', sx(fx), sy(fy) + head + 2);
   }
   // 실책 · 실투 — 그 선수 머리 위에 빨간 느낌표(잠깐 · 사용자 2026-10-22). 첫 실책은 기록된 사람(송구 실책이면 던진 사람), 그 뒤는 놓친 사람
   let firstMiss = true;
