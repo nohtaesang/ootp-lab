@@ -291,6 +291,19 @@ function draw() {
     ctx.stroke();
     ctx.globalAlpha = 1;
   }
+  // 판정 선언 — 홈 위에 이름만: 인필드 플라이(선언 순간부터 · 타자 아웃) · 인정 2루타(튀어 담장을 넘은 순간부터)
+  const CALLS = { infield_fly: '인필드 플라이', ground_rule: '인정 2루타' };
+  const call = TL.events.find((e) => CALLS[e.kind] && t >= e.t && t <= TL.end_t + LOOK.errorS);
+  if (call) {
+    ctx.fillStyle = C.text;
+    ctx.font = `800 ${Math.max(13, Math.round(1.8 * S.k))}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(CALLS[call.kind], sx(0), sy(0) + Math.max(12, 2.5 * S.k));
+    ctx.fillText(CALLS[call.kind], sx(0), sy(0) + Math.max(12, 2.5 * S.k));
+  }
   // 내야 다이빙 — 그 선수 아래에 「다이빙」(엔진이 몸을 던져 닿았다고 한 순간만 · 사용자 2026-10-22)
   for (const e of TL.events) {
     if (e.kind !== 'dive' || t < e.t || t > e.t + LOOK.errorS || e.fielder == null) continue;
