@@ -1,340 +1,29 @@
 {
- "made": "2026-10-21",
+ "made": "2026-10-22",
  "rounds": [
   {
-   "id": "r2-1",
+   "id": "r3-1",
    "name": "1판",
    "items": [
-    {
-     "key": "9-normal",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "아주 깊은 타구라 중계플레이(유격수, 2루수)가 더 앞으로 나가주면 좋을듯"
-     },
-     "changed": [
-      6,
-      7
-     ],
-     "runners": [],
-     "mention": [
-      4,
-      6
-     ]
-    },
-    {
-     "key": "9-borderline",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "중견수가 한번 튕기는게 무슨의미인지"
-     },
-     "changed": [
-      6,
-      7
-     ],
-     "runners": [],
-     "mention": [
-      8
-     ]
-    },
-    {
-     "key": "11-borderline",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "유격수가 좀 더 공잡은 좌익수 쪾으로 나갔으면 좋겠음"
-     },
-     "changed": [
-      4
-     ],
-     "runners": [],
-     "mention": [
-      6,
-      7
-     ]
-    },
-    {
-     "key": "17-borderline",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "2루수가 우익수 쪽으로 더 나갔으면 좋겠음"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4,
-      9
-     ]
-    },
-    {
-     "key": "17-error",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "우익수 쪽으로 공기가면 2루수가 중계플레이하러 나가고 유격수가  2루로 들어간다. 그리고 1루수는 1루커버 할게 아니라 1루 안쪽으로 좀 들어오는게 자연스럽지 다음 상황 대비해서 외야안타상황에서는 1루주자가 트롤 짓하지 않는이상 아웃시키기 힘드니까"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      3,
-      4,
-      6,
-      9
-     ]
-    },
-    {
-     "key": "23-error",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "외야 안타 확인한 순간 1루수는 좀더 앞으로 나와서 넓은 범위 커버하러 가야지 그리고 타자도 2루쪽으로 움직려는 움직임도 필요하고 1자로 1루를 그대로 지나치는게 아니라 약간 호를 그리며 2루 갈까 말까한 움직임 필요"
-     },
-     "changed": [
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": [
-      3,
-      4
-     ]
-    },
-    {
-     "key": "24-normal",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "중견수가 잡고 격수한테 던졌는데 여기서 2루수한테 던져도됨"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4,
-      8
-     ]
-    },
-    {
-     "key": "24-borderline",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "2루한테 던져도됨"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4
-     ]
-    },
-    {
-     "key": "25-normal",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "2루수는 2루 베이스 지키고 유격수 위치는 적당한데 1루수는 2루에서 공이 빠질걸 대비해야지"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      3,
-      4,
-      6
-     ]
-    },
-    {
-     "key": "25-borderline",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "2루수 유격수가 왜 둘다 뛰어감"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4,
-      6
-     ]
-    },
-    {
-     "key": "25-error",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "또 똑같은 문제 2루수 유격수 어디가냐고"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4,
-      6
-     ]
-    },
-    {
-     "key": "27-error",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "외야수가 잡고 홈승부 늦은건 보통 가까운 내야수한테 던지는게 안전하다"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "28-error",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "이것도 똑같다 홈승부 늦었으면 보통 가까운 내야수한테 던지는게 그나마 안전하다. 다면 과감하게 송구하는 선수들도 있다."
-     },
-     "changed": [],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "29-normal",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "1루수가 왜 뛰어가냐 중계플레이로 왜 두명이가고 완전 잘못됨"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      3
-     ]
-    },
-    {
-     "key": "29-borderline",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "2루는 대체 어디가냐 1루는 왜 2루까지 뛰어가고 2루수가 병신짓해서 1루수가 커버가는건 잘하네 억지칭찬 2루 1루 다 병신같다"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      3,
-      4
-     ]
-    },
-    {
-     "key": "29-error",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "2루수 어디가냐"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4
-     ]
-    },
-    {
-     "key": "31-normal",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "전체적으로 외야수는 송구 딜레이가 좀 긴듯? 아닌가?"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "31-borderline",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "투수가 3루가고 3루수는 대체뭐함? 2루에 주자가 있는데 3루로 안감? 이건 존나 애매하다 2루가 1루커버를 가고 1루가 가운데서 중계플레이를 하는건 맞겠지?"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      1,
-      3,
-      4,
-      5
-     ]
-    },
-    {
-     "key": "31-error",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "투수가 왜 3루로 가냐  1루수는 1루쪽에 붙어있고 2루수가 2루쪽 유격수가 안쪽으로 와야지 엉망이다"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      1,
-      3,
-      4,
-      5,
-      6
-     ]
-    }
-   ]
-  },
-  {
-   "id": "r2-2",
-   "name": "2판",
-   "items": [
-    {
-     "key": "1-error",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "2루수가 2루 베이스 까지 들어올 필요가있나? 2루수는 제 위치 지키는게 좋을지도 빠져서 2루로 뛸때 커버해야하니까?"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4
-     ]
-    },
     {
      "key": "3-borderline",
      "must": false,
      "prev": {
       "j": "odd",
-      "note": "왜 x표랑 잡는 위치가 안맞는지? 실제 경기에도 x표가 나옴?"
+      "note": "우익스가 플라이볼 잡을때 왜 바운드된공 잡는 느낌이 드는거임?"
      },
      "changed": [],
      "runners": [],
-     "mention": []
+     "mention": [
+      9
+     ]
     },
     {
      "key": "4-borderline",
      "must": false,
      "prev": {
       "j": "odd",
-      "note": "보기엔 담장맞고 나온거같은데 타자 아웃? 보는게 틀린건지 아웃이 틀린건지"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "5-borderline",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "이것도 담장맞는 느낌 화면이 잘못된건가"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "6-borderline",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "야수가 공을 잡기전 한번 튕기는게 어떤의미?"
+      "note": "이것도 담장맞는공 잡은거아님? 확실히 잡았다는 어떤 표현이 들어가야 하는거 아니야?"
      },
      "changed": [],
      "runners": [],
@@ -344,40 +33,29 @@
      "key": "7-normal",
      "must": false,
      "prev": {
-      "j": "ask",
-      "note": "평범한 유격수 플라이지만 포수나 외야수 우익수 1루 쪽으로 좀 접근하면 좋을듯 외야수들도 좀 앞으로 오고"
+      "j": "odd",
+      "note": "중견수만 움직이지말고 외야수 전체가 움직였으면 좋겠어 가만히 있는건 어색해"
      },
      "changed": [],
      "runners": [],
      "mention": [
-      2,
-      3,
-      6,
-      9
+      8
      ]
-    },
-    {
-     "key": "8-borderline",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "설명과 다르다. 설명이 중계의 반영됨?"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": []
     },
     {
      "key": "14-normal",
      "must": false,
      "prev": {
       "j": "ask",
-      "note": "주자 없는 상황에서 투수가 베이스까지 들어올필요는 없을듯"
+      "note": "포수 못잡고 크게 떨어트릴수 있으니 투수가 더 붙어주고 1루수도 붙고 2루가 1루가는건 어떰? 2루가 1루가는건 오버런 잡기 위해서"
      },
      "changed": [],
      "runners": [],
      "mention": [
-      1
+      1,
+      2,
+      3,
+      4
      ]
     },
     {
@@ -385,103 +63,23 @@
      "must": false,
      "prev": {
       "j": "ask",
-      "note": "주자 없는 상황에서 포수가 공 못잡을수 있으니 투수가 붙는건 맞다.근데 너무 홈베이스가 아니라 살짝 더 포수 쪽으로 붙어주는게 좋을듯"
+      "note": "투수가 더 포수쪽으로 붙어서 떨어진 공에 대해서 가담하고 1루도 포수쪽으로 조금 붙고 2루가 1루 커버는 시간이 부족한가?"
      },
      "changed": [],
      "runners": [],
      "mention": [
       1,
-      2
-     ]
-    },
-    {
-     "key": "15-borderline",
-     "must": false,
-     "prev": {
-      "j": "odd",
-      "note": "공잡은 3루수 앞으로 유격수가 뛰어가는게 말이안됨 뒤로 돌아가던가 그리고 유격수는 좀 천천히 3루수 뒤로 돌아가는게 정석 어차피 공빠져서 2루주자가 3루로 뛰어도 유격수가 더 여유롭기 때문에"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4,
-      5,
-      6
+      2,
+      3,
+      4
      ]
     },
     {
      "key": "15-error",
      "must": false,
      "prev": {
-      "j": "ask",
-      "note": "중견수 너무 많이 뛰어옴 2루로 공들어갈때 멈춰야함."
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      4,
-      8
-     ]
-    },
-    {
-     "key": "16-borderline",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "땅볼타구로 빠져나가는 그림인데 땅볼은 땅볼만의 표시가 있었으면 좋겠다.  직관적으로 땅볼이네 알기 힘듬"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "18-borderline",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "투수 앞 타구일때 2루수도 1루 쪽으로 뛰어주면 좋겠다"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      1,
-      3,
-      4
-     ]
-    },
-    {
-     "key": "19-borderline",
-     "must": false,
-     "prev": {
       "j": "odd",
-      "note": "유격수가 그렇게 빨리 3루 베이스 커버 들어갈 필요가없음 주자 보다 훨씬 빠르게 커버할수있기 때문에 좀 천천히 여유롭게 움직였으면 좋겠음"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      5,
-      6
-     ]
-    },
-    {
-     "key": "20-borderline",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "땅볼타구를 알기힘듬. 3루수도 너무 3루에 박혀있음 자연스럽게 움직였으면 좋겠음"
-     },
-     "changed": [],
-     "runners": [],
-     "mention": [
-      5
-     ]
-    },
-    {
-     "key": "20-error",
-     "must": false,
-     "prev": {
-      "j": "ask",
-      "note": "포수가 너무 빨리 뛸 필요없다 더크게 돌아뛰면 좋을듯 1루 뒤쪽으로"
+      "note": "포수가 1루커버는 좋은데 호를 그리며 1루 뒤쪽으로 이동해야지 너무 라인타고간다. 그리고 좀더 천천히 가도 괜찮은데"
      },
      "changed": [],
      "runners": [],
@@ -491,37 +89,52 @@
      ]
     },
     {
-     "key": "22-borderline",
+     "key": "16-borderline",
      "must": false,
      "prev": {
-      "j": "ask",
-      "note": "투수가 너무 유격수 완전 뒤에서 2루 커버할 필요는 없음 좀 여유로운 모습도 필요 우익수는 2루수한테 던져도됨 더 안전한 선택임 가깝고 2루에서 다른 야수들도 가깝기 때문에"
+      "j": "odd",
+      "note": "땅볼타구인거 전혀 모르겠음 플레이어가 바로잡았는데 왜 아웃이냐 외칠것같음"
+     },
+     "changed": [],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "18-borderline",
+     "must": false,
+     "prev": {
+      "j": "odd",
+      "note": "포수가 좀 뒤로 뛰었으면 좋겠음 라인타고 뛰기보다"
      },
      "changed": [],
      "runners": [],
      "mention": [
-      1,
-      4,
-      6,
-      9
+      2
      ]
+    },
+    {
+     "key": "22-borderline",
+     "must": false,
+     "prev": {
+      "j": "odd",
+      "note": "공이 왜 뚝떨어짐? 어떤상황인지 직관적으로 이해하기 힘들다. 그것부터 개선해라"
+     },
+     "changed": [],
+     "runners": [],
+     "mention": []
     }
    ]
   },
   {
-   "id": "r2-3",
-   "name": "3판",
+   "id": "r3-2",
+   "name": "2판",
    "items": [
     {
-     "key": "30-borderline",
+     "key": "10-normal",
      "must": true,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "prev": null,
      "changed": [
       1,
-      2,
       3,
       4,
       5,
@@ -530,60 +143,18 @@
       8,
       9
      ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "8-error",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      1,
-      3,
-      4,
-      6,
-      7,
-      8,
-      9
-     ],
      "runners": [],
      "mention": []
     },
     {
-     "key": "11-normal",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "key": "10-error",
+     "must": true,
+     "prev": null,
      "changed": [
       1,
       3,
       4,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "27-normal",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      1,
-      3,
-      4,
+      5,
       6,
       7,
       8,
@@ -594,15 +165,13 @@
     },
     {
      "key": "28-normal",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "must": true,
+     "prev": null,
      "changed": [
       1,
       3,
       4,
+      5,
       6,
       7,
       8,
@@ -612,37 +181,14 @@
      "mention": []
     },
     {
-     "key": "24-error",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      1,
-      3,
-      4,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
      "key": "23-borderline",
      "must": true,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "prev": null,
      "changed": [
       1,
       3,
       4,
+      5,
       6,
       7,
       8,
@@ -655,39 +201,14 @@
      "mention": []
     },
     {
-     "key": "27-borderline",
-     "must": true,
-     "prev": {
-      "j": "ok",
-      "note": "우익수가 공을잡고 던지는 선택지가 좀 늘어나면 어떨까?"
-     },
-     "changed": [
-      1,
-      3,
-      4,
-      6,
-      7,
-      8,
-      9
-     ],
-     "runners": [
-      2
-     ],
-     "mention": [
-      9
-     ]
-    },
-    {
      "key": "28-borderline",
      "must": true,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "prev": null,
      "changed": [
       1,
       3,
       4,
+      5,
       6,
       7,
       8,
@@ -699,16 +220,15 @@
      "mention": []
     },
     {
-     "key": "10-normal",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "key": "2-borderline",
+     "must": true,
+     "prev": null,
      "changed": [
-      1,
+      2,
       3,
       4,
+      5,
+      6,
       7,
       8,
       9
@@ -718,31 +238,15 @@
     },
     {
      "key": "21-error",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "must": true,
+     "prev": null,
      "changed": [
       2,
+      3,
       4,
+      5,
       6,
       7,
-      9
-     ],
-     "runners": [],
-     "mention": []
-    },
-    {
-     "key": "15-normal",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      2,
-      5,
       8,
       9
      ],
@@ -750,15 +254,19 @@
      "mention": []
     },
     {
-     "key": "20-normal",
-     "must": false,
+     "key": "15-borderline",
+     "must": true,
      "prev": {
       "j": "ok",
       "note": ""
      },
      "changed": [
       2,
+      3,
+      4,
       5,
+      6,
+      7,
       8,
       9
      ],
@@ -766,34 +274,259 @@
      "mention": []
     },
     {
-     "key": "17-normal",
-     "must": false,
+     "key": "1-borderline",
+     "must": true,
+     "prev": null,
+     "changed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "26-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "26-borderline",
+     "must": true,
+     "prev": null,
+     "changed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "26-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "19-normal",
+     "must": true,
+     "prev": null,
+     "changed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0,
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "19-error",
+     "must": true,
+     "prev": null,
+     "changed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0,
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "19-borderline",
+     "must": true,
      "prev": {
       "j": "ok",
       "note": ""
      },
+     "changed": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0,
+      1
+     ],
+     "mention": []
+    },
+    {
+     "key": "8-normal",
+     "must": true,
+     "prev": null,
      "changed": [
       3,
       4,
+      5,
       6,
       7,
       8,
       9
      ],
-     "runners": [
-      0
-     ],
+     "runners": [],
      "mention": []
     },
     {
-     "key": "23-normal",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "key": "8-error",
+     "must": true,
+     "prev": null,
      "changed": [
       3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "10-borderline",
+     "must": true,
+     "prev": null,
+     "changed": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    }
+   ]
+  },
+  {
+   "id": "r3-3",
+   "name": "3판",
+   "items": [
+    {
+     "key": "7-borderline",
+     "must": false,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "27-normal",
+     "must": false,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "30-borderline",
+     "must": false,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "11-error",
+     "must": false,
+     "prev": null,
+     "changed": [
+      1,
+      3,
+      4,
+      5,
+      6,
       7,
       8,
       9
@@ -804,32 +537,16 @@
      "mention": []
     },
     {
-     "key": "30-error",
+     "key": "16-error",
      "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "prev": null,
      "changed": [
+      2,
+      3,
       4,
+      5,
       6,
       7,
-      8
-     ],
-     "runners": [
-      0
-     ],
-     "mention": []
-    },
-    {
-     "key": "22-error",
-     "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
-     "changed": [
-      4,
       8,
       9
      ],
@@ -839,32 +556,85 @@
     {
      "key": "9-error",
      "must": false,
-     "prev": {
-      "j": "ok",
-      "note": "깊은 타구에는 중계 선수(유격수 혹은 2루수)가 더 붙어줬으면 좋겠다"
-     },
+     "prev": null,
      "changed": [
+      3,
+      4,
+      5,
       6,
       7,
-      8
+      8,
+      9
      ],
      "runners": [],
-     "mention": [
-      4,
-      6
-     ]
+     "mention": []
     },
     {
-     "key": "7-error",
+     "key": "22-error",
      "must": false,
-     "prev": {
-      "j": "ok",
-      "note": ""
-     },
+     "prev": null,
      "changed": [
-      8
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
      ],
      "runners": [],
+     "mention": []
+    },
+    {
+     "key": "23-error",
+     "must": false,
+     "prev": null,
+     "changed": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [],
+     "mention": []
+    },
+    {
+     "key": "17-normal",
+     "must": false,
+     "prev": null,
+     "changed": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
+     "mention": []
+    },
+    {
+     "key": "24-error",
+     "must": false,
+     "prev": null,
+     "changed": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ],
+     "runners": [
+      0
+     ],
      "mention": []
     }
    ]

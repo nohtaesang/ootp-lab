@@ -68,7 +68,7 @@ const C = {
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
 const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
-const LOOK = { skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, shadow: 0.35, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2 };
+const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, shadow: 0.35, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -225,6 +225,25 @@ function draw() {
   // 땅에 붙어 굴러가면 꼬리가 땅 자국처럼 남는다(16 · 20 경계 「땅볼인지 알기 힘듦」).
   const tb = Math.min(t, TL.ball.length ? TL.ball[TL.ball.length - 1][0] : 0);
   const [bx, by, bz] = at(TL.ball, tb);
+  // 뜬 공이 떨어질 자리 — 큰 반투명 원에서 공이 내려올수록 공 크기로 줄고, 잡거나 땅에 닿으면 사라진다
+  // (사용자 2026-10-22 「큰 원으로 있다가 점점 낙하할 때 공의 크기로 작아져야」 · 친구 r2-2 22 「공이 왜 뚝 떨어짐?」 · 3 「바운드된 공 잡는 느낌」)
+  const first = TL.ball.find((q) => q[0] > 0.15 && q[3] <= 0.05);
+  const caught = TL.events.find((e) => e.kind === 'catch');
+  if (first && TL.launch >= 8) {
+    const gone = Math.min(first[0], caught ? caught.t : Infinity);
+    if (t < gone) {
+      const big = Math.max(10, LOOK.landR * S.k);
+      const small = Math.max(3, LOOK.ball * S.k);
+      const left = Math.max(0, (first[0] - t) / first[0]);
+      const rad = small + (big - small) * left;
+      ctx.fillStyle = C.chalk;
+      ctx.globalAlpha = 0.18 + 0.12 * (1 - left);
+      ctx.beginPath();
+      ctx.arc(sx(first[1]), sy(first[2]), rad, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
   const rr = Math.max(3, (LOOK.ball + bz * LOOK.ballGrow) * S.k);
   const shx = sx(bx) + bz * S.k * LOOK.shadow, shy = sy(by) + bz * S.k * LOOK.shadow;
   ctx.globalAlpha = Math.max(0.3, 0.6 - bz * 0.01);
@@ -255,14 +274,40 @@ function draw() {
   ctx.arc(sx(bx), sy(by), rr, 0, Math.PI * 2);
   ctx.fillStyle = C.chalk;
   ctx.fill();
-  // 실책 순간 표시(3 실책 「느낌표」) — 공이 있던 자리에 잠깐
+  // 포구 순간 — 잡은 사람 둘레에 퍼지는 고리(공중에서 잡음 · 친구 r2-2 4 「확실히 잡았다는 표현」)
   for (const e of TL.events) {
-    if (e.kind !== 'miss' || t < e.t || t > e.t + LOOK.errorS) continue;
-    const [ex, ey] = at(TL.ball, e.t);
+    if (e.kind !== 'catch' || e.fielder == null || t < e.t || t > e.t + LOOK.catchS) continue;
+    const f = TL.fielders[e.fielder - 1];
+    if (!f) continue;
+    const [fx, fy] = at(f.pts, e.t);
+    const k = (t - e.t) / LOOK.catchS;
+    ctx.strokeStyle = C.chalk;
+    ctx.globalAlpha = 1 - k;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(sx(fx), sy(fy), Math.max(9, LOOK.token * S.k) * (1.3 + 1.2 * k), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  // 실책 · 실투 — 그 선수 머리 위에 빨간 느낌표(잠깐 · 사용자 2026-10-22). 첫 실책은 기록된 사람(송구 실책이면 던진 사람), 그 뒤는 놓친 사람
+  let firstMiss = true;
+  for (const e of TL.events) {
+    if (e.kind !== 'miss') continue;
+    const who = firstMiss && TL.result.error ? TL.result.error.pos : e.fielder;
+    firstMiss = false;
+    if (t < e.t || t > e.t + LOOK.errorS || who == null) continue;
+    const f = TL.fielders[who - 1];
+    if (!f) continue;
+    const [fx, fy] = at(f.pts, t);
+    const head = Math.max(9, LOOK.token * S.k);
     ctx.fillStyle = C.error;
-    ctx.font = `700 ${Math.max(16, Math.round(2.2 * S.k))}px sans-serif`;
+    ctx.font = `900 ${Math.max(22, Math.round(3.2 * S.k))}px sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('!', sx(ex), sy(ey) - Math.max(14, 2 * S.k));
+    ctx.textBaseline = 'bottom';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#000';
+    ctx.strokeText('!', sx(fx), sy(fy) - head - 2);
+    ctx.fillText('!', sx(fx), sy(fy) - head - 2);
   }
   // 결과는 플레이가 끝난 뒤에만
   const box = $('#result');
