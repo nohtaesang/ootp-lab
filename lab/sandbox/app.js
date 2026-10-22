@@ -70,7 +70,7 @@ const C = {
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
 const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
-const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2 };
+const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2, headMinV: 1.0, headLen: 3.0, headDt: 0.1 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -211,10 +211,24 @@ function draw() {
   for (const p of TL.plans) if (p.t <= t) plan = p;
   TL.fielders.forEach((f, i) => {
     const [x, y] = at(f.pts, t);
+    // 움직이는 방향(엔진 사실 · 멈추면 없음) — 몸 방향 · 시선은 엔진에 없어 그리지 않는다(사용자 2026-10-22 「이동 방향만」)
+    const [px, py] = at(f.pts, Math.max(0, t - LOOK.headDt));
+    const v = Math.hypot(x - px, y - py) / LOOK.headDt;
+    if (t > 0 && v > LOOK.headMinV) {
+      const r = Math.max(7, LOOK.token * S.k);
+      const ux = (x - px) / (v * LOOK.headDt), uy = (y - py) / (v * LOOK.headDt);
+      const len = r + Math.max(12, LOOK.headLen * S.k);
+      ctx.strokeStyle = C.text;
+      ctx.lineWidth = Math.max(2, 0.22 * S.k);
+      ctx.beginPath();
+      ctx.moveTo(sx(x + ux * r / S.k), sy(y + uy * r / S.k));
+      ctx.lineTo(sx(x + ux * len / S.k), sy(y + uy * len / S.k));
+      ctx.stroke();
+    }
     token(x, y, C.fielder, NAMES[i], 1);
     const ring = (color, w) => { ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(sx(x), sy(y), Math.max(7, LOOK.token * S.k) + w + 2, 0, Math.PI * 2); ctx.stroke(); };
     // 지난 통과 뒤 움직임이 바뀐 사람 — 고리만으론 뜻을 몰랐다(친구 r3 16 실책 「원표시는 왜?」)
-    if (ITEM && ITEM.changed.includes(i + 1)) {
+    if (ITEM && ITEM.changed.length < 9 && ITEM.changed.includes(i + 1)) {
       ring(C.chalk, 2);
       ctx.fillStyle = C.chalk;
       ctx.font = `700 ${Math.max(10, Math.round(0.85 * S.k))}px sans-serif`;
@@ -516,7 +530,8 @@ function runScene() {
   $('#prevBox').classList.toggle('hide', !(ITEM && ITEM.prev));
   if (ITEM && ITEM.prev) $('#prevNote').textContent = `${JLABEL[ITEM.prev.j]}${ITEM.prev.note ? ' · ' + ITEM.prev.note : ''}`;
   const ch = ITEM ? ITEM.changed.map((p) => POSNAME[p - 1]) : [];
-  $('#changed').textContent = ch.length ? `바뀐 선수 ${ch.join(' · ')}` : '';
+  // 9명이 다 바뀌었으면 고리는 뜻이 없다 — 글에 「전원」만(사용자 2026-10-22 「갑자기 선수 주변에 원이 생기는데 이거 뭐임?」)
+  $('#changed').textContent = ch.length === 9 ? '바뀐 선수 전원' : ch.length ? `바뀐 선수 ${ch.join(' · ')}` : '';
   const b = s.input.ball;
   mark = b.aim ? [b.aim.x, b.aim.y] : null;
   show(s.input);
