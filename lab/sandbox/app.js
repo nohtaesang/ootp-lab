@@ -63,6 +63,8 @@ const C = {
   runner: tok('--attention-solid', '#e0a030'),
   on: tok('--primary-on', '#ffffff'),
   error: tok('--danger-text', '#ff6b6b'),
+  // 떨어질 자리 — 정보 색(하늘) · 잔디 · 흙 위에서 잘 보이고 야수(남색) · 주자(호박) · 실책(빨강)과 안 겹친다(사용자 2026-10-22 「회색 말고 잘 보이는 색」)
+  land: tok('--info-solid', '#3cb4e6'),
 };
 
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
@@ -237,11 +239,15 @@ function draw() {
       const small = Math.max(3, LOOK.ball * S.k);
       const left = Math.max(0, (first[0] - t) / first[0]);
       const rad = small + (big - small) * left;
-      ctx.fillStyle = C.chalk;
-      ctx.globalAlpha = 0.18 + 0.12 * (1 - left);
+      ctx.fillStyle = C.land;
+      ctx.globalAlpha = 0.5 + 0.25 * (1 - left);
       ctx.beginPath();
       ctx.arc(sx(first[1]), sy(first[2]), rad, 0, Math.PI * 2);
       ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = C.land;
+      ctx.lineWidth = Math.max(2, 0.25 * S.k);
+      ctx.stroke();
       ctx.globalAlpha = 1;
     }
   }
