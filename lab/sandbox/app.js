@@ -68,7 +68,7 @@ const C = {
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
 const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
-const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, shadow: 0.35, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2 };
+const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, shadow: 0.35, shadowMax: 0.6, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -227,7 +227,8 @@ function draw() {
   const [bx, by, bz] = at(TL.ball, tb);
   // 뜬 공이 떨어질 자리 — 큰 반투명 원에서 공이 내려올수록 공 크기로 줄고, 잡거나 땅에 닿으면 사라진다
   // (사용자 2026-10-22 「큰 원으로 있다가 점점 낙하할 때 공의 크기로 작아져야」 · 친구 r2-2 22 「공이 왜 뚝 떨어짐?」 · 3 「바운드된 공 잡는 느낌」)
-  const first = TL.ball.find((q) => q[0] > 0.15 && q[3] <= 0.05);
+  // 잡힌 뜬공도 떨어질 자리가 있다(TL.land = 공 길이 처음 땅에 닿는 [t, x, y]) — 없던 옛 시간표는 공 자취에서 찾는다
+  const first = TL.land ? [TL.land[0], TL.land[1], TL.land[2]] : TL.ball.find((q) => q[0] > 0.15 && q[3] <= 0.05);
   const caught = TL.events.find((e) => e.kind === 'catch');
   if (first && TL.launch >= 8) {
     const gone = Math.min(first[0], caught ? caught.t : Infinity);
@@ -245,7 +246,9 @@ function draw() {
     }
   }
   const rr = Math.max(3, (LOOK.ball + bz * LOOK.ballGrow) * S.k);
-  const shx = sx(bx) + bz * S.k * LOOK.shadow, shy = sy(by) + bz * S.k * LOOK.shadow;
+  // 그림자는 공 바로 옆에 조금만 — 높이는 떨어질 자리 원이 보여 준다(사용자 2026-10-22 r3-1 7 「그림자 위치가 맞나」 · 34m 뜬공이면 12m 떨어져 엉뚱한 곳에 까만 점)
+  const off = Math.min(bz * LOOK.shadow, LOOK.shadowMax) * S.k;
+  const shx = sx(bx) + off, shy = sy(by) + off;
   ctx.globalAlpha = Math.max(0.3, 0.6 - bz * 0.01);
   ctx.beginPath();
   ctx.ellipse(shx, shy, Math.max(3, 0.45 * S.k), Math.max(2, 0.3 * S.k), 0, 0, Math.PI * 2);
