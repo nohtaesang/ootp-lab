@@ -105,12 +105,12 @@
   --team-12: oklch(94.0% 0.0293 17);
 
   --bg-canvas: var(--neutral-1);
-  --bg-surface: var(--neutral-2);
+  --bg-surface: var(--neutral-3);
   --bg-raised: var(--neutral-3);
   --bg-overlay: var(--neutral-3);
   --bg-sunken: var(--neutral-1);
   --bg-field: var(--neutral-1);
-  --bg-stripe: var(--neutral-1);
+  --bg-stripe: #303030;
   --bg-hover: var(--neutral-4);
   --bg-active: var(--neutral-5);
   --bg-scrim: rgba(5, 5, 10, .62);
@@ -175,7 +175,7 @@
   --team-soft: var(--team-12);
   --team-deep: var(--team-1);
   --team-muted: rgba(255, 255, 255, .66);
-  --shadow-plate: inset 0 1px 0 rgba(255, 255, 255, .06);
+  --shadow-plate: none;
   --shadow-card: inset 0 1px 0 rgba(255, 255, 255, .06), 0 1px 2px rgba(0, 0, 0, .45), 0 4px 14px rgba(0, 0, 0, .3);
   --shadow-overlay: inset 0 1px 0 rgba(255, 255, 255, .06), 0 2px 6px rgba(0, 0, 0, .4), 0 24px 56px rgba(0, 0, 0, .6);
   --edge-lifted: var(--border);
@@ -314,6 +314,7 @@
   --tcard-band-h: 52px;
   --duel-label-w: 72px;
   --doctab-w: 200px;
+  --table-search-w: 200px;
   --side-tabs-w: 180px;
   --palette-w: 560px;
   --palette-h: 420px;
