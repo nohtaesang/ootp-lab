@@ -533,7 +533,7 @@ function seg(id, attr, onPick) {
 }
 
 async function boot() {
-  const bytes = await (await fetch('playfield.wasm')).arrayBuffer();
+  const bytes = await (await fetch('playfield.wasm', { cache: 'no-cache' })).arrayBuffer();
   wasm = (await WebAssembly.instantiate(bytes, {})).instance;
   FIELD = call('field');
   SCENES = call('scenes');
@@ -606,7 +606,7 @@ async function boot() {
   try {
     const id = new URLSearchParams(location.search).get('round');
     if (id) {
-      const rv = await (await fetch('review.json')).json();
+      const rv = await (await fetch('review.json', { cache: 'no-cache' })).json();
       ROUND = rv.rounds.find((x) => x.id === id) || null;
       if (ROUND && ROUND.items.length) { const [rank, v] = ROUND.items[0].key.split('-'); $('#scene').value = rank; variant = v; }
     }
