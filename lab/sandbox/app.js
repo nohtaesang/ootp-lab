@@ -213,7 +213,14 @@ function draw() {
     const [x, y] = at(f.pts, t);
     token(x, y, C.fielder, NAMES[i], 1);
     const ring = (color, w) => { ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(sx(x), sy(y), Math.max(7, LOOK.token * S.k) + w + 2, 0, Math.PI * 2); ctx.stroke(); };
-    if (ITEM && ITEM.changed.includes(i + 1)) ring(C.chalk, 2);
+    // 지난 통과 뒤 움직임이 바뀐 사람 — 고리만으론 뜻을 몰랐다(친구 r3 16 실책 「원표시는 왜?」)
+    if (ITEM && ITEM.changed.includes(i + 1)) {
+      ring(C.chalk, 2);
+      ctx.fillStyle = C.chalk;
+      ctx.font = `700 ${Math.max(10, Math.round(0.85 * S.k))}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('바뀜', sx(x), sy(y) + Math.max(7, LOOK.token * S.k) + Math.max(14, 1.6 * S.k));
+    }
     if (WHO.includes(i + 1)) ring(C.error, 3);
     if (showParts && plan) {
       ctx.fillStyle = C.text;
@@ -440,6 +447,22 @@ function verdicts() {
     if (!k || !VERD[k]) return;
     VERD[k].note = $('#vnote').value.trim();
     saveV(VERD);
+  });
+  // 앞과 같음 — 이 판에서 바로 앞쪽의 마지막 지적(애매 · 어색)을 그대로 가져와 「= 2 경계와 같음」으로 적는다(친구: 비슷한 장면마다 같은 말을 또 쓰기 · 2026-10-22)
+  $('#vsame').addEventListener('click', () => {
+    const k = sceneKey();
+    if (!k) return;
+    const pool = ROUND ? ROUND.items.map((it) => it.key) : SCENES.map((x) => `${x.rank}-${x.variant}`);
+    const pre = ROUND ? ROUND.id + ':' : '';
+    for (let j = pool.indexOf(bare(k)) - 1; j >= 0; j--) {
+      const v = VERD[pre + pool[j]];
+      if (!v || v.j === 'ok') continue;
+      const [r, vv] = pool[j].split('-');
+      VERD[k] = { j: v.j, note: `= ${r} ${VLABEL[vv]}와 같음`, at: Number(t.toFixed(1)), fp: fingerprint(), who: v.who || [] };
+      saveV(VERD);
+      refreshV();
+      return;
+    }
   });
   $('#vcopy').addEventListener('click', async () => {
     const name = (rank) => (SCENES.find((s) => String(s.rank) === rank) || {}).family || '';
