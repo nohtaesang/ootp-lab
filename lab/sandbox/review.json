@@ -200,7 +200,8 @@
  "rounds": [
   {
    "id": "r5",
-   "name": "다시 볼 것",
+   "name": "판정",
+   "watch": "watch.json",
    "items": [
     {
      "key": "19-error",

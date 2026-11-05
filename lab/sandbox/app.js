@@ -619,6 +619,17 @@ function seg(id, attr, onPick) {
   });
 }
 
+// 경기 보기 장면(watch-game 의 watch.json) → 놀이터 장면 목록 · 순위 base+1~
+const WATCH_BASE = 1000;
+function watchScenes(doc, base) {
+  return doc.scenes.map((x, i) => {
+    const w = x.scene;
+    const on = w.bases.map((b, k) => (b ? k + 1 : 0)).filter(Boolean);
+    // 인플레이 공은 놀이터 판정으로 그린다(2c 전) — 엔진 결과 이름을 붙이면 결과 칩과 어긋난다
+    return { rank: base + i + 1, variant: 'normal', input: w.req, what: w.req.scene === 'in_play' ? '' : w.what, family: `${x.game}경기 ${w.inning}회${w.top ? '초' : '말'} · ${w.outs}아웃 · ${on.length ? '주자 ' + on.join('·') + '루' : '주자 없음'}` };
+  });
+}
+
 async function boot() {
   const bytes = await (await fetch('playfield.wasm', { cache: 'no-cache' })).arrayBuffer();
   wasm = (await WebAssembly.instantiate(bytes, {})).instance;
@@ -628,15 +639,26 @@ async function boot() {
   const wq = new URLSearchParams(location.search).get('watch');
   if (wq !== null) {
     const doc = await (await fetch(wq || 'watch.json', { cache: 'no-cache' })).json();
-    SCENES = doc.scenes.map((x, i) => {
-      const w = x.scene;
-      const on = w.bases.map((b, k) => (b ? k + 1 : 0)).filter(Boolean);
-      // 인플레이 공은 놀이터 판정으로 그린다(2c 전) — 엔진 결과 이름을 붙이면 결과 칩과 어긋난다
-      return { rank: i + 1, variant: 'normal', input: w.req, what: w.req.scene === 'in_play' ? '' : w.what, family: `${x.game}경기 ${w.inning}회${w.top ? '초' : '말'} · ${w.outs}아웃 · ${on.length ? '주자 ' + on.join('·') + '루' : '주자 없음'}` };
-    });
+    SCENES = watchScenes(doc, 0);
     // 경기 하나가 판 하나 — 판정은 그 경기 이름표로 저장한다(대표 장면 판정과 섞이지 않게 · 「전체 복사」 첫 줄 판 ${id})
     ROUND = { id: doc.id || `w${doc.seed}`, name: '경기', items: SCENES.map((x) => ({ key: `${x.rank}-normal`, prev: null, changed: [], runners: [], mention: [], reqs: [] })) };
   }
+  // 판정 판(?round=) — 판에 watch 가 있으면 그 경기 장면을 판 뒤에 잇는다(순위 1001~ · 한 판에서 다 본다)
+  let first = null;
+  try {
+    const id = new URLSearchParams(location.search).get('round');
+    if (id) {
+      const rv = await (await fetch('review.json', { cache: 'no-cache' })).json();
+      ROUND = rv.rounds.find((x) => x.id === id) || null;
+      LEDGER = rv.ledger || [];
+      if (ROUND && ROUND.watch) {
+        const ws = watchScenes(await (await fetch(ROUND.watch, { cache: 'no-cache' })).json(), WATCH_BASE);
+        SCENES = SCENES.concat(ws);
+        ROUND.items = ROUND.items.concat(ws.map((x) => ({ key: `${x.rank}-normal`, prev: null, changed: [], runners: [], mention: [], reqs: [] })));
+      }
+      if (ROUND && ROUND.items.length) first = ROUND.items[0].key.split('-');
+    }
+  } catch { ROUND = null; }
   const sel = $('#scene');
   for (const s of SCENES.filter((x) => x.variant === 'normal')) {
     const o = document.createElement('option');
@@ -703,15 +725,7 @@ async function boot() {
     else if (e.key === ' ') { e.preventDefault(); $('#play').click(); }
     else if (['1', '2', '3'].includes(e.key)) $('#verdict').querySelectorAll('button')[Number(e.key) - 1].click();
   });
-  try {
-    const id = new URLSearchParams(location.search).get('round');
-    if (id) {
-      const rv = await (await fetch('review.json', { cache: 'no-cache' })).json();
-      ROUND = rv.rounds.find((x) => x.id === id) || null;
-      LEDGER = rv.ledger || [];
-      if (ROUND && ROUND.items.length) { const [rank, v] = ROUND.items[0].key.split('-'); $('#scene').value = rank; variant = v; }
-    }
-  } catch { ROUND = null; }
+  if (first) { $('#scene').value = first[0]; variant = first[1]; }
   verdicts();
   runScene();
   requestAnimationFrame((now) => { last = now; tick(now); });
