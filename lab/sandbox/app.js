@@ -27,6 +27,8 @@ let SCENE = null;
 let ROUND = null;
 let ITEM = null;
 let WHO = [];
+// 요청 장부 전체(review.json ledger · 어긴 요청 고르기의 「다른 요청」)
+let LEDGER = [];
 // 친구 화면은 판정에 필요한 것만 — ?dev 면 개발 도구(낙하점 X · 부품 번호 · 놓기 · 목록 · 배속)도 보인다
 const DEV = new URLSearchParams(location.search).has('dev');
 // 라벨링(?blind) — 다른 사람 판정 · 메모 · 바뀐 선수를 숨긴다(앞 사람을 따라가지 않게 · 사용자 2026-10-22 판정표 고정 뒤 라벨링)
@@ -318,7 +320,7 @@ function draw() {
     ctx.globalAlpha = 1;
   }
   // 판정 선언 — 홈 위에 이름만: 인필드 플라이(선언 순간부터 · 타자 아웃) · 인정 2루타(튀어 담장을 넘은 순간부터)
-  const CALLS = { infield_fly: '인필드 플라이', ground_rule: '인정 2루타' };
+  const CALLS = { infield_fly: '인필드 플라이', ground_rule: '인정 2루타', balk: '보크', walk: '볼넷', intentional_walk: '고의4구', hit_by_pitch: '몸에 맞는 공', interference: '타격방해', strikeout: '삼진' };
   const call = TL.events.find((e) => CALLS[e.kind] && t >= e.t && t <= TL.end_t + LOOK.errorS);
   if (call) {
     ctx.fillStyle = C.text;
@@ -377,7 +379,7 @@ function draw() {
   } else {
     box.classList.add('hide');
   }
-  if (SCENE) $('#title').textContent = t >= TL.end_t ? `${SCENE.rank}. ${SCENE.family} · ${VLABEL[SCENE.variant]}` : situation(SCENE);
+  if (SCENE) $('#title').textContent = t >= TL.end_t ? `${SCENE.rank}. ${SCENE.family} · ${SCENE.what || VLABEL[SCENE.variant]}` : situation(SCENE);
   $('#clock').textContent = t.toFixed(1);
   $('#scrub').value = String(Math.round((t / TL.duration) * 1000));
 }
@@ -410,7 +412,7 @@ function show(input) {
 }
 
 // 친구 판정(#1873) — 「이 장면」: 괜찮다 / 애매하다(질문) / 어색하다를 누르는 순간 이 브라우저에 저장된다(다시 누르면 지움 · 한 줄은 쓰는 대로 저장).
-// 저장 값 = 판정 · 한 줄 · 누른 순간의 재생 시각 · 장면 지문. 「전체 복사」가 모든 장면 판정을 글로 낸다(서버 없음 — 친구가 그 글을 보낸다).
+// 저장 값 = 판정 · 한 줄 · 어긴 요청(장부 id · 복사 글 「요청 R01」) · 누른 순간의 재생 시각 · 장면 지문. 「전체 복사」가 모든 장면 판정을 글로 낸다(서버 없음 — 친구가 그 글을 보낸다).
 // 엔진이 바뀌어 지문이 달라지면 그 장면에 「옛 장면」이 붙는다. 변형 단추 · 장면 목록에 판정 표시(✓ 괜찮다 · ? 애매하다 · ✗ 어색하다).
 const VKEY = 'playfield-verdicts-v1';
 let pick = null;
@@ -438,6 +440,7 @@ function refreshV() {
   pick = v ? v.j : null;
   $('#verdict').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.j === pick));
   if (document.activeElement !== $('#vnote')) $('#vnote').value = v ? v.note : '';
+  $('#vreq').value = v && v.req ? v.req : '';
   $('#vnote').placeholder = pick === 'ask' ? '질문' : '누가 · 언제 · 무엇';
   $('#vstale').textContent = v && v.fp !== fingerprint() ? '옛 장면' : '';
   const pool = ROUND ? ROUND.items.map((it) => it.key) : SCENES.map((x) => `${x.rank}-${x.variant}`);
@@ -457,9 +460,16 @@ function verdicts() {
     const k = sceneKey();
     if (!btn || !k) return;
     if (VERD[k] && VERD[k].j === btn.dataset.j) delete VERD[k];
-    else VERD[k] = { j: btn.dataset.j, note: $('#vnote').value.trim(), at: Number(t.toFixed(1)), fp: fingerprint(), who: [...WHO] };
+    else VERD[k] = { j: btn.dataset.j, note: $('#vnote').value.trim(), at: Number(t.toFixed(1)), fp: fingerprint(), who: [...WHO], req: $('#vreq').value };
     saveV(VERD);
     refreshV();
+  });
+  // 어긴 요청 — 판정이 있으면 바로 저장(없으면 판정 단추를 누를 때 함께 저장 · 한 줄과 같다)
+  $('#vreq').addEventListener('change', () => {
+    const k = sceneKey();
+    if (!k || !VERD[k]) return;
+    VERD[k].req = $('#vreq').value;
+    saveV(VERD);
   });
   $('#vnote').addEventListener('input', () => {
     const k = sceneKey();
@@ -477,7 +487,7 @@ function verdicts() {
       const v = VERD[pre + pool[j]];
       if (!v || v.j === 'ok') continue;
       const [r, vv] = pool[j].split('-');
-      VERD[k] = { j: v.j, note: `= ${r} ${VLABEL[vv]}와 같음`, at: Number(t.toFixed(1)), fp: fingerprint(), who: v.who || [] };
+      VERD[k] = { j: v.j, note: `= ${r} ${VLABEL[vv]}와 같음`, at: Number(t.toFixed(1)), fp: fingerprint(), who: v.who || [], req: v.req || '' };
       saveV(VERD);
       refreshV();
       return;
@@ -490,7 +500,7 @@ function verdicts() {
       .filter(([k]) => inRound(k))
       .map(([k, v]) => [bare(k), v])
       .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10))
-      .map(([k, v]) => { const [rank, vv] = k.split('-'); const who = v.who && v.who.length ? ' · 누구 ' + v.who.map((p) => POSNAME[p - 1]).join('·') : ''; return `${rank} ${name(rank)} · ${vname[vv]} · ${JLABEL[v.j]} · ${v.at}초${who}${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
+      .map(([k, v]) => { const [rank, vv] = k.split('-'); const who = v.who && v.who.length ? ' · 누구 ' + v.who.map((p) => POSNAME[p - 1]).join('·') : ''; const req = v.req ? ' · 요청 ' + v.req : ''; return `${rank} ${name(rank)} · ${vname[vv]} · ${JLABEL[v.j]} · ${v.at}초${who}${req}${v.note ? ' · ' + v.note : ''} · ${v.fp}`; })
       .join('\n');
     const top = [ROUND ? `판 ${ROUND.id}` : '', BY ? `판정자 ${BY}` : '', `판본 ${BUILD}`].filter(Boolean).join(' · ');
     const out = `${top}\n` + text;
@@ -518,6 +528,8 @@ function step(d) {
 
 // 재생 중 제목은 상황만(주자 · 아웃 · 변형) — 결과를 미리 말하지 않는다(8 경계 「설명과 다르다」 · 결과는 끝난 뒤 제목과 칩으로)
 function situation(s) {
+  // 투구 전후 장면(순위 201~ · #2267)은 이름이 곧 상황이다
+  if (s.input.scene || s.what) return `${s.rank}. ${s.family}`;
   const r = (s.input.runners || []).map((x) => x.base).sort();
   const on = r.length ? `주자 ${r.join('·')}루` : '주자 없음';
   return `${s.rank}. ${on} · ${s.input.outs || 0}아웃 · ${VLABEL[s.variant]}`;
@@ -537,17 +549,64 @@ function runScene() {
   $('#pos').textContent = `${ROUND ? ROUND.name + ' · ' : ''}${seq.indexOf(s) + 1} / ${seq.length}`;
   SCENE = s;
   ITEM = ROUND ? ROUND.items.find((it) => it.key === `${s.rank}-${s.variant}`) || null : null;
-  if (ITEM && BLIND) ITEM = { ...ITEM, prev: null, changed: [], runners: [], mention: [] };
+  if (ITEM && BLIND) ITEM = { ...ITEM, prev: null, changed: [], runners: [], mention: [], reqs: [] };
   const sv = VERD[`${ROUND ? ROUND.id + ':' : ''}${s.rank}-${s.variant}`];
   WHO = sv && sv.who ? [...sv.who] : [];
   $('#prevBox').classList.toggle('hide', !(ITEM && ITEM.prev));
   if (ITEM && ITEM.prev) $('#prevNote').textContent = `${JLABEL[ITEM.prev.j]}${ITEM.prev.note ? ' · ' + ITEM.prev.note : ''}`;
+  showRequests();
+  showVideos();
   const ch = ITEM ? ITEM.changed.map((p) => POSNAME[p - 1]) : [];
   // 9명이 다 바뀌었으면 고리는 뜻이 없다 — 글에 「전원」만(사용자 2026-10-22 「갑자기 선수 주변에 원이 생기는데 이거 뭐임?」)
   $('#changed').textContent = ch.length === 9 ? '바뀐 선수 전원' : ch.length ? `바뀐 선수 ${ch.join(' · ')}` : '';
   const b = s.input.ball;
-  mark = b.aim ? [b.aim.x, b.aim.y] : null;
+  mark = b && b.aim ? [b.aim.x, b.aim.y] : null;
   show(s.input);
+}
+
+// 요청 장부(#1944 · review.json 의 reqs) — 이 장면에 걸린 요청과 상태 · 답. 판정자가 「무엇을 고쳤고 무엇을 답했는지」 장면마다 본다
+// (r4 「했던 말을 계속 해야 한다 · 고친 건지 모르겠다 · 질문에 답이 없다」). 이 장면 메모에서 나온 요청 먼저, 같은 순위 다른 변형 것 다음
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+function showRequests() {
+  const box = $('#reqs');
+  const reqs = (ITEM && ITEM.reqs) || [];
+  box.replaceChildren();
+  box.classList.toggle('hide', !reqs.length);
+  if (reqs.length) box.append(el('div', 'h', '요청'));
+  for (const q of reqs) {
+    const row = el('div', 'req');
+    row.append(el('span', 'rid', q.id));
+    const say = el('span', 'say');
+    say.append(el('span', `st st-${q.status.replace(/\s/g, '')}`, q.status), ` ${q.say}`);
+    row.append(say);
+    if (q.answer) row.append(el('span', 'ans', q.answer));
+    box.append(row);
+  }
+  // 어긴 요청 고르기 — 이 장면 요청 먼저, 그 밖의 장부 요청은 아래 묶음
+  const sel = $('#vreq');
+  sel.replaceChildren(el('option', null, '어긴 요청'));
+  sel.firstChild.value = '';
+  const opt = (q) => { const o = el('option', null, `${q.id} ${q.say}`); o.value = q.id; return o; };
+  reqs.forEach((q) => sel.append(opt(q)));
+  const rest = LEDGER.filter((q) => !reqs.some((r) => r.id === q.id));
+  if (rest.length) { const g = el('optgroup'); g.label = '다른 요청'; rest.forEach((q) => g.append(opt(q))); sel.append(g); }
+  sel.classList.toggle('hide', !LEDGER.length);
+}
+// 같은 상황의 실제 MLB 플레이(Statcast 2024 · tools/playfield/videos.mjs 가 고름) — Savant 영상
+function showVideos() {
+  const box = $('#videos');
+  const ids = (ITEM && ITEM.videos) || [];
+  box.replaceChildren();
+  box.classList.toggle('hide', !ids.length);
+  if (!ids.length) return;
+  box.append(el('span', 'h', '실제 영상'));
+  ids.forEach((id, i) => {
+    const a = el('a', null, String(i + 1));
+    a.href = `https://baseballsavant.mlb.com/sporty-videos?playId=${encodeURIComponent(id)}`;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    box.append(a);
+  });
 }
 
 function seg(id, attr, onPick) {
@@ -565,6 +624,19 @@ async function boot() {
   wasm = (await WebAssembly.instantiate(bytes, {})).instance;
   FIELD = call('field');
   SCENES = call('scenes');
+  // 경기 보기(#2267 · ?watch 또는 ?watch=파일): watch-game 이 쓴 한 경기의 사건 순서 장면으로 바꾼다 — 재생 중엔 상황만 · 끝나면 엔진 결과 이름
+  const wq = new URLSearchParams(location.search).get('watch');
+  if (wq !== null) {
+    const doc = await (await fetch(wq || 'watch.json', { cache: 'no-cache' })).json();
+    SCENES = doc.scenes.map((x, i) => {
+      const w = x.scene;
+      const on = w.bases.map((b, k) => (b ? k + 1 : 0)).filter(Boolean);
+      // 인플레이 공은 놀이터 판정으로 그린다(2c 전) — 엔진 결과 이름을 붙이면 결과 칩과 어긋난다
+      return { rank: i + 1, variant: 'normal', input: w.req, what: w.req.scene === 'in_play' ? '' : w.what, family: `${x.game}경기 ${w.inning}회${w.top ? '초' : '말'} · ${w.outs}아웃 · ${on.length ? '주자 ' + on.join('·') + '루' : '주자 없음'}` };
+    });
+    // 경기 하나가 판 하나 — 판정은 그 경기 이름표로 저장한다(대표 장면 판정과 섞이지 않게 · 「전체 복사」 첫 줄 판 ${id})
+    ROUND = { id: doc.id || `w${doc.seed}`, name: '경기', items: SCENES.map((x) => ({ key: `${x.rank}-normal`, prev: null, changed: [], runners: [], mention: [], reqs: [] })) };
+  }
   const sel = $('#scene');
   for (const s of SCENES.filter((x) => x.variant === 'normal')) {
     const o = document.createElement('option');
@@ -636,6 +708,7 @@ async function boot() {
     if (id) {
       const rv = await (await fetch('review.json', { cache: 'no-cache' })).json();
       ROUND = rv.rounds.find((x) => x.id === id) || null;
+      LEDGER = rv.ledger || [];
       if (ROUND && ROUND.items.length) { const [rank, v] = ROUND.items[0].key.split('-'); $('#scene').value = rank; variant = v; }
     }
   } catch { ROUND = null; }

@@ -216,6 +216,7 @@
   --text-xl: 19px;
   --text-2xl: 24px;
   --text-3xl: 32px;
+  --text-hero: 64px;
   --h1-size: var(--type-title-size);
   --h2-size: var(--type-section-size);
   --h3-size: var(--type-sub-size);
@@ -307,6 +308,7 @@
   --bar-value-w: 72px;
   --team-mark: 22px;
   --team-mark-lg: 32px;
+  --team-mark-xl: 88px;
   --team-logo: 14px;
 
   --doc-facts-w: 360px;
@@ -315,6 +317,7 @@
   --duel-label-w: 72px;
   --doctab-w: 200px;
   --table-search-w: 200px;
+  --foot-input-w: 240px;
   --side-tabs-w: 180px;
   --palette-w: 560px;
   --palette-h: 420px;
@@ -352,9 +355,12 @@
   --match-mid-w: 72px;
   --match-place-w: 56px;
   --match-act-min-w: 168px;
+  --bracket-game-w: 200px;
+  --bracket-link-w: var(--space-8);
   --cols-gutter: var(--space-8);
   --cal-band-h: var(--space-4);
   --settings-select-w: 220px;
+  --settings-list-w: 560px;
   --multiples-col-min-w: 220px;
   --contract-compact-w: 220px;
 
@@ -433,6 +439,7 @@
   --type-mark-size: var(--text-xxs);
   --type-display-size: var(--text-lg);
   --type-stage-size: var(--text-3xl);
+  --type-hero-size: var(--text-hero);
   --weight-mark: var(--weight-bold);
   --tracking-mark: -0.02em;
   --gap-hair: 2px;
@@ -442,6 +449,7 @@
   --gap-between: var(--space-4);
   --gap-group: var(--space-5);
   --gap-section: var(--space-6);
+  --gap-poster: var(--space-8);
   --item-inset: var(--space-1);
   --item-px: var(--space-3);
   --item-pad: var(--space-2);

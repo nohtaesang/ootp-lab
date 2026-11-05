@@ -54,6 +54,21 @@
   .seg.big button { min-height: 48px; font-weight: 600; }
   .seg.small button { min-height: 32px; padding: 4px 6px; font-size: var(--text-sm, 12px); }
   #scene { color: var(--lab-muted); font-size: var(--text-sm, 12px); min-height: 32px; padding: 4px 8px; }
+  /* 요청 장부(#1944) — 상태 글자색만 뜻을 갖는다(반영 · 일부 · 안 됨 · 충돌 · 답변 · 보류) */
+  .reqs { display: flex; flex-direction: column; gap: 10px; }
+  .req { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; row-gap: 4px; font-size: var(--text-sm, 12px); line-height: 1.5; }
+  .req .rid { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .req .say { color: var(--lab-muted); }
+  .req .st { font-weight: 600; }
+  .req .ans { grid-column: 2; color: var(--lab-text); }
+  .st-반영 { color: var(--success-text, #4cc38a); }
+  .st-일부 { color: var(--attention-text, #f0b440); }
+  .st-안됨, .st-충돌 { color: var(--danger-text, #ff6b6b); }
+  .st-답변 { color: var(--info-text, #5ab8f0); }
+  .st-보류 { color: var(--lab-muted); }
+  .videos { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .videos a { color: var(--lab-text); text-decoration: none; border: 1px solid var(--lab-line); border-radius: 8px; min-width: 36px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+  .videos .h { margin-right: 2px; }
   .all { margin-top: auto; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   @media (max-width: 720px) {
     .app { grid-template-columns: 1fr; grid-template-rows: 62vh auto; height: auto; }
@@ -77,6 +92,8 @@
       <div class="title" id="title"></div>
       <div class="h" id="changed"></div>
       <div class="prev hide" id="prevBox"><span class="h">지난번</span> <span id="prevNote"></span></div>
+      <div class="reqs hide" id="reqs"></div>
+      <div class="videos hide" id="videos"></div>
       <div class="seg dev hide" id="variant">
         <button data-v="normal" class="on">보통</button>
         <button data-v="borderline">경계</button>
@@ -91,6 +108,7 @@
         <button data-j="ask">애매하다</button>
         <button data-j="odd">어색하다</button>
       </div>
+      <select id="vreq" class="hide" aria-label="어긴 요청"><option value="">어긴 요청</option></select>
       <input type="text" id="vnote" placeholder="누가 · 언제 · 무엇">
       <button id="vsame">앞과 같음</button>
     </section>
@@ -135,6 +153,6 @@
     </section>
   </div>
 </div>
-<script src="app.js?v=6a026c083"></script>
+<script src="app.js?v=4349683d1"></script>
 </body>
 </html>
