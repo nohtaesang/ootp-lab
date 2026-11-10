@@ -77,7 +77,9 @@ const C = {
 // ── 좌표: 홈 원점 · +y 중견 · +x 1루 쪽 ─────────────────────
 const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
-const LOOK = { landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
+// hopSlow · hopFast: 땅 찍는 원 크기 — 바닥 찍는 순간 수평 속도(m/s)가 hopSlow 이하면 가장 큰 원(landR) · hopFast 이상이면 가장 작은 원(0.3배)
+// callS: 경합 뜬공의 「콜」을 잡기 몇 초 전부터 띄우나
+const LOOK = { callS: 1.5, hopSlow: 12, hopFast: 40, landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -173,6 +175,24 @@ function at(pts, tt) {
   const a = pts[lo], b = pts[hi];
   const k = (tt - a[0]) / Math.max(1e-9, b[0] - a[0]);
   return a.slice(1).map((v, i) => v + (b[i + 1] - v) * k);
+}
+
+// 공이 바닥을 찍는 자리들 [t, x, y, 그때 수평 속도 m/s] — 공 자취에서 땅 가까이(LOOK.groundZ) 내려온 가장 낮은 점마다 · 그 전에 한 번은 떠 있었어야 한다(굴러가는 공은 한 번만)
+const HOPS = new WeakMap();
+function bounces(tl) {
+  if (HOPS.has(tl)) return HOPS.get(tl);
+  const b = tl.ball, out = [];
+  let up = true;
+  for (let i = 1; i < b.length - 1; i++) {
+    if (b[i][3] > 2 * LOOK.groundZ) up = true;
+    if (up && b[i][3] <= LOOK.groundZ && b[i][3] <= b[i - 1][3] && b[i][3] <= b[i + 1][3] && b[i][0] > 0.05) {
+      const dt = Math.max(1e-6, b[i][0] - b[i - 1][0]);
+      out.push([b[i][0], b[i][1], b[i][2], Math.hypot(b[i][1] - b[i - 1][1], b[i][2] - b[i - 1][2]) / dt]);
+      up = false;
+    }
+  }
+  HOPS.set(tl, out);
+  return out;
 }
 
 function token(x, y, fill, label, alpha) {
@@ -279,6 +299,24 @@ function draw() {
       ctx.globalAlpha = 1;
     }
   }
+  // 땅 찍는 자리 — 공이 바닥을 찍을 자리마다 파란 원이 앞 바운드(타격)부터 줄어들어 공이 닿을 때 사라진다. 원이 크면 느린 공 · 작으면 빠른 공
+  // (태훈 V02 r5 1004 · 16 「땅볼인지 확실히 알려줘야 · 원이 크면 느리고 작으면 빠르다 · 튀면 또 작은 원」) — 뜬공의 첫 떨어질 자리는 위 원이 맡는다
+  const hops = bounces(TL);
+  const done = Math.min(caught ? caught.t : Infinity, ...TL.events.filter((e) => e.kind === 'field').map((e) => e.t));
+  for (let i = 0; i < hops.length; i++) {
+    const [ht, hx, hy, hv] = hops[i];
+    const from = i ? hops[i - 1][0] : 0;
+    if (t < from || t >= ht || t >= done || (i === 0 && first && TL.launch >= 8)) continue;
+    const big = Math.max(8, LOOK.landR * S.k * Math.min(1, Math.max(0.3, (LOOK.hopSlow - hv) / (LOOK.hopSlow - LOOK.hopFast))));
+    const small = Math.max(3, LOOK.ball * S.k);
+    const left = (ht - t) / Math.max(1e-6, ht - from);
+    ctx.fillStyle = C.land;
+    ctx.globalAlpha = 0.45 + 0.25 * (1 - left);
+    ctx.beginPath();
+    ctx.arc(sx(hx), sy(hy), small + (big - small) * left, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
   const rr = Math.max(3, (LOOK.ball + bz * LOOK.ballGrow) * S.k);
   // 완전 탑다운 — 공 점이 곧 땅 위 자리라 따로 미는 그림자는 그리지 않는다. 높이는 떨어질 자리 원(줄어드는 정도)과 공 크기로 본다
   // (사용자 2026-10-22 「그림자는 그라운드 어디에 투영되는지 알려고 쓰는 거 아니야? 너무 헷갈려」 — 비스듬한 그림자는 땅 위치가 아니라 높이 눈금이라 헷갈렸다)
@@ -347,6 +385,47 @@ function draw() {
     ctx.strokeStyle = '#000';
     ctx.strokeText('다이빙', sx(fx), sy(fy) + head + 2);
     ctx.fillText('다이빙', sx(fx), sy(fy) + head + 2);
+  }
+  // 사건 글자 — 그 자리 위에 이름만(태훈 V05 · V01 r5): 견제(투수 위) · 세이프 · 아웃(그 루 위) · 콜(잡겠다는 야수 위) · 펜스(담장 맞은 자리)
+  const word = (text, x, y, lift) => {
+    ctx.fillStyle = C.chalk;
+    ctx.font = `800 ${Math.max(12, Math.round(1.6 * S.k))}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#000';
+    ctx.strokeText(text, sx(x), sy(y) - lift);
+    ctx.fillText(text, sx(x), sy(y) - lift);
+  };
+  const head = Math.max(9, LOOK.token * S.k) + 2;
+  const posOf = (id, tt) => { const f = TL.fielders.find((x) => x.id === id); return f ? at(f.pts, tt) : null; };
+  if (SCENE && SCENE.input.scene === 'pickoff') {
+    const rel = TL.events.find((e) => e.kind === 'release' && e.fielder === 1);
+    const p = posOf(1, t);
+    if (rel && p && t >= rel.t - 0.4 && t <= rel.t + 1.0) word('견제', p[0], p[1], head);
+  }
+  for (const e of TL.events) {
+    if ((e.kind !== 'out' && e.kind !== 'safe') || e.base == null || e.base < 1 || t < e.t || t > e.t + LOOK.errorS) continue;
+    const [x, y] = FIELD.bags[e.base % 4];
+    word(e.kind === 'out' ? '아웃' : '세이프', x, y, Math.max(6, LOOK.bag * S.k));
+  }
+  const callAt = TL.plans.find((p) => p.roles.some((r) => r.part === 'F3'));
+  const catchE = TL.events.find((e) => e.kind === 'catch');
+  const catcher = catchE && posOf(catchE.fielder, t);
+  // 양보는 타격 순간 정해지지만 콜은 둘이 모일 때 외친다 — 잡기 LOOK.callS 전부터
+  if (callAt && catcher && t >= Math.max(callAt.t, catchE.t - LOOK.callS) && t <= catchE.t + 0.3) word('콜', catcher[0], catcher[1], head);
+  const wall = TL.events.find((e) => e.kind === 'wall');
+  if (wall && t >= wall.t && t <= wall.t + LOOK.errorS) {
+    const [wx0, wy0] = at(TL.ball, wall.t);
+    const k = (t - wall.t) / LOOK.errorS;
+    ctx.strokeStyle = C.chalk;
+    ctx.globalAlpha = 1 - k;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(sx(wx0), sy(wy0), Math.max(9, LOOK.token * S.k) * (1.0 + 1.5 * k), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    word('펜스', wx0, wy0, head);
   }
   // 실책 · 실투 — 그 선수 머리 위에 빨간 느낌표(잠깐 · 사용자 2026-10-22). 첫 실책은 기록된 사람(송구 실책이면 던진 사람), 그 뒤는 놓친 사람
   let firstMiss = true;
@@ -554,6 +633,10 @@ function runScene() {
   WHO = sv && sv.who ? [...sv.who] : [];
   $('#prevBox').classList.toggle('hide', !(ITEM && ITEM.prev));
   if (ITEM && ITEM.prev) $('#prevNote').textContent = `${JLABEL[ITEM.prev.j]}${ITEM.prev.note ? ' · ' + ITEM.prev.note : ''}`;
+  // 이 장면을 괜찮다 하면 확정되는 책임표 칸(review.json cells · #2267 진행) — 「2루수 2루 커버」처럼 이름만
+  const cells = (ITEM && ITEM.cells) || [];
+  $('#cellsBox').classList.toggle('hide', !cells.length);
+  if (cells.length) $('#cellsNote').textContent = `${cells.length} · ${cells.map((c) => `${c.who} ${actName(c.did)}`).join(' · ')}`;
   showRequests();
   showVideos();
   const ch = ITEM ? ITEM.changed.map((p) => POSNAME[p - 1]) : [];
@@ -571,9 +654,11 @@ function showRequests() {
   const box = $('#reqs');
   const reqs = (ITEM && ITEM.reqs) || [];
   box.replaceChildren();
-  box.classList.toggle('hide', !reqs.length);
-  if (reqs.length) box.append(el('div', 'h', '요청'));
-  for (const q of reqs) {
+  // 판에 보이는 건 이 장면 메모에서 나온 요청만 — 같은 순위 다른 변형 것은 아래 「어긴 요청」 고르기에만(r6 판정 피로 · 사용자 2026-11-10)
+  const mine = reqs.filter((q) => q.same !== false);
+  box.classList.toggle('hide', !mine.length);
+  if (mine.length) box.append(el('div', 'h', '요청'));
+  for (const q of mine) {
     const row = el('div', 'req');
     row.append(el('span', 'rid', q.id));
     const say = el('span', 'say');
@@ -591,6 +676,12 @@ function showRequests() {
   const rest = LEDGER.filter((q) => !reqs.some((r) => r.id === q.id));
   if (rest.length) { const g = el('optgroup'); g.label = '다른 요청'; rest.forEach((q) => g.append(opt(q))); sel.append(g); }
   sel.classList.toggle('hide', !LEDGER.length);
+}
+// 책임표 행동 말 → 이름(progress.html word · examples/chart_report.rs word 와 같음)
+function actName(w) {
+  const base = (b) => (b === '4' ? '홈' : b + '루');
+  return ({ chase: '공', relay: '중계', trail: '트레일', idle: '할 일 없음', backup: '야수 뒤 받침', hold: '공 쥠', tag: '태그업 준비', stay: '얼음', halfway: '하프웨이', run: '진루', back: '귀루' })[w]
+    ?? (!w ? '' : w.startsWith('toward') ? base(w.slice(6)) + ' 쪽으로' : w.startsWith('cover') ? base(w.slice(5)) + ' 커버' : w.startsWith('backup') ? base(w.slice(6)) + ' 백업' : w.startsWith('cutoff') ? base(w.slice(6)) + ' 컷' : w);
 }
 // 같은 상황의 실제 MLB 플레이(Statcast 2024 · tools/playfield/videos.mjs 가 고름) — Savant 영상
 function showVideos() {
@@ -626,11 +717,26 @@ function watchScenes(doc, base) {
     const w = x.scene;
     const on = w.bases.map((b, k) => (b ? k + 1 : 0)).filter(Boolean);
     // 인플레이 공은 놀이터 판정으로 그린다(2c 전) — 엔진 결과 이름을 붙이면 결과 칩과 어긋난다
-    return { rank: base + i + 1, variant: 'normal', input: w.req, what: w.req.scene === 'in_play' ? '' : w.what, family: `${x.game}경기 ${w.inning}회${w.top ? '초' : '말'} · ${w.outs}아웃 · ${on.length ? '주자 ' + on.join('·') + '루' : '주자 없음'}` };
+    return { rank: base + i + 1, variant: 'normal', input: w.req, what: w.req.scene === 'in_play' ? '' : w.what, prev: x.prev || null, reqs: x.reqs || [], family: `${x.game}경기 ${w.inning}회${w.top ? '초' : '말'} · ${w.outs}아웃 · ${on.length ? '주자 ' + on.join('·') + '루' : '주자 없음'}` };
+  });
+}
+
+// 탭 — 판정 · 통계(통계는 처음 열 때 progress.html 을 읽는다 · 돌아오면 판을 다시 그린다)
+function tabs() {
+  $('#tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const stats = b.dataset.tab === 'stats';
+    $('#tabs').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    if (stats && !$('#stats').src) $('#stats').src = 'progress.html';
+    $('#stats').classList.toggle('hide', !stats);
+    $('#judge').classList.toggle('hide', stats);
+    if (!stats) draw();
   });
 }
 
 async function boot() {
+  tabs();
   const bytes = await (await fetch('playfield.wasm', { cache: 'no-cache' })).arrayBuffer();
   wasm = (await WebAssembly.instantiate(bytes, {})).instance;
   FIELD = call('field');
@@ -654,7 +760,8 @@ async function boot() {
       if (ROUND && ROUND.watch) {
         const ws = watchScenes(await (await fetch(ROUND.watch, { cache: 'no-cache' })).json(), WATCH_BASE);
         SCENES = SCENES.concat(ws);
-        ROUND.items = ROUND.items.concat(ws.map((x) => ({ key: `${x.rank}-normal`, prev: null, changed: [], runners: [], mention: [], reqs: [] })));
+        // 다시 보는 경기 장면은 지난번 판정 · 메모와 걸린 요청(답)을 싣는다(watch.json 의 prev · reqs)
+        ROUND.items = ROUND.items.concat(ws.map((x) => ({ key: `${x.rank}-normal`, prev: x.prev, changed: [], runners: [], mention: [], reqs: x.reqs })));
       }
       if (ROUND && ROUND.items.length) first = ROUND.items[0].key.split('-');
     }

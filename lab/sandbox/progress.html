@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>놀이터 진행</title>
+<!-- 놀이터 진행(#2267) — tools/playfield/progress.mjs 가 쓴 progress.json 을 그린다. 판정 앱 「통계」 탭 -->
+<!-- 장면 지도: 판정 하나 = 장면 하나 = 칸 하나(사용자 2026-11-10 「293번 판정해야 채울 것 같다 · 전체 지도가 얼마나 찼나 직관적으로 · 판마다 슬라이드」) -->
+<link rel="stylesheet" href="tokens.css">
+<style>
+  :root {
+    --p-bg: var(--bg-canvas, #1d1d1f);
+    --p-surface: var(--bg-surface, #262628);
+    --p-text: var(--text-normal, #f5f5f5);
+    --p-muted: var(--text-muted, #bdbdbd);
+    --p-faint: var(--text-faint, #8a8a8e);
+    /* 상태 색 — 뜻이 있는 넷만: 확정(통과) · 재검수(전에 통과 · 한 번 더) · 미확정 · 검수 전 */
+    --s-done: var(--success-solid, #30a46c);
+    --s-again: var(--success-border, #2f7c57);
+    --s-flag: var(--attention-solid, #ffb224);
+    --s-unseen: var(--bg-active, #4a4a4e);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--p-bg); color: var(--p-text); font-family: var(--font-sans, Pretendard, system-ui, sans-serif); font-size: var(--text-md, 14px); font-variant-numeric: tabular-nums; }
+  main { max-width: 880px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 24px; }
+  h2 { margin: 0; font-size: var(--text-lg, 16px); font-weight: 700; }
+  .muted { color: var(--p-muted); }
+  .block { background: var(--p-surface); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .hero { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .big { font-size: 48px; font-weight: 800; line-height: 1; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  /* 슬라이드 — 판마다 지도를 그때 판정으로 칠한다 */
+  .slide { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .slide button { font: inherit; color: var(--p-muted); background: transparent; border: 0; border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .slide button.on { background: var(--bg-active, #4a4a4e); color: var(--p-text); font-weight: 700; }
+  .slide .play { color: var(--p-text); }
+  .part { display: flex; flex-direction: column; gap: 14px; }
+  .part + .part { padding-top: 20px; border-top: 1px solid var(--border, #3a3a3c); }
+  .group { display: grid; grid-template-columns: minmax(0, 9em) minmax(0, 1fr); gap: 12px; align-items: start; }
+  .tiles { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tile { width: 18px; height: 18px; border-radius: 4px; background: var(--s-unseen); transition: background-color .5s ease; }
+  .gname { color: var(--p-muted); font-size: var(--text-sm, 12px); padding-top: 2px; }
+  .rows { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: grid; grid-template-columns: minmax(0, 9em) minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+  .bar { height: 8px; border-radius: 4px; overflow: hidden; background: var(--s-unseen); }
+  .bar span { display: block; height: 100%; background: var(--s-again); }
+  .row.pass .bar span { background: var(--s-done); }
+  .val { text-align: right; min-width: 7em; }
+  .row.pass .val { color: var(--s-done); font-weight: 700; }
+  @media (max-width: 560px) { .group { grid-template-columns: 1fr; gap: 6px; } .row { grid-template-columns: minmax(0, 1fr) auto; } .row .bar { grid-column: 1 / -1; grid-row: 2; } }
+</style>
+</head>
+<body>
+<main id="app"><p class="muted">불러오는 중</p></main>
+<script>
+const COLOR = { 확정: 'var(--s-done)', 통과: 'var(--s-done)', 재검수: 'var(--s-again)', 미확정: 'var(--s-flag)', '검수 전': 'var(--s-unseen)' };
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const tally = (list) => list.reduce((m, x) => ((m[x] = (m[x] || 0) + 1), m), {});
+
+function render(p) {
+  const app = document.getElementById('app');
+  const now = p.tiles.map((t) => t.state);
+  // 판마다 그때 판정(통과 · 미확정 · 검수 전) → 마지막은 지금(확정 · 재검수 · 미확정 · 검수 전)
+  const frames = [...p.history.map((h) => ({ name: h.round, states: h.states, now: false })), { name: '지금', states: now, now: true }];
+  const left = now.filter((s) => s !== '확정').length;
+  const parts = ['수비', '투구 전후', '경계 · 실책'];
+  const groupsOf = (part) => [...new Set(p.tiles.filter((t) => t.part === part).map((t) => t.group))];
+  app.innerHTML = `
+    <section class="block">
+      <div class="hero"><span class="big">${left}</span><span class="muted">장면 남음 · 판 ${Math.ceil(left / p.board)}개</span></div>
+      <div class="legend" id="legend"></div>
+      <div class="slide" id="slide"><button class="play" id="play" aria-label="재생">▶</button>${frames.map((f, i) => `<button data-i="${i}">${esc(f.name)}</button>`).join('')}</div>
+      ${parts.map((part) => `<div class="part"><h2>${part}</h2>${groupsOf(part).map((g) => `<div class="group"><span class="gname">${esc(g)}</span><div class="tiles">${p.tiles.map((t, i) => (t.part === part && t.group === g ? `<i class="tile" data-i="${i}" title="${esc(t.name)}${t.cells ? '\n' + esc(t.cells.join(' · ')) : ''}"></i>` : '')).join('')}</div></div>`).join('')}</div>`).join('')}
+    </section>
+    <section class="block">
+      <div class="hero"><span class="big">${p.modules.filter((m) => m.pass).length}</span><span class="muted">/ ${p.modules.length} 완성 조건</span></div>
+      <div class="rows">${p.modules.map((m) => {
+        const v = m.name === '불변식' ? `위반 ${m.bad ?? '-'}` : m.goal ? `${Math.round((m.done / Math.max(1, m.of)) * 100)}% / ${m.goal * 100}%` : `${m.done} / ${m.of}`;
+        const w = m.name === '불변식' ? (m.bad === 0 ? 1 : 0) : m.goal ? Math.min(1, m.done / Math.max(1, m.of) / m.goal) : m.done / Math.max(1, m.of);
+        return `<div class="row${m.pass ? ' pass' : ''}"><b>${esc(m.name)}</b><div class="bar"><span style="width:${w * 100}%"></span></div><span class="val">${v}</span></div>`;
+      }).join('')}</div>
+    </section>`;
+  const tiles = [...app.querySelectorAll('.tile')];
+  let cur = frames.length - 1, timer = null;
+  const show = (i) => {
+    const f = frames[i];
+    tiles.forEach((el) => { el.style.background = COLOR[f.states[el.dataset.i]]; });
+    app.querySelectorAll('#slide button[data-i]').forEach((b) => b.classList.toggle('on', Number(b.dataset.i) === i));
+    const c = tally(f.states);
+    const keys = f.now ? ['확정', '재검수', '미확정', '검수 전'] : ['통과', '미확정', '검수 전'];
+    app.querySelector('#legend').innerHTML = keys.map((k) => `<span><i class="dot" style="background:${COLOR[k]}"></i>${k} <b>${c[k] || 0}</b></span>`).join('');
+    cur = i;
+  };
+  const stop = () => { clearInterval(timer); timer = null; app.querySelector('#play').textContent = '▶'; };
+  app.querySelector('#slide').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.id === 'play') {
+      if (timer) return stop();
+      show(0);
+      b.textContent = '❚❚';
+      timer = setInterval(() => (cur + 1 < frames.length ? show(cur + 1) : stop()), 1100);
+      return;
+    }
+    stop();
+    show(Number(b.dataset.i));
+  });
+  show(cur);
+}
+
+fetch('progress.json', { cache: 'no-cache' }).then((r) => r.json()).then(render).catch(() => { document.getElementById('app').innerHTML = '<p class="muted">progress.json 없음</p>'; });
+</script>
+</body>
+</html>
