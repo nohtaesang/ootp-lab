@@ -262,52 +262,52 @@
       {
        "who": "투수",
        "did": "backup3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "포수",
        "did": "cover4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "cutoff3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "좌익수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "backup",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루 주자",
        "did": "run",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
@@ -390,47 +390,47 @@
       {
        "who": "투수",
        "did": "backup3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "포수",
        "did": "cover4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "idle",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루 주자",
        "did": "run",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
@@ -602,47 +602,47 @@
       {
        "who": "투수",
        "did": "backup4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "포수",
        "did": "cover4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cutoff4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "좌익수",
        "did": "backup3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "backup",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
@@ -896,42 +896,42 @@
       {
        "who": "투수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "cutoff2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "좌익수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "backup",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
@@ -1373,52 +1373,52 @@
       {
        "who": "투수",
        "did": "backup3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "포수",
        "did": "cover4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "cutoff3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "좌익수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "backup",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루 주자",
        "did": "run",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
@@ -1501,47 +1501,47 @@
       {
        "who": "투수",
        "did": "backup3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "포수",
        "did": "cover4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "idle",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루 주자",
        "did": "run",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
@@ -1713,47 +1713,47 @@
       {
        "who": "투수",
        "did": "backup4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "포수",
        "did": "cover4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cutoff4",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "좌익수",
        "did": "backup3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "backup",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
@@ -2007,42 +2007,42 @@
       {
        "who": "투수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "1루수",
        "did": "cover1",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "2루수",
        "did": "cover2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "3루수",
        "did": "cover3",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "유격수",
        "did": "cutoff2",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "좌익수",
        "did": "chase",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "중견수",
        "did": "backup",
-       "state": "재검수"
+       "state": "미확정"
       },
       {
        "who": "우익수",
        "did": "backup2",
-       "state": "재검수"
+       "state": "미확정"
       }
      ],
      "reqs": [
