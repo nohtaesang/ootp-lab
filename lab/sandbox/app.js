@@ -21,6 +21,8 @@ let last = 0;
 let variant = 'normal';
 let placing = false;
 let showParts = false;
+// 이유 표시(#1980 1단계) — 선수마다 맡은 일 · 따르는 줄(일 이름) · 루마다 주자가 공보다 먼저 닿을 확률(엔진 PlanSnap.reach)
+let showWhy = false;
 let kind = 'ground';
 let SCENE = null;
 // 판정 판(review.json · ?round=r2-1) — 판 안의 장면만 돈다 · 장면마다 지난번 판정과 메모 · 바뀐 선수 · 메모에 나온 선수
@@ -263,13 +265,29 @@ function draw() {
       ctx.fillText('바뀜', sx(x), sy(y) + Math.max(7, LOOK.token * S.k) + Math.max(14, 1.6 * S.k));
     }
     if (WHO.includes(i + 1)) ring(C.error, 3);
-    if (showParts && plan) {
+    if (showWhy && plan && plan.roles[i]) {
+      ctx.fillStyle = C.text;
+      ctx.font = `600 ${Math.max(10, Math.round(0.8 * S.k))}px sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText(plan.roles[i].name || plan.roles[i].part, sx(x) + Math.max(9, 1.4 * S.k), sy(y) - Math.max(9, 1.4 * S.k));
+    } else if (showParts && plan) {
       ctx.fillStyle = C.text;
       ctx.font = `600 ${Math.max(10, Math.round(0.9 * S.k))}px sans-serif`;
       ctx.textAlign = 'left';
       ctx.fillText(plan.roles[i].part, sx(x) + Math.max(9, 1.4 * S.k), sy(y) - Math.max(9, 1.4 * S.k));
     }
   });
+  if (showWhy && plan && plan.reach) {
+    ctx.fillStyle = C.chalk;
+    ctx.font = `700 ${Math.max(11, Math.round(1.0 * S.k))}px sans-serif`;
+    ctx.textAlign = 'center';
+    for (let k = 1; k <= 4; k++) {
+      const p = plan.reach[k];
+      if (p == null) continue;
+      const [x, y] = FIELD.bags[k % 4];
+      ctx.fillText(`${Math.round(p * 100)}%`, sx(x), sy(y) + Math.max(16, 2.2 * S.k));
+    }
+  }
   // 공: 실제 자리에 그린다(높이를 화면 위로 올리면 중견 쪽 뜬공이 담장을 넘었다 돌아오는 착시 — 친구 r1 4 · 5 · 6 · 9 경계).
   // 높이 = 떨어질 자리 원이 줄어드는 정도 + 공 크기 · 속도 = 지나온 꼬리의 길이(친구 답 「높이와 그림자 · 속도에 따른 꼬리」 · 그림자는 탑다운에서 공 밑이라 뺐다).
   // 땅에 붙어 굴러가면 꼬리가 땅 자국처럼 남는다(16 · 20 경계 「땅볼인지 알기 힘듦」).
@@ -500,7 +518,8 @@ function saveV(v) { try { localStorage.setItem(VKEY, JSON.stringify(v)); } catch
 let VERD = loadV();
 function sceneKey() { return placing || !TL ? null : `${ROUND ? ROUND.id + ':' : ''}${$('#scene').value}-${variant}`; }
 const bare = (k) => k.replace(/^[^:]*:/, '');
-const inRound = (k) => (ROUND ? k.startsWith(ROUND.id + ':') : !k.includes(':'));
+// 판의 장면만(한 장면 링크 ?at= 면 그 장면만 · 복사도 그 장면만)
+const inRound = (k) => (ROUND ? ROUND.items.some((it) => k === ROUND.id + ':' + it.key) : !k.includes(':'));
 function fingerprint() {
   // 사건 + 움직임(0.5m · 0.1초로 반올림) — 움직임만 바뀌어도 「옛 장면」이 된다
   if (!TL) return '';
@@ -605,13 +624,16 @@ function step(d) {
   runScene();
 }
 
-// 재생 중 제목은 상황만(주자 · 아웃 · 변형) — 결과를 미리 말하지 않는다(8 경계 「설명과 다르다」 · 결과는 끝난 뒤 제목과 칩으로)
+// 점수 차(공격 − 수비 · 태훈 R17 — 동점 · 역전 주자면 외야수가 조금 늦어도 홈으로 던진다)
+const scoreName = (d) => (d == null ? '' : d === 0 ? '동점' : d > 0 ? `공격 ${d}점 앞섬` : `공격 ${-d}점 뒤짐`);
+// 재생 중 제목은 상황만(주자 · 아웃 · 점수 · 변형) — 결과를 미리 말하지 않는다(8 경계 「설명과 다르다」 · 결과는 끝난 뒤 제목과 칩으로)
 function situation(s) {
   // 투구 전후 장면(순위 201~ · #2267)은 이름이 곧 상황이다
   if (s.input.scene || s.what) return `${s.rank}. ${s.family}`;
   const r = (s.input.runners || []).map((x) => x.base).sort();
   const on = r.length ? `주자 ${r.join('·')}루` : '주자 없음';
-  return `${s.rank}. ${on} · ${s.input.outs || 0}아웃 · ${VLABEL[s.variant]}`;
+  const sc = scoreName(s.input.score_diff);
+  return `${s.rank}. ${on} · ${s.input.outs || 0}아웃${sc ? ' · ' + sc : ''} · ${VLABEL[s.variant]}`;
 }
 
 function runScene() {
@@ -717,7 +739,7 @@ function watchScenes(doc, base) {
     const w = x.scene;
     const on = w.bases.map((b, k) => (b ? k + 1 : 0)).filter(Boolean);
     // 인플레이 공은 놀이터 판정으로 그린다(2c 전) — 엔진 결과 이름을 붙이면 결과 칩과 어긋난다
-    return { rank: base + i + 1, variant: 'normal', input: w.req, what: w.req.scene === 'in_play' ? '' : w.what, prev: x.prev || null, reqs: x.reqs || [], family: `${x.game}경기 ${w.inning}회${w.top ? '초' : '말'} · ${w.outs}아웃 · ${on.length ? '주자 ' + on.join('·') + '루' : '주자 없음'}` };
+    return { rank: base + i + 1, variant: 'normal', input: w.req, what: w.req.scene === 'in_play' ? '' : w.what, prev: x.prev || null, reqs: x.reqs || [], family: `${x.game}경기 ${w.inning}회${w.top ? '초' : '말'} · ${w.outs}아웃${(w.req.input || w.req).score_diff != null ? ' · ' + scoreName((w.req.input || w.req).score_diff) : ''} · ${on.length ? '주자 ' + on.join('·') + '루' : '주자 없음'}` };
   });
 }
 
@@ -763,6 +785,14 @@ async function boot() {
         // 다시 보는 경기 장면은 지난번 판정 · 메모와 걸린 요청(답)을 싣는다(watch.json 의 prev · reqs)
         ROUND.items = ROUND.items.concat(ws.map((x) => ({ key: `${x.rank}-normal`, prev: x.prev, changed: [], runners: [], mention: [], reqs: x.reqs })));
       }
+      // 한 장면 링크(?round=판&at=순위-변형): 친구와 한 장면씩 보고 결론 짓는다(사용자 2026-11-11 「링크 하나에 하나같이 판정하고 결론」) — 이전 · 다음 없이 그 장면만
+      const at = new URLSearchParams(location.search).get('at');
+      if (ROUND && at) {
+        // at = 원칙 id(피드백 확인 판 · 장면 하나를 여러 원칙이 함께 쓴다) 또는 장면 키 — 원칙이면 판 이름표에 붙여 판정이 서로 안 덮인다(복사 첫 줄 「판 f1-R05」)
+        const hit = ROUND.items.filter((it) => it.rule === at || it.key === at);
+        ROUND = { ...ROUND, id: hit.length && hit[0].rule === at ? `${ROUND.id}-${at}` : ROUND.id, items: hit.slice(0, 1) };
+        document.querySelectorAll('#prev, #next').forEach((x) => x.classList.add('hide'));
+      }
       if (ROUND && ROUND.items.length) first = ROUND.items[0].key.split('-');
     }
   } catch { ROUND = null; }
@@ -786,6 +816,10 @@ async function boot() {
     if (!TL) return;
     setPlaying(false);
     t = (Number(e.target.value) / 1000) * TL.duration;
+  });
+  $('#why').addEventListener('click', (e) => {
+    showWhy = !showWhy;
+    e.target.classList.toggle('on', showWhy);
   });
   $('#parts').addEventListener('click', (e) => {
     showParts = !showParts;
