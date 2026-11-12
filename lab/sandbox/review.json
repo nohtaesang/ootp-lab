@@ -2614,7 +2614,7 @@
      "videos": []
     },
     {
-     "key": "24-borderline",
+     "key": "17-error",
      "rule": "R08",
      "must": false,
      "prev": {
