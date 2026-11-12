@@ -124,6 +124,13 @@ function drawField() {
   poly([[0, 0], ...fence]);
   ctx.fillStyle = C.grass;
   ctx.fill();
+  // 워닝트랙(담장 앞 흙길 · field.track_m) — 외야수가 이 안에서 공을 잡으면 중계 두 명(태훈 R34 · f1 2026-11-12 「워닝트랙 흙바닥 표시」)
+  if (f.track > 0) {
+    const inner = fence.map(([x, y]) => { const d = Math.hypot(x, y); const k = Math.max(0, d - f.track) / d; return [x * k, y * k]; });
+    poly([...fence, ...inner.slice().reverse()]);
+    ctx.fillStyle = C.dirt;
+    ctx.fill();
+  }
   // 내야 흙(투수판에서 반지름 29 m 원호 · 페어 안) · 안쪽 잔디
   ctx.save();
   poly([[0, 0], ...fence]);
