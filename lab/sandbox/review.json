@@ -3218,6 +3218,12 @@
    "name": "무작위 20",
    "watch": "r7.json",
    "items": []
+  },
+  {
+   "id": "r8",
+   "name": "무작위 20 · 11-23",
+   "watch": "r8.json",
+   "items": []
   }
  ]
 }
