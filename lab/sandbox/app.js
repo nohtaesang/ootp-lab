@@ -297,6 +297,11 @@ function draw() {
     const out = outAt[r.id] != null && t >= outAt[r.id];
     token(x, y, C.runner, RUNNER[r.id], out ? 0.35 : 1);
   }
+  // 견제 · 도루처럼 타자가 안 뛰는 장면은 엔진이 타자를 안 넘긴다 — 타석에 서 있는 타자를 그린다(2026-11-25 r8 12 친구 「타자가 없대」)
+  if (boxSide && !TL.runners.some((r) => r.id === 0)) {
+    const px = Math.max(LOOK.boxX * S.k, LOOK.boxTokenFrac * Math.max(7, LOOK.token * S.k));
+    token(boxSide * px / S.k, 0, C.runner, RUNNER[0], 1);
+  }
   let plan = null;
   for (const p of TL.plans) if (p.t <= t) plan = p;
   TL.fielders.forEach((f, i) => {
