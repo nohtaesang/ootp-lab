@@ -81,7 +81,7 @@ const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
 // hopSlow · hopFast: 땅 찍는 원 크기 — 바닥 찍는 순간 수평 속도(m/s)가 hopSlow 이하면 가장 큰 원(landR) · hopFast 이상이면 가장 작은 원(0.3배)
 // callS: 경합 뜬공의 「콜」을 잡기 몇 초 전부터 띄우나
-const LOOK = { callS: 1.5, hopSlow: 12, hopFast: 40, landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
+const LOOK = { callS: 1.5, hopSlow: 12, hopFast: 40, landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, dashPeak: 0.95, dashSlackS: 0.3, dashLookS: 1.2, dashBeforeS: 0.6, dashAfterS: 0.5, dashGhostDt: 0.07, dashGhostN: 5, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -206,6 +206,33 @@ function bounces(tl) {
   return out;
 }
 
+// 전력 질주 포구 — 잡기 전 dashLookS 안에 최고 속도의 dashPeak 이상으로 달렸고, 잡는 자리(1m 안)에 닿은 지 dashSlackS 안에 잡음.
+// 먼저 가서 기다린 포구 · 짧게 움직인 포구는 빠진다(2026-11-25 r8 7 친구 「슬라이딩도 빠르게 움직이는 느낌 · 그 모션」 · 사용자 「슈왕」 · 확인 「맞대」).
+const DASH = new WeakMap();
+function dashCatches(tl) {
+  if (DASH.has(tl)) return DASH.get(tl);
+  const out = new Map();
+  for (const e of tl.events) {
+    if (e.kind !== 'catch' || e.fielder == null) continue;
+    const f = tl.fielders[e.fielder - 1];
+    if (!f || !(f.vmax > 0)) continue;
+    const [cx, cy] = at(f.pts, e.t);
+    let arrive = 0;
+    for (let tt = e.t; tt >= 0; tt -= 0.02) {
+      const [qx, qy] = at(f.pts, tt);
+      if (Math.hypot(qx - cx, qy - cy) > 1.0) { arrive = tt + 0.02; break; }
+    }
+    let peak = 0;
+    for (let tt = Math.max(0.02, e.t - LOOK.dashLookS); tt <= e.t; tt += 0.02) {
+      const [ax, ay] = at(f.pts, tt - 0.02), [bx, by] = at(f.pts, tt);
+      peak = Math.max(peak, Math.hypot(bx - ax, by - ay) / 0.02);
+    }
+    if (peak >= LOOK.dashPeak * f.vmax && e.t - arrive <= LOOK.dashSlackS) out.set(e.fielder, e.t);
+  }
+  DASH.set(tl, out);
+  return out;
+}
+
 function token(x, y, fill, label, alpha) {
   const r = Math.max(7, LOOK.token * S.k);
   ctx.globalAlpha = alpha;
@@ -262,6 +289,16 @@ function draw() {
       ctx.moveTo(sx(x + ux * r / S.k), sy(y + uy * r / S.k));
       ctx.lineTo(sx(x + ux * len / S.k), sy(y + uy * len / S.k));
       ctx.stroke();
+    }
+    // 전력 질주 포구 잔상 — 지나온 자리에 옅어지는 선수 몇 개 · 잡은 뒤 dashAfterS 동안 사라진다
+    const dashT = dashCatches(TL).get(i + 1);
+    if (dashT != null && t >= dashT - LOOK.dashBeforeS && t <= dashT + LOOK.dashAfterS) {
+      const fade = t <= dashT ? 1 : 1 - (t - dashT) / LOOK.dashAfterS;
+      const tt = Math.min(t, dashT);
+      for (let k = LOOK.dashGhostN; k >= 1; k--) {
+        const [gx, gy] = at(f.pts, Math.max(0, tt - k * LOOK.dashGhostDt));
+        token(gx, gy, C.fielder, '', fade * 0.45 * (1 - k / (LOOK.dashGhostN + 1)));
+      }
     }
     token(x, y, C.fielder, NAMES[i], 1);
     const ring = (color, w) => { ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(sx(x), sy(y), Math.max(7, LOOK.token * S.k) + w + 2, 0, Math.PI * 2); ctx.stroke(); };
