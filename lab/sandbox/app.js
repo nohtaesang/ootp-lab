@@ -191,8 +191,10 @@ const HOPS = new WeakMap();
 function bounces(tl) {
   if (HOPS.has(tl)) return HOPS.get(tl);
   const b = tl.ball, out = [];
+  // 잡거나 처리한 뒤의 공은 송구다 — 송구가 낮게 닿는 자리를 바운드로 세면 공이 아직 굴러갈 때 2루 쪽에 원이 미리 떴다(2026-11-25 r8s81 「첫 원 뒤 2루 쪽에 원이 또 생긴다 · 오류 같다」)
+  const held = Math.min(Infinity, ...tl.events.filter((e) => e.kind === 'catch' || e.kind === 'field').map((e) => e.t));
   let up = true;
-  for (let i = 1; i < b.length - 1; i++) {
+  for (let i = 1; i < b.length - 1 && b[i][0] < held; i++) {
     if (b[i][3] > 2 * LOOK.groundZ) up = true;
     if (up && b[i][3] <= LOOK.groundZ && b[i][3] <= b[i - 1][3] && b[i][3] <= b[i + 1][3] && b[i][0] > 0.05) {
       const dt = Math.max(1e-6, b[i][0] - b[i - 1][0]);
