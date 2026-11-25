@@ -436,6 +436,13 @@ function draw() {
     const [x, y] = FIELD.bags[e.base % 4];
     word(e.kind === 'out' ? '아웃' : '세이프', x, y, Math.max(6, LOOK.bag * S.k));
   }
+  // 뜬공 · 직선타를 잡아 타자가 아웃 — 잡은 선수 머리 위에도 「아웃」(2026-11-25 r8 7 친구 「외야수가 잡아서 아웃시킬 때도 아웃 글자가」 · 확인 「응 맞대」)
+  for (const e of TL.events) {
+    if (e.kind !== 'out' || e.base != null || e.fielder == null || t < e.t || t > e.t + LOOK.errorS) continue;
+    if (!TL.events.some((c) => c.kind === 'catch' && c.fielder === e.fielder && Math.abs(c.t - e.t) < 1e-6)) continue;
+    const p = posOf(e.fielder, e.t);
+    if (p) word('아웃', p[0], p[1], head);
+  }
   const callAt = TL.plans.find((p) => p.roles.some((r) => r.part === 'F3'));
   const catchE = TL.events.find((e) => e.kind === 'catch');
   const catcher = catchE && posOf(catchE.fielder, t);
