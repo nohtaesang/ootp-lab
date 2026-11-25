@@ -81,7 +81,7 @@ const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
 // hopSlow · hopFast: 땅 찍는 원 크기 — 바닥 찍는 순간 수평 속도(m/s)가 hopSlow 이하면 가장 큰 원(landR) · hopFast 이상이면 가장 작은 원(0.3배)
 // callS: 경합 뜬공의 「콜」을 잡기 몇 초 전부터 띄우나
-const LOOK = { callS: 1.5, hopSlow: 12, hopFast: 40, landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, dashPeak: 0.95, dashSlackS: 0.3, dashLookS: 1.2, dashBeforeS: 1.0, dashAfterS: 0.5, dashGhostDt: 0.12, dashGhostN: 5, splashS: 0.3, splashR: 2.2, splashZ: 0.02, boxX: 0.8, boxBlendS: 0.3, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
+const LOOK = { callS: 1.5, hopSlow: 12, hopFast: 40, landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, dashPeak: 0.95, dashSlackS: 0.3, dashLookS: 1.2, dashBeforeS: 1.0, dashAfterS: 0.5, dashGhostDt: 0.12, dashGhostN: 5, splashS: 0.3, splashR: 2.2, splashZ: 0.02, boxX: 1.0, boxTokenFrac: 0.8, boxBlendS: 0.3, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -290,7 +290,9 @@ function draw() {
     if (r.id === 0 && boxSide) {
       const go = (r.pts.find((q) => Math.hypot(q[1] - r.pts[0][1], q[2] - r.pts[0][2]) > 0.05) || [Infinity])[0];
       const k = t <= go ? 1 : Math.max(0, 1 - (t - go) / LOOK.boxBlendS);
-      x += boxSide * LOOK.boxX * k;
+      // 실제 타석 가운데(홈 가운데에서 약 1m)지만 바둑알이 실제보다 크게 그려져 화면에선 안 보인다 — 바둑알 반지름의 boxTokenFrac 만큼은 옮긴다
+      const px = Math.max(LOOK.boxX * S.k, LOOK.boxTokenFrac * Math.max(7, LOOK.token * S.k));
+      x += boxSide * (px / S.k) * k;
     }
     const out = outAt[r.id] != null && t >= outAt[r.id];
     token(x, y, C.runner, RUNNER[r.id], out ? 0.35 : 1);
