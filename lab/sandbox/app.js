@@ -81,7 +81,7 @@ const VIEW = { x0: -100, x1: 100, y0: -22, y1: 132 };
 // 그림용 치수(m · 모양만 · 판정과 무관): 내야 흙 원호 반지름(투수판 기준) · 안쪽 잔디 비율 · 마운드 · 홈 흙 · 바둑알 · 공
 // hopSlow · hopFast: 땅 찍는 원 크기 — 바닥 찍는 순간 수평 속도(m/s)가 hopSlow 이하면 가장 큰 원(landR) · hopFast 이상이면 가장 작은 원(0.3배)
 // callS: 경합 뜬공의 「콜」을 잡기 몇 초 전부터 띄우나
-const LOOK = { callS: 1.5, hopSlow: 12, hopFast: 40, landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, dashPeak: 0.95, dashSlackS: 0.3, dashLookS: 1.2, dashBeforeS: 1.0, dashAfterS: 0.5, dashGhostDt: 0.12, dashGhostN: 5, splashS: 0.3, splashR: 2.2, splashZ: 0.02, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
+const LOOK = { callS: 1.5, hopSlow: 12, hopFast: 40, landR: 4.0, bounceS: 1.5, catchS: 0.9, skin: 29, infieldGrass: 0.8, mound: 2.7, home: 4, bag: 0.6, token: 1.1, ball: 0.4, ballGrow: 0.04, groundZ: 0.3, trailStep: 0.05, trailN: 8, dashPeak: 0.95, dashSlackS: 0.3, dashLookS: 1.2, dashBeforeS: 1.0, dashAfterS: 0.5, dashGhostDt: 0.12, dashGhostN: 5, splashS: 0.3, splashR: 2.2, splashZ: 0.02, boxX: 0.8, boxBlendS: 0.3, errorS: 1.2, headMinV: 1.0, headLen: 1.4, headW: 0.12, headDt: 0.1 };
 let S = { k: 1, ox: 0, oy: 0, dpr: 1 };
 function fit() {
   const r = canvas.getBoundingClientRect();
@@ -281,8 +281,17 @@ function draw() {
   if (!TL) return;
   const outAt = {};
   for (const e of TL.events) if (e.kind === 'out' && e.runner != null) outAt[e.runner] = e.t;
+  // 타자는 자기 타석에 — 좌타 1루 쪽 · 우타 3루 쪽 boxX(그림만 · 엔진 출발점은 홈 가운데이고 좌타 이점은 lefty_first_s 시간으로 이미 있다).
+  // 뛰기 시작하면 boxBlendS 동안 달리는 길로 합친다(2026-11-25 r8 9 친구 「좌타자라면 좌타 쪽으로 타자가 좀 이동하면 좋겠다 아주 약간」)
+  const bats = ((SCENE && SCENE.input && (SCENE.input.input || SCENE.input)) || {}).bats;
+  const boxSide = bats === 'L' ? 1 : bats === 'R' ? -1 : 0;
   for (const r of TL.runners) {
-    const [x, y] = at(r.pts, t);
+    let [x, y] = at(r.pts, t);
+    if (r.id === 0 && boxSide) {
+      const go = (r.pts.find((q) => Math.hypot(q[1] - r.pts[0][1], q[2] - r.pts[0][2]) > 0.05) || [Infinity])[0];
+      const k = t <= go ? 1 : Math.max(0, 1 - (t - go) / LOOK.boxBlendS);
+      x += boxSide * LOOK.boxX * k;
+    }
     const out = outAt[r.id] != null && t >= outAt[r.id];
     token(x, y, C.runner, RUNNER[r.id], out ? 0.35 : 1);
   }
